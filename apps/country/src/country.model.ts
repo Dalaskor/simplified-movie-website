@@ -1,4 +1,6 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { FilmSpectators } from 'apps/film/src/film-spectator.model';
+import { Film } from 'apps/film/src/film.model';
+import { BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
 
 interface CountryCreationAttrs {
     name: string;
@@ -20,4 +22,7 @@ export class Country extends Model<Country, CountryCreationAttrs> {
         allowNull: false,
     })
     name: string;
+
+    // @BelongsToMany(() => Film, () => FilmSpectators)
+    // films: Film[]
 }

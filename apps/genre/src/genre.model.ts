@@ -1,4 +1,6 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Film } from 'apps/film/src/film.model';
+import { BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
+import { FilmGenres } from './film-genres.model';
 
 interface GenreCreationAttrs {
     name: string;
@@ -16,4 +18,7 @@ export class Genre extends Model<Genre, GenreCreationAttrs> {
 
     @Column({ type: DataType.STRING, unique: true, allowNull: false })
     name: string;
+
+    // @BelongsToMany(() => Film, () => FilmGenres)
+    // films: Film[];
 }
