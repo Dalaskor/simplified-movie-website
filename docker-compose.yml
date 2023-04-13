@@ -1,0 +1,77 @@
+service:
+  main-app:
+    build:
+      context: .
+      dockerfile: ./apps/
+      target: development
+    command: rpm run start:dev main_app
+    env_file:
+      - ./apps/main_app/.env
+    depends_on:
+      - postgres-main
+      - film
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3000:3000'
+  film:
+    build:
+      context: .
+      dockerfile: ./apps/
+      target: development
+    command: rpm run start:dev film
+    env_file:
+      - ./apps/film/.env
+    depends_on:
+      - postgres-main
+      - staff
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3001:3000'
+  staff:
+    build:
+      context: .
+      dockerfile: ./apps/
+      target: development
+    command: rpm run start:dev film
+    env_file:
+      - ./apps/film/.env
+    depends_on:
+      - postgres-main
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3002:3000'
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
+  postgres-main:
+      image: postgres:15
+      environment:
+        POSTGRES_DB: movie_main 
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: root
+        PG_DATA: /var/lib/postgresql/data
+      ports:
+        - "5001:5432"
+      volumes:
+      restart: always
+  postgres-users:
+      image: postgres:15
+      environment:
+        POSTGRES_DB: movie_users 
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: root
+        PG_DATA: /var/lib/postgresql/data
+      ports:
+        - "5002:5432"
+      volumes:
+      restart: always
