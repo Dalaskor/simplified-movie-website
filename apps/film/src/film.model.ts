@@ -10,6 +10,7 @@ import {
     Model,
     Table,
 } from 'sequelize-typescript';
+import { FilmSpectators } from './film-spectator.model';
 import {
     FilmActors,
     FilmArtists,
@@ -141,4 +142,7 @@ export class Film extends Model<Film, FilmCreationAttrs> {
 
     @BelongsToMany(() => Staff, () => FilmMontages)
     montages: Staff[];
+
+    @BelongsToMany(() => Country, () => FilmSpectators)
+    spectators: Country[];
 }
