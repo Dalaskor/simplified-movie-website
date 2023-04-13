@@ -1,14 +1,33 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Country } from 'apps/country/src/country.model';
+import { FilmGenres } from 'apps/genre/src/film-genres.model';
+import { Genre } from 'apps/genre/src/genre.model';
+import { Staff } from 'apps/staff/src/staff.model';
+import {
+    BelongsToMany,
+    Column,
+    DataType,
+    ForeignKey,
+    Model,
+    Table,
+} from 'sequelize-typescript';
+import {
+    FilmActors,
+    FilmArtists,
+    FilmCompositors,
+    FilmDirectors,
+    FilmMontages,
+    FilmOperators,
+} from './film-staff.model';
 
 interface FilmCreationAttrs {
-    name: string,
-    img_url: string,
-    year: number,
-    tagline: string,
-    budget: string,
-    fees_us: string,
-    fees_ru: string,
-    fees: string,
+    name: string;
+    img_url: string;
+    year: number;
+    tagline: string;
+    budget: string;
+    fees_us: string;
+    fees_ru: string;
+    fees: string;
     premiere: string;
     premiere_ru: string;
     release_dvd: string;
@@ -97,4 +116,29 @@ export class Film extends Model<Film, FilmCreationAttrs> {
         type: DataType.STRING,
     })
     rating_mpaa: string;
+
+    @ForeignKey(() => Country)
+    @Column({ type: DataType.INTEGER })
+    country_id: number;
+
+    @BelongsToMany(() => Genre, () => FilmGenres)
+    genres: Genre[];
+
+    @BelongsToMany(() => Staff, () => FilmOperators)
+    operators: Staff[];
+
+    @BelongsToMany(() => Staff, () => FilmCompositors)
+    compositors: Staff[];
+
+    @BelongsToMany(() => Staff, () => FilmActors)
+    actors: Staff[];
+
+    @BelongsToMany(() => Staff, () => FilmArtists)
+    artists: Staff[];
+
+    @BelongsToMany(() => Staff, () => FilmDirectors)
+    directors: Staff[];
+
+    @BelongsToMany(() => Staff, () => FilmMontages)
+    montages: Staff[];
 }
