@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build auth
+RUN npm run build staff
 
 FROM node:alpine as production
 

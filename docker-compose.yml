@@ -1,14 +1,13 @@
-service:
+services:
   main-app:
     build:
       context: .
-      dockerfile: ./apps/
+      dockerfile: ./apps/main_app/Dockerfile
       target: development
-    command: rpm run start:dev main_app
+    command: npm run start:dev main_app
     env_file:
       - ./apps/main_app/.env
     depends_on:
-      - postgres-main
       - film
       - rabbitmq
     volumes:
@@ -19,28 +18,30 @@ service:
   film:
     build:
       context: .
-      dockerfile: ./apps/
+      dockerfile: ./apps/film/Dockerfile
       target: development
-    command: rpm run start:dev film
+    command: npm run start:dev film
     env_file:
       - ./apps/film/.env
     depends_on:
       - postgres-main
       - staff
+      - country
+      - genre
       - rabbitmq
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - '3001:3000'
+      - '3001:3001'
   staff:
     build:
       context: .
-      dockerfile: ./apps/
+      dockerfile: ./apps/staff/Dockerfile
       target: development
-    command: rpm run start:dev film
+    command: npm run start:dev staff
     env_file:
-      - ./apps/film/.env
+      - ./apps/staff/.env
     depends_on:
       - postgres-main
       - rabbitmq
@@ -48,30 +49,62 @@ service:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - '3002:3000'
+      - '3002:3002'
+  country:
+    build:
+      context: .
+      dockerfile: ./apps/country/Dockerfile
+      target: development
+    command: npm run start:dev country
+    env_file:
+      - ./apps/country/.env
+    depends_on:
+      - postgres-main
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3003:3003'
+  genre:
+    build:
+      context: .
+      dockerfile: ./apps/country/Dockerfile
+      target: development
+    command: npm run start:dev genre
+    env_file:
+      - ./apps/genre/.env
+    depends_on:
+      - postgres-main
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3004:3004'
   rabbitmq:
     image: rabbitmq
     ports:
       - '5672:5672'
   postgres-main:
-      image: postgres:15
-      environment:
-        POSTGRES_DB: movie_main 
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: root
-        PG_DATA: /var/lib/postgresql/data
-      ports:
-        - "5001:5432"
-      volumes:
-      restart: always
+    image: postgres:15
+    environment:
+      POSTGRES_DB: movie_main
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      PG_DATA: /var/lib/postgresql/data
+    ports:
+      - '5010:5432'
+    volumes:
+      - ./docker_postgres_init.sql:/docker-entrypoint initdb.d/docker_postgres_init.sql
+    restart: always
   postgres-users:
-      image: postgres:15
-      environment:
-        POSTGRES_DB: movie_users 
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: root
-        PG_DATA: /var/lib/postgresql/data
-      ports:
-        - "5002:5432"
-      volumes:
-      restart: always
+    image: postgres:15
+    environment:
+      POSTGRES_DB: movie_users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      PG_DATA: /var/lib/postgresql/data
+    ports:
+      - '5020:5432'
+    restart: always
