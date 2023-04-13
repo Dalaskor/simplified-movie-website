@@ -10,27 +10,18 @@ export class FilmService {
 
   // не готова
   async createMany(createFilmDtoArray: CreateFilmDto[]) {
-    let staffArray: CreateStaffDto[] = getStaffArray(createFilmDtoArray);
+    let staffArray: CreateStaffDto[] = this.getStaffArray(createFilmDtoArray);
     this.staffClient.send('createManyStaff', staffArray);
 
     return createFilmDtoArray;
-
-    function getStaffArray(createFilmDtoArray: CreateFilmDto[]) {
-      let staffArray: CreateStaffDto[] = [];
-      return staffArray;
-    }
   }
 
   //не готова
   async create(createFilmDto: CreateFilmDto) {
-    let staffArray: CreateStaffDto[] = getStaffArray(createFilmDto);
+    let staffArray: CreateStaffDto[] = this.getStaffArray([createFilmDto]);
     this.staffClient.send('createManyStaff', staffArray);
 
     return createFilmDto;
-
-    function getStaffArray(createFilmDtoArray: CreateFilmDto) {
-      return createFilmDtoArray.artist.map(value => ({name: value}));
-    }
   }
 
   async findAll() {
@@ -47,5 +38,22 @@ export class FilmService {
 
   async remove(id: number) {
     return id;
+  }
+
+  getStaffArray(createFilmDtoArray: CreateFilmDto[]): CreateStaffDto[] {
+    let staffArray: CreateStaffDto[] = [];
+
+    createFilmDtoArray.forEach(value => {
+      value.director.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+      value.scenario.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+      value.producer.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+      value.operator.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+      value.compositor.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+      value.artist.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+      value.montage.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+      value.actors.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
+    })
+
+    return staffArray;
   }
 }
