@@ -6,6 +6,10 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 export class StaffService {
   constructor() {}
 
+  async createMany(createStaffDtoArray: CreateStaffDto[]) {
+    return createStaffDtoArray;
+  }
+
   async create(createStaffDto: CreateStaffDto) {
     return createStaffDto;
   }
