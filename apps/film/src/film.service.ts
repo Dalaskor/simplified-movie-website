@@ -2,16 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
+import { CreateStaffDto } from './../../staff/src/dto/create-staff.dto';
+import { CreateCountryDto } from './../../country/src/dto/create-country.dto';
+import { CreateGenreDto } from './../../genre/src/dto/create-genre.dto';
 
 @Injectable()
 export class FilmService {
-  constructor(private readonly staffClient: ClientProxy) {}
+  constructor(
+    private readonly staffClient: ClientProxy,
+    private readonly countryClient: ClientProxy,
+    private readonly genreClient: ClientProxy,
+  ) {}
 
-  // не готова
+  // использовать один раз
   async createMany(createFilmDtoArray: CreateFilmDto[]) {
     let staffArray: CreateStaffDto[] = this.getStaffArray(createFilmDtoArray);
+    let countryArray: CreateCountryDto[] = this.getCountryArray(createFilmDtoArray);
+    let genreArray: CreateGenreDto[] = this.getGenreArray(createFilmDtoArray);
+
     this.staffClient.send('createManyStaff', staffArray);
+    this.countryClient.send('createManyCountry', countryArray);
+    this.genreClient.send('createManyGenre', genreArray);
+
+    /*
+    дождаться завершения клиентов и добавить код по добавлению фильма со всеми отношениями
+    */
 
     return createFilmDtoArray;
   }
@@ -52,8 +67,29 @@ export class FilmService {
       value.artist.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
       value.montage.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
       value.actors.forEach(name => {if (!staffArray.find(value => value.name == name)) staffArray.push({name});});
-    })
+    });
 
     return staffArray;
+  }
+
+  getCountryArray(createFilmDtoArray: CreateFilmDto[]): CreateCountryDto[] {
+    let countryArray: CreateCountryDto[] = [];
+
+    createFilmDtoArray.forEach(value => {
+      value.country.forEach(name => {if (!countryArray.find(value => value.name == name)) countryArray.push({name});});
+      value.spectators.forEach(obj => {if (!countryArray.find(value => value.name == obj.country)) countryArray.push({name: obj.country});});
+    });
+
+    return countryArray;
+  }
+
+  getGenreArray(createFilmDtoArray: CreateFilmDto[]): CreateGenreDto[] {
+    let genreArray: CreateGenreDto[] = [];
+
+    createFilmDtoArray.forEach(value => {
+      value.genre.forEach(name => {if (!genreArray.find(value => value.name == name)) genreArray.push({name});});
+    });
+
+    return genreArray;
   }
 }
