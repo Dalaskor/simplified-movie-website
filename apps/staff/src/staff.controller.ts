@@ -8,6 +8,11 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
+  @MessagePattern('createManyStaff')
+  async createMany(@Payload() createStaffDtoArray: CreateStaffDto[]) {
+    return await this.staffService.createMany(createStaffDtoArray);
+  }
+
   @MessagePattern('createStaff')
   async create(@Payload() createStaffDto: CreateStaffDto) {
     return await this.staffService.create(createStaffDto);

@@ -7,6 +7,11 @@ import { UpdateFilmDto } from './dto/update-film.dto';
 @Controller()
 export class FilmController {
   constructor(private readonly filmService: FilmService) {}
+  
+  @MessagePattern('createManyFilm')
+  async createMany(@Payload() createFilmDtoArray: CreateFilmDto[]) {
+    return await this.filmService.createMany(createFilmDtoArray);
+  }
 
   @MessagePattern('createFilm')
   async create(@Payload() createFilmDto: CreateFilmDto) {
