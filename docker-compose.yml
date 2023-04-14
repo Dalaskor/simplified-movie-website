@@ -9,6 +9,7 @@ services:
       - ./apps/main_app/.env
     depends_on:
       - film
+      - auth
       - rabbitmq
     volumes:
       - .:/usr/src/app
@@ -69,7 +70,7 @@ services:
   genre:
     build:
       context: .
-      dockerfile: ./apps/country/Dockerfile
+      dockerfile: ./apps/genre/Dockerfile
       target: development
     command: npm run start:dev genre
     env_file:
@@ -82,6 +83,22 @@ services:
       - /usr/src/app/node_modules
     ports:
       - '3004:3004'
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - postgres-users
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3005:3005'
   rabbitmq:
     image: rabbitmq
     ports:
