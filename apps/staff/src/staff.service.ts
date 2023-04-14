@@ -48,14 +48,7 @@ export class StaffService {
     }
 
     async update(id: number, updateStaffDto: UpdateStaffDto) {
-        const staff = await this.staffRepository.findOne({ where: { id } });
-
-        if (!staff) {
-            throw new HttpException(
-                'Участник фильма не найден',
-                HttpStatus.NOT_FOUND,
-            );
-        }
+        const staff = await this.findOne(id);
 
         staff.name = updateStaffDto.name;
 
@@ -65,16 +58,9 @@ export class StaffService {
     }
 
     async remove(id: number) {
-        const staff = await this.staffRepository.findOne({ where: { id } });
+        const staff = await this.findOne(id);
 
-        if (!staff) {
-            throw new HttpException(
-                'Участник фильма не найден',
-                HttpStatus.NOT_FOUND,
-            );
-        }
-
-        staff.destroy();
+        await staff.destroy();
 
         return { status: HttpStatus.OK };
     }
