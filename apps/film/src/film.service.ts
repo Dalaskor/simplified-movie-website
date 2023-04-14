@@ -10,6 +10,7 @@ import {
     GENRE_SERVICE,
     STAFF_SERVICE,
 } from '../constants/services';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class FilmService {
@@ -28,13 +29,19 @@ export class FilmService {
         let genreArray: CreateGenreDto[] =
             this.getGenreArray(createFilmDtoArray);
 
-        this.staffClient.send('createManyStaff', staffArray);
-        this.countryClient.send('createManyCountry', countryArray);
-        this.genreClient.send('createManyGenre', genreArray);
+        await lastValueFrom(
+            this.staffClient.send('createManyStaff', staffArray),
+        );
+        await lastValueFrom(
+            this.countryClient.send('createManyCountry', countryArray),
+        );
+        await lastValueFrom(
+            this.genreClient.send('createManyGenre', genreArray),
+        );
 
-        /*
-    дождаться завершения клиентов и добавить код по добавлению фильма со всеми отношениями
-    */
+        //
+        // дождаться завершения клиентов и добавить код по добавлению фильма со всеми отношениями
+        //
 
         return createFilmDtoArray;
     }
