@@ -1,32 +1,64 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
+import { Genre } from './genre.model';
 
 @Injectable()
 export class GenreService {
-  constructor() {}
+    constructor(@InjectModel(Genre) private genreRepository: typeof Genre) {}
 
-  async createMany(createGenreDtoArray: CreateGenreDto[]) {
-    return createGenreDtoArray;
-  }
+    async createMany(createGenreDtoArray: CreateGenreDto[]) {
+        const genres = [];
 
-  async create(createGenreDto: CreateGenreDto) {
-    return createGenreDto;
-  }
+        for (const dto of createGenreDtoArray) {
+            const genre = await this.create(dto);
 
-  async findAll() {
-    return ;
-  }
+            genres.push(genre);
+        }
 
-  async findOne(id: number) {
-    return id;
-  }
+        return genres;
+    }
 
-  async update(id: number, updateGenreDto: UpdateGenreDto) {
-    return {id, ...updateGenreDto};
-  }
+    async create(createGenreDto: CreateGenreDto) {
+        const genre = this.genreRepository.create(createGenreDto);
 
-  async remove(id: number) {
-    return id;
-  }
+        return genre;
+    }
+
+    async findAll() {
+        const genres = this.genreRepository.findAll({
+            include: { all: true },
+        });
+
+        return genres;
+    }
+
+    async findOne(id: number) {
+        const genre = this.genreRepository.findOne({ where: { id } });
+
+        if (!genre) {
+            throw new HttpException('Жанр не найден', HttpStatus.NOT_FOUND);
+        }
+
+        return genre;
+    }
+
+    async update(id: number, updateGenreDto: UpdateGenreDto) {
+        const genre = await this.findOne(id);
+
+        genre.name = updateGenreDto.name;
+
+        await genre.save();
+
+        return genre;
+    }
+
+    async remove(id: number) {
+        const genre = await this.findOne(id);
+
+        await genre.destroy();
+
+        return { status: HttpStatus.OK };
+    }
 }
