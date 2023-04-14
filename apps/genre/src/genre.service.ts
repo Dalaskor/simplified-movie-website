@@ -9,13 +9,9 @@ export class GenreService {
     constructor(@InjectModel(Genre) private genreRepository: typeof Genre) {}
 
     async createMany(createGenreDtoArray: CreateGenreDto[]) {
-        const genres = [];
-
-        for (const dto of createGenreDtoArray) {
-            const genre = await this.create(dto);
-
-            genres.push(genre);
-        }
+        const genres = await this.genreRepository.bulkCreate(
+            createGenreDtoArray,
+        );
 
         return genres;
     }

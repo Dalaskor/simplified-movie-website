@@ -11,13 +11,7 @@ export class CountryService {
     ) {}
 
     async createMany(createCountryDtoArray: CreateCountryDto[]) {
-        const countries = [];
-
-        for (const dto of createCountryDtoArray) {
-            const country = await this.create(dto);
-
-            countries.push(country);
-        }
+        const countries = await this.countryRepository.bulkCreate(createCountryDtoArray);
 
         return countries;
     }

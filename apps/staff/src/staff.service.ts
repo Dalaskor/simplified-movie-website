@@ -9,13 +9,9 @@ export class StaffService {
     constructor(@InjectModel(Staff) private staffRepository: typeof Staff) {}
 
     async createMany(createStaffDtoArray: CreateStaffDto[]) {
-        const staffs = [];
-
-        for (const dto of createStaffDtoArray) {
-            const staff = await this.create(dto);
-
-            staffs.push(staff);
-        }
+        const staffs = await this.staffRepository.bulkCreate(
+            createStaffDtoArray,
+        );
 
         return staffs;
     }
