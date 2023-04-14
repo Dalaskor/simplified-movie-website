@@ -22,6 +22,7 @@ import {
 
 interface FilmCreationAttrs {
     name: string;
+    name_en: string;
     img_url: string;
     year: number;
     tagline: string;
@@ -52,6 +53,11 @@ export class Film extends Model<Film, FilmCreationAttrs> {
         allowNull: false,
     })
     name: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    name_en: string;
 
     @Column({
         type: DataType.STRING,
