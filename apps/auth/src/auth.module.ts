@@ -6,6 +6,7 @@ import * as Joi from 'joi';
 import { JwtModule } from '@nestjs/jwt';
 import { RmqModule } from '@app/common';
 import { UserModule } from './users/users.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
     imports: [
@@ -32,6 +33,7 @@ import { UserModule } from './users/users.module';
         }),
         RmqModule,
         UserModule,
+        RolesModule,
     ],
     controllers: [AuthController],
     providers: [AuthService],
