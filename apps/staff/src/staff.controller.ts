@@ -33,7 +33,7 @@ export class StaffController {
     return await this.staffService.update(updateStaffDto.id, updateStaffDto);
   }
 
-  @MessagePattern('removeFilm')
+  @MessagePattern('removeStaff')
   async remove(@Payload() id: number) {
     return await this.staffService.remove(id);
   }

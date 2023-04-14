@@ -16,13 +16,11 @@ export class AuthController {
         private readonly rmqService: RmqService,
     ) {}
 
-    // @Post('/registration')
     @MessagePattern('registration')
     async registration(@Payload() dto: CreateUserDto) {
         return await this.authService.registration(dto);
     }
 
-    // @Post('/login')
     @MessagePattern('login')
     async login(@Payload() dto: CreateUserDto) {
         return await this.authService.login(dto);
