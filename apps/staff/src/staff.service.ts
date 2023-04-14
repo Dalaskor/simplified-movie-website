@@ -1,32 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
+import { Staff } from './staff.model';
 
 @Injectable()
 export class StaffService {
-  constructor() {}
+    constructor(@InjectModel(Staff) private staffRepository: typeof Staff) {}
 
-  async createMany(createStaffDtoArray: CreateStaffDto[]) {
-    return createStaffDtoArray;
-  }
+    async createMany(createStaffDtoArray: CreateStaffDto[]) {
+        const staffs = [];
 
-  async create(createStaffDto: CreateStaffDto) {
-    return createStaffDto;
-  }
+        for (const dto of createStaffDtoArray) {
+            const staff = await this.create(dto);
 
-  async findAll() {
-    return ;
-  }
+            staffs.push(staff);
+        }
 
-  async findOne(id: number) {
-    return id;
-  }
+        return staffs;
+    }
 
-  async update(id: number, updateStaffDto: UpdateStaffDto) {
-    return {id, ...updateStaffDto};
-  }
+    async create(createStaffDto: CreateStaffDto) {
+        const staff = await this.staffRepository.create(createStaffDto);
 
-  async remove(id: number) {
-    return id;
-  }
+        return staff;
+    }
+
+    async findAll() {
+        const staffs = await this.staffRepository.findAll({
+            include: { all: true },
+        });
+
+        return staffs;
+    }
+
+    async findOne(id: number) {
+        const staff = await this.staffRepository.findOne({ where: { id } });
+
+        if (!staff) {
+            throw new HttpException(
+                'Участник фильма не найден',
+                HttpStatus.NOT_FOUND,
+            );
+        }
+
+        return staff;
+    }
+
+    async update(id: number, updateStaffDto: UpdateStaffDto) {
+        const staff = await this.staffRepository.findOne({ where: { id } });
+
+        if (!staff) {
+            throw new HttpException(
+                'Участник фильма не найден',
+                HttpStatus.NOT_FOUND,
+            );
+        }
+
+        staff.name = updateStaffDto.name;
+
+        await staff.save();
+
+        return staff;
+    }
+
+    async remove(id: number) {
+        const staff = await this.staffRepository.findOne({ where: { id } });
+
+        if (!staff) {
+            throw new HttpException(
+                'Участник фильма не найден',
+                HttpStatus.NOT_FOUND,
+            );
+        }
+
+        staff.destroy();
+
+        return { status: HttpStatus.OK };
+    }
 }
