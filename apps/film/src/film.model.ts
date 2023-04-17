@@ -6,7 +6,6 @@ import {
     BelongsToMany,
     Column,
     DataType,
-    ForeignKey,
     Model,
     Table,
 } from 'sequelize-typescript';
@@ -24,19 +23,22 @@ import {
 interface FilmCreationAttrs {
     name: string;
     name_en: string;
+    type: string;
     mainImg: string;
     year: number;
     tagline: string;
     budget: string;
-    fees_us: string;
-    fees_ru: string;
+    feesUS: string;
+    feesRU: string;
     fees: string;
     premiere: string;
-    premiere_ru: string;
-    release_dvd: string;
-    release_bluray: string;
+    premiereRU: string;
+    releaseDVD: string;
+    releaseBluRay: string;
     age: string;
-    rating_mpaa: string;
+    ratingMPAA: string;
+    time: string;
+    description: string;
 }
 
 @Table({ tableName: 'films' })
@@ -59,6 +61,16 @@ export class Film extends Model<Film, FilmCreationAttrs> {
         type: DataType.STRING,
     })
     name_en: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    type: string;
+
+    @Column({
+        type: DataType.TEXT,
+    })
+    description: string;
 
     @Column({
         type: DataType.STRING,
@@ -88,12 +100,12 @@ export class Film extends Model<Film, FilmCreationAttrs> {
     @Column({
         type: DataType.STRING,
     })
-    fees_us: string;
+    feesUS: string;
 
     @Column({
         type: DataType.STRING,
     })
-    fees_ru: string;
+    feesRU: string;
 
     @Column({
         type: DataType.STRING,
@@ -103,17 +115,17 @@ export class Film extends Model<Film, FilmCreationAttrs> {
     @Column({
         type: DataType.STRING,
     })
-    premiere_ru: string;
+    premiereRU: string;
 
     @Column({
         type: DataType.STRING,
     })
-    release_dvd: string;
+    releaseDVD: string;
 
     @Column({
         type: DataType.STRING,
     })
-    release_bluray: string;
+    releaseBluRay: string;
 
     @Column({
         type: DataType.STRING,
@@ -123,7 +135,12 @@ export class Film extends Model<Film, FilmCreationAttrs> {
     @Column({
         type: DataType.STRING,
     })
-    rating_mpaa: string;
+    ratingMPAA: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    time: string;
 
     @BelongsToMany(() => Country, () => FilmCountries)
     countries: Country[];

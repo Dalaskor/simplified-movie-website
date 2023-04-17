@@ -5,7 +5,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CreateStaffDto } from './../../staff/src/dto/create-staff.dto';
 import { CreateCountryDto } from './../../country/src/dto/create-country.dto';
 import { CreateGenreDto } from './../../genre/src/dto/create-genre.dto';
-import { lastValueFrom, tap } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/sequelize';
 import { Film } from './film.model';
 import { COUNTRY_SERVICE, GENRE_SERVICE, STAFF_SERVICE } from '@app/common';
@@ -40,14 +40,8 @@ export class FilmService {
             this.genreClient.send('createManyGenre', genreArray),
         );
 
-        // const staffs = this.staffClient.send('createManyStaff', staffArray);
-        // const genres = this.genreClient.send('createManyGenre', genreArray);
-        // const countries = this.countryClient.send(
-        // 'createManyCountry',
-        // countryArray,
-        // );
-
         const filmDtos = [];
+
         for (const dto of createFilmDtoArray) {
             filmDtos.push({
                 name: dto.name,
@@ -65,60 +59,77 @@ export class FilmService {
                 releaseBluRay: dto.releaseBluRay,
                 age: dto.age,
                 ratingMPAA: dto.ratingMPAA,
+                description: dto.description,
+                type: dto.type,
+                time: dto.time,
             });
         }
 
         const films = await this.filmRepository.bulkCreate(filmDtos);
 
-        for (const film of films) {
+        for (const dto of createFilmDtoArray) {
+            const curFilm = films.find((film) => film.name === dto.name);
+
+            if (!curFilm) {
+                continue;
+            }
+
             const operators = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', film.operators),
+                this.staffClient.send('getStaffByNames', dto.operator),
             );
 
             const compositors = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', film.compositors),
+                this.staffClient.send('getStaffByNames', dto.compositor),
             );
 
             const actors = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', film.actors),
+                this.staffClient.send('getStaffByNames', dto.actors),
             );
 
             const artists = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', film.artists),
+                this.staffClient.send('getStaffByNames', dto.artist),
             );
 
             const directors = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', film.directors),
+                this.staffClient.send('getStaffByNames', dto.director),
             );
 
             const montages = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', film.montages),
+                this.staffClient.send('getStaffByNames', dto.montage),
             );
 
             const genres = await lastValueFrom(
-                this.genreClient.send('getGenresByNames', film.genres),
+                this.genreClient.send('getGenresByNames', dto.genre),
             );
 
             const countries = await lastValueFrom(
-                this.countryClient.send('getCountriesByNames', film.genres),
+                this.countryClient.send('getCountriesByNames', dto.country),
             );
 
-            film.$set('genres', genres);
-            film.genres = genres;
-            film.$set('countries', countries);
-            film.countries = countries;
-            film.$set('operators', operators);
-            film.operators = operators;
-            film.$set('compositors', compositors);
-            film.compositors = compositors;
-            film.$set('actors', actors);
-            film.actors = actors;
-            film.$set('artists', artists);
-            film.artists = artists;
-            film.$set('directors', directors);
-            film.directors = directors;
-            film.$set('montages', montages);
-            film.montages = montages;
+            const spectators = await lastValueFrom(
+                this.countryClient.send('getCountriesByNames', dto.spectators),
+            );
+
+            curFilm.$set('operators', operators);
+            curFilm.operators = operators;
+            curFilm.$set('compositors', compositors);
+            curFilm.compositors = compositors;
+            curFilm.$set('actors', actors);
+            curFilm.actors = actors;
+            curFilm.$set('artists', artists);
+            curFilm.artists = artists;
+            curFilm.$set('directors', directors);
+            curFilm.directors = directors;
+            curFilm.$set('montages', montages);
+            curFilm.montages = montages;
+            curFilm.$set('genres', genres);
+            curFilm.genres = genres;
+            curFilm.$set('countries', countries);
+            curFilm.countries = countries;
+            curFilm.$set('spectators', spectators);
+            curFilm.spectators = spectators;
+
+            curFilm.save();
         }
 
         return createFilmDtoArray;

@@ -11,7 +11,6 @@ export class FilmController {
 
     @MessagePattern('createManyFilm')
     async createMany(@Payload() createFilmDtoArray: CreateFilmDto[], @Ctx() context: RmqContext) {
-        console.log('[LOG] - CREATE MANY HANDLE');
         this.rmqService.ack(context);
         return await this.filmService.createMany(createFilmDtoArray);
     }

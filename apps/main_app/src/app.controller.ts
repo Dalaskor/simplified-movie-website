@@ -43,8 +43,6 @@ export class AppController {
     // Заполнить базу данных из json
     @Post('/fill-db')
     async fillDb(@Body() dtoArray: CreateFilmDto[]) {
-        console.log('FILL DB ENDPOINT');
-
         await lastValueFrom(this.filmClient.emit('createManyFilm', dtoArray));
 
         return { status: HttpStatus.CREATED };

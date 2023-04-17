@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { Staff } from './staff.model';
@@ -64,7 +65,9 @@ export class StaffService {
     async getStaffByNamesArray(names: string[]) {
         const staffs = this.staffRepository.findAll({
             where: {
-                name: names,
+                name: {
+                    [Op.or]: names
+                },
             },
         });
 
