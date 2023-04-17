@@ -12,7 +12,6 @@ import { StaffService } from './staff.service';
         ConfigModule.forRoot({
             isGlobal: true,
             validationSchema: Joi.object({
-                PORT: Joi.number().required(),
                 RABBIT_MQ_URI: Joi.string().required(),
                 RABBIT_MQ_STAFF_QUEUE: Joi.string().required(),
                 POSTGRES_URI: Joi.string().required(),

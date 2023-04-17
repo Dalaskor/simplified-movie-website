@@ -15,6 +15,7 @@ import {
     GENRE_SERVICE,
     STAFF_SERVICE,
 } from '../constants/services';
+import { FilmCountries } from './film-country.model';
 import { FilmSpectators } from './film-spectator.model';
 import {
     FilmActors,
@@ -38,7 +39,7 @@ import { FilmService } from './film.service';
                 RABBIT_MQ_FILM_QUEUE: Joi.string().required(),
                 POSTGRES_URI: Joi.string().required(),
             }),
-            envFilePath: './apps/auth/.env',
+            envFilePath: './apps/film/.env',
         }),
         DatabaseModule,
         SequelizeModule.forFeature([
@@ -54,6 +55,7 @@ import { FilmService } from './film.service';
             FilmDirectors,
             FilmMontages,
             FilmSpectators,
+            FilmCountries,
         ]),
         RmqModule,
         RmqModule.register({ name: STAFF_SERVICE }),

@@ -12,12 +12,11 @@ import { CountryService } from './country.service';
         ConfigModule.forRoot({
             isGlobal: true,
             validationSchema: Joi.object({
-                PORT: Joi.number().required(),
                 RABBIT_MQ_URI: Joi.string().required(),
                 RABBIT_MQ_COUNTRY_QUEUE: Joi.string().required(),
                 POSTGRES_URI: Joi.string().required(),
             }),
-            envFilePath: './apps/auth/.env',
+            envFilePath: './apps/country/.env',
         }),
         DatabaseModule,
         SequelizeModule.forFeature([Country]),

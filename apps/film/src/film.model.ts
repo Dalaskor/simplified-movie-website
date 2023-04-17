@@ -10,6 +10,7 @@ import {
     Model,
     Table,
 } from 'sequelize-typescript';
+import { FilmCountries } from './film-country.model';
 import { FilmSpectators } from './film-spectator.model';
 import {
     FilmActors,
@@ -23,7 +24,7 @@ import {
 interface FilmCreationAttrs {
     name: string;
     name_en: string;
-    img_url: string;
+    mainImg: string;
     year: number;
     tagline: string;
     budget: string;
@@ -62,7 +63,7 @@ export class Film extends Model<Film, FilmCreationAttrs> {
     @Column({
         type: DataType.STRING,
     })
-    img_url: string;
+    mainImg: string;
 
     @Column({
         type: DataType.INTEGER,
@@ -124,9 +125,8 @@ export class Film extends Model<Film, FilmCreationAttrs> {
     })
     rating_mpaa: string;
 
-    @ForeignKey(() => Country)
-    @Column({ type: DataType.INTEGER })
-    country_id: number;
+    @BelongsToMany(() => Country, () => FilmCountries)
+    countries: Country[];
 
     @BelongsToMany(() => Genre, () => FilmGenres)
     genres: Genre[];

@@ -57,4 +57,14 @@ export class CountryService {
 
         return { status: HttpStatus.OK };
     }
+
+    async getCountriesByNamesArray(names: string[]) {
+        const countries = this.countryRepository.findAll({
+            where: {
+                name: names,
+            },
+        });
+
+        return countries;
+    }
 }

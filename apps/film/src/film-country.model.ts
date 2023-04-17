@@ -8,8 +8,8 @@ import {
 } from 'sequelize-typescript';
 import { Film } from './film.model';
 
-@Table({ tableName: 'film_spectators', createdAt: false, updatedAt: false })
-export class FilmSpectators extends Model<FilmSpectators> {
+@Table({ tableName: 'film_countries', createdAt: false, updatedAt: false })
+export class FilmCountries extends Model<FilmCountries> {
     @Column({
         type: DataType.INTEGER,
         unique: true,
@@ -25,7 +25,4 @@ export class FilmSpectators extends Model<FilmSpectators> {
     @ForeignKey(() => Country)
     @Column({ type: DataType.INTEGER })
     countryId: number;
-
-    @Column({ type: DataType.INTEGER })
-    count: number;
 }

@@ -1,6 +1,5 @@
 import { RmqService } from '@app/common';
 import { ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { RmqOptions } from '@nestjs/microservices';
 import { CountryModule } from './country.module';
@@ -14,9 +13,6 @@ async function bootstrap() {
     );
     app.useGlobalPipes(new ValidationPipe());
 
-    const configService = app.get(ConfigService);
-
     await app.startAllMicroservices();
-    await app.listen(configService.get('PORT'));
 }
 bootstrap();

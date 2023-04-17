@@ -1,16 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateStaffDto } from './../../staff/src/dto/create-staff.dto';
 import { CreateCountryDto } from './../../country/src/dto/create-country.dto';
 import { CreateGenreDto } from './../../genre/src/dto/create-genre.dto';
-import {
-    COUNTRY_SERVICE,
-    GENRE_SERVICE,
-    STAFF_SERVICE,
-} from '../constants/services';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, tap } from 'rxjs';
+import { InjectModel } from '@nestjs/sequelize';
+import { Film } from './film.model';
+import { COUNTRY_SERVICE, GENRE_SERVICE, STAFF_SERVICE } from '@app/common';
 
 @Injectable()
 export class FilmService {
@@ -18,6 +16,7 @@ export class FilmService {
         @Inject(STAFF_SERVICE) private readonly staffClient: ClientProxy,
         @Inject(COUNTRY_SERVICE) private readonly countryClient: ClientProxy,
         @Inject(GENRE_SERVICE) private readonly genreClient: ClientProxy,
+        @InjectModel(Film) private readonly filmRepository: typeof Film,
     ) {}
 
     // использовать один раз
@@ -32,16 +31,95 @@ export class FilmService {
         await lastValueFrom(
             this.staffClient.send('createManyStaff', staffArray),
         );
+
         await lastValueFrom(
             this.countryClient.send('createManyCountry', countryArray),
         );
+
         await lastValueFrom(
             this.genreClient.send('createManyGenre', genreArray),
         );
 
-        //
-        // дождаться завершения клиентов и добавить код по добавлению фильма со всеми отношениями
-        //
+        // const staffs = this.staffClient.send('createManyStaff', staffArray);
+        // const genres = this.genreClient.send('createManyGenre', genreArray);
+        // const countries = this.countryClient.send(
+        // 'createManyCountry',
+        // countryArray,
+        // );
+
+        const filmDtos = [];
+        for (const dto of createFilmDtoArray) {
+            filmDtos.push({
+                name: dto.name,
+                name_en: dto.name_en,
+                mainImg: dto.mainImg,
+                year: dto.year,
+                tagline: dto.tagline,
+                budget: dto.budget,
+                fees: dto.fees,
+                feesRU: dto.feesRU,
+                feesUS: dto.feesUS,
+                premiere: dto.premiere,
+                premiereRU: dto.premiereRU,
+                releaseDVD: dto.releaseDVD,
+                releaseBluRay: dto.releaseBluRay,
+                age: dto.age,
+                ratingMPAA: dto.ratingMPAA,
+            });
+        }
+
+        const films = await this.filmRepository.bulkCreate(filmDtos);
+
+        for (const film of films) {
+            const operators = await lastValueFrom(
+                this.staffClient.send('getStaffByNames', film.operators),
+            );
+
+            const compositors = await lastValueFrom(
+                this.staffClient.send('getStaffByNames', film.compositors),
+            );
+
+            const actors = await lastValueFrom(
+                this.staffClient.send('getStaffByNames', film.actors),
+            );
+
+            const artists = await lastValueFrom(
+                this.staffClient.send('getStaffByNames', film.artists),
+            );
+
+            const directors = await lastValueFrom(
+                this.staffClient.send('getStaffByNames', film.directors),
+            );
+
+            const montages = await lastValueFrom(
+                this.staffClient.send('getStaffByNames', film.montages),
+            );
+
+            const genres = await lastValueFrom(
+                this.genreClient.send('getGenresByNames', film.genres),
+            );
+
+            const countries = await lastValueFrom(
+                this.countryClient.send('getCountriesByNames', film.genres),
+            );
+
+            film.$set('genres', genres);
+            film.genres = genres;
+            film.$set('countries', countries);
+            film.countries = countries;
+            film.$set('operators', operators);
+            film.operators = operators;
+            film.$set('compositors', compositors);
+            film.compositors = compositors;
+            film.$set('actors', actors);
+            film.actors = actors;
+            film.$set('artists', artists);
+            film.artists = artists;
+            film.$set('directors', directors);
+            film.directors = directors;
+            film.$set('montages', montages);
+            film.montages = montages;
+        }
 
         return createFilmDtoArray;
     }
@@ -55,11 +133,21 @@ export class FilmService {
     }
 
     async findAll() {
-        return;
+        const films = await this.filmRepository.findAll({
+            include: { all: true },
+        });
+
+        return films;
     }
 
     async findOne(id: number) {
-        return id;
+        const film = await this.filmRepository.findOne({ where: { id } });
+
+        if (!film) {
+            throw new HttpException('Фильм не найден', HttpStatus.NOT_FOUND);
+        }
+
+        return film;
     }
 
     async update(id: number, updateFilmDto: UpdateFilmDto) {
@@ -67,7 +155,11 @@ export class FilmService {
     }
 
     async remove(id: number) {
-        return id;
+        const film = await this.findOne(id);
+
+        film.destroy();
+
+        return { status: HttpStatus.OK, value: 'Фильм удален' };
     }
 
     getStaffArray(createFilmDtoArray: CreateFilmDto[]): CreateStaffDto[] {

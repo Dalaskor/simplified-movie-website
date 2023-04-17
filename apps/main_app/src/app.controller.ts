@@ -1,3 +1,9 @@
+import {
+    COUNTRY_SERVICE,
+    FILM_SERVICE,
+    GENRE_SERVICE,
+    STAFF_SERVICE,
+} from '@app/common';
 import { AUTH_SERVICE } from '@app/common/auth/service';
 import {
     Body,
@@ -20,32 +26,28 @@ import { CreateGenreDto } from 'apps/genre/src/dto/create-genre.dto';
 import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
 import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
 import { UpdateStaffDto } from 'apps/staff/src/dto/update-staff.dto';
-import { lastValueFrom } from 'rxjs';
-import {
-    COUNTRY_SERVICE,
-    FILM_SERVICE,
-    GENRE_SERVICE,
-    STAFF_SERVICE,
-} from '../constants/services';
+import { lastValueFrom, tap } from 'rxjs';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
     constructor(
         private readonly appService: AppService,
-        @Inject(FILM_SERVICE) private readonly filmClient: ClientProxy,
-        @Inject(GENRE_SERVICE) private readonly genreClient: ClientProxy,
-        @Inject(STAFF_SERVICE) private readonly staffClient: ClientProxy,
-        @Inject(COUNTRY_SERVICE) private readonly countryClient: ClientProxy,
-        @Inject(AUTH_SERVICE) private readonly authClient: ClientProxy,
+        @Inject(FILM_SERVICE) private filmClient: ClientProxy,
+        @Inject(GENRE_SERVICE) private genreClient: ClientProxy,
+        @Inject(STAFF_SERVICE) private staffClient: ClientProxy,
+        @Inject(COUNTRY_SERVICE) private countryClient: ClientProxy,
+        @Inject(AUTH_SERVICE) private authClient: ClientProxy,
     ) {}
 
     // Заполнить базу данных из json
     @Post('/fill-db')
     async fillDb(@Body() dtoArray: CreateFilmDto[]) {
-        await lastValueFrom(this.filmClient.send('createManyFilm', dtoArray));
+        console.log('FILL DB ENDPOINT');
 
-        return HttpStatus.CREATED;
+        await lastValueFrom(this.filmClient.emit('createManyFilm', dtoArray));
+
+        return { status: HttpStatus.CREATED };
     }
 
     //Auth endpoints

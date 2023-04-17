@@ -13,7 +13,6 @@ import { RolesModule } from './roles/roles.module';
         ConfigModule.forRoot({
             isGlobal: true,
             validationSchema: Joi.object({
-                PORT: Joi.number().required(),
                 JWT_SECRET: Joi.string().required(),
                 JWT_EXPIRATION: Joi.string().required(),
                 RABBIT_MQ_URI: Joi.string().required(),

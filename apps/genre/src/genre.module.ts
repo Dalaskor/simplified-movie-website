@@ -12,12 +12,11 @@ import { GenreService } from './genre.service';
         ConfigModule.forRoot({
             isGlobal: true,
             validationSchema: Joi.object({
-                PORT: Joi.number().required(),
                 RABBIT_MQ_URI: Joi.string().required(),
                 RABBIT_MQ_GENRE_QUEUE: Joi.string().required(),
                 POSTGRES_URI: Joi.string().required(),
             }),
-            envFilePath: './apps/auth/.env',
+            envFilePath: './apps/genre/.env',
         }),
         DatabaseModule,
         SequelizeModule.forFeature([Genre]),

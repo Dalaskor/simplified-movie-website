@@ -1,40 +1,43 @@
 import { Controller } from '@nestjs/common';
 import { FilmService } from './film.service';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
+import { RmqService } from '@app/common';
 
 @Controller()
 export class FilmController {
-  constructor(private readonly filmService: FilmService) {}
-  
-  @MessagePattern('createManyFilm')
-  async createMany(@Payload() createFilmDtoArray: CreateFilmDto[]) {
-    return await this.filmService.createMany(createFilmDtoArray);
-  }
+    constructor(private readonly filmService: FilmService, private readonly rmqService: RmqService) {}
 
-  @MessagePattern('createFilm')
-  async create(@Payload() createFilmDto: CreateFilmDto) {
-    return await this.filmService.create(createFilmDto);
-  }
+    @MessagePattern('createManyFilm')
+    async createMany(@Payload() createFilmDtoArray: CreateFilmDto[], @Ctx() context: RmqContext) {
+        console.log('[LOG] - CREATE MANY HANDLE');
+        this.rmqService.ack(context);
+        return await this.filmService.createMany(createFilmDtoArray);
+    }
 
-  @MessagePattern('findAllFilm')
-  async findAll() {
-    return await this.filmService.findAll();
-  }
+    @MessagePattern('createFilm')
+    async create(@Payload() createFilmDto: CreateFilmDto) {
+        return await this.filmService.create(createFilmDto);
+    }
 
-  @MessagePattern('findOneFilm')
-  async findOne(@Payload() id: number) {
-    return await this.filmService.findOne(id);
-  }
+    @MessagePattern('findAllFilm')
+    async findAll() {
+        return await this.filmService.findAll();
+    }
 
-  @MessagePattern('updateFilm')
-  async update(@Payload() updateFilmDto: UpdateFilmDto) {
-    return await this.filmService.update(updateFilmDto.id, updateFilmDto);
-  }
+    @MessagePattern('findOneFilm')
+    async findOne(@Payload() id: number) {
+        return await this.filmService.findOne(id);
+    }
 
-  @MessagePattern('removeFilm')
-  async remove(@Payload() id: number) {
-    return await this.filmService.remove(id);
-  }
+    @MessagePattern('updateFilm')
+    async update(@Payload() updateFilmDto: UpdateFilmDto) {
+        return await this.filmService.update(updateFilmDto.id, updateFilmDto);
+    }
+
+    @MessagePattern('removeFilm')
+    async remove(@Payload() id: number) {
+        return await this.filmService.remove(id);
+    }
 }

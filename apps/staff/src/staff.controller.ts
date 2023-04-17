@@ -6,35 +6,43 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 
 @Controller()
 export class StaffController {
-  constructor(private readonly staffService: StaffService) {}
+    constructor(private readonly staffService: StaffService) {}
 
-  @MessagePattern('createManyStaff')
-  async createMany(@Payload() createStaffDtoArray: CreateStaffDto[]) {
-    return await this.staffService.createMany(createStaffDtoArray);
-  }
+    @MessagePattern('createManyStaff')
+    async createMany(@Payload() createStaffDtoArray: CreateStaffDto[]) {
+        return await this.staffService.createMany(createStaffDtoArray);
+    }
 
-  @MessagePattern('createStaff')
-  async create(@Payload() createStaffDto: CreateStaffDto) {
-    return await this.staffService.create(createStaffDto);
-  }
+    @MessagePattern('createStaff')
+    async create(@Payload() createStaffDto: CreateStaffDto) {
+        return await this.staffService.create(createStaffDto);
+    }
 
-  @MessagePattern('findAllStaff')
-  async findAll() {
-    return await this.staffService.findAll();
-  }
+    @MessagePattern('findAllStaff')
+    async findAll() {
+        return await this.staffService.findAll();
+    }
 
-  @MessagePattern('findOneStaff')
-  async findOne(@Payload() id: number) {
-    return await this.staffService.findOne(id);
-  }
+    @MessagePattern('findOneStaff')
+    async findOne(@Payload() id: number) {
+        return await this.staffService.findOne(id);
+    }
 
-  @MessagePattern('updateStaff')
-  async update(@Payload() updateStaffDto: UpdateStaffDto) {
-    return await this.staffService.update(updateStaffDto.id, updateStaffDto);
-  }
+    @MessagePattern('updateStaff')
+    async update(@Payload() updateStaffDto: UpdateStaffDto) {
+        return await this.staffService.update(
+            updateStaffDto.id,
+            updateStaffDto,
+        );
+    }
 
-  @MessagePattern('removeStaff')
-  async remove(@Payload() id: number) {
-    return await this.staffService.remove(id);
-  }
+    @MessagePattern('removeStaff')
+    async remove(@Payload() id: number) {
+        return await this.staffService.remove(id);
+    }
+
+    @MessagePattern('getStaffByNames')
+    async getStaffByNamesHandle(@Payload() names: string[]) {
+        return await this.staffService.getStaffByNamesArray(names);
+    }
 }

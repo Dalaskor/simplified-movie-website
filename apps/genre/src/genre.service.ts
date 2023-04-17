@@ -57,4 +57,14 @@ export class GenreService {
 
         return { status: HttpStatus.OK };
     }
+
+    async getGenresByNamesArray(names: string[]) {
+        const genres = this.genreRepository.findAll({
+            where: {
+                name: names,
+            },
+        });
+
+        return genres;
+    }
 }

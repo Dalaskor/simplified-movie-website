@@ -60,4 +60,14 @@ export class StaffService {
 
         return { status: HttpStatus.OK };
     }
+
+    async getStaffByNamesArray(names: string[]) {
+        const staffs = this.staffRepository.findAll({
+            where: {
+                name: names,
+            },
+        });
+
+        return staffs;
+    }
 }

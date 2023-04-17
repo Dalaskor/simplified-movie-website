@@ -1,13 +1,14 @@
-import { RmqModule } from '@app/common';
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import {
+    AuthModule,
     COUNTRY_SERVICE,
     FILM_SERVICE,
     GENRE_SERVICE,
+    RmqModule,
     STAFF_SERVICE,
-} from '../constants/services';
+} from '@app/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -17,11 +18,10 @@ import { AppService } from './app.service';
             isGlobal: true,
             validationSchema: Joi.object({
                 PORT: Joi.number().required(),
-                RABBIT_MQ_URI: Joi.string().required(),
-                POSTGRES_URI: Joi.string().required(),
             }),
-            envFilePath: './apps/ ',
+            envFilePath: './apps/main_app/.env',
         }),
+        forwardRef(() => AuthModule),
         RmqModule.register({ name: FILM_SERVICE }),
         RmqModule.register({ name: GENRE_SERVICE }),
         RmqModule.register({ name: STAFF_SERVICE }),

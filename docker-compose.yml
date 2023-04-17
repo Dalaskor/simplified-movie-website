@@ -25,16 +25,14 @@ services:
     env_file:
       - ./apps/film/.env
     depends_on:
+      - rabbitmq
       - postgres-main
       - staff
       - country
       - genre
-      - rabbitmq
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    ports:
-      - '3001:3001'
   staff:
     build:
       context: .
@@ -49,8 +47,6 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    ports:
-      - '3002:3002'
   country:
     build:
       context: .
@@ -65,8 +61,6 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    ports:
-      - '3003:3003'
   genre:
     build:
       context: .
@@ -81,8 +75,6 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    ports:
-      - '3004:3004'
   auth:
     build:
       context: .
@@ -97,8 +89,6 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    ports:
-      - '3005:3005'
   rabbitmq:
     image: rabbitmq
     ports:
