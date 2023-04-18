@@ -259,15 +259,65 @@ export class FilmService {
         );
     }
 
-    //не готова
-    async create(createFilmDto: CreateFilmDto) {
-        let staffArray: CreateStaffDto[] = this.getStaffArray([createFilmDto]);
-        this.staffClient.send('createManyStaff', staffArray);
+    /*
+     * Сервис для для создания одного фильма
+     */
+    async create(dto: CreateFilmDto): Promise<Film> {
+        const film = await this.filmRepository.create({
+            name: dto.name,
+            name_en: dto.name_en,
+            mainImg: dto.mainImg,
+            year: Number(dto.year),
+            tagline: dto.tagline,
+            budget: dto.budget,
+            fees: dto.fees,
+            feesRU: dto.feesRU,
+            feesUS: dto.feesUS,
+            premiere: dto.premiere,
+            premiereRU: dto.premiereRU,
+            releaseDVD: dto.releaseDVD,
+            releaseBluRay: dto.releaseBluRay,
+            age: dto.age,
+            ratingMPAA: dto.ratingMPAA,
+            description: dto.description,
+            type: dto.type,
+            time: dto.time,
+        });
 
-        return createFilmDto;
+        const genres = await this.getGenresByNames(dto.genre);
+        await this.filmApplyGenres(film, genres);
+
+        const countries = await this.getCountriesByNames(dto.country);
+        await this.filmApplyCountries(film, countries);
+
+        const scenarios = await this.getStaffsByNames(dto.scenario);
+        await this.filmApplyScenarios(film, scenarios);
+
+        const compositors = await this.getStaffsByNames(dto.compositor);
+        await this.filmApplyCompositors(film, compositors);
+
+        const actors = await this.getStaffsByNames(dto.actors);
+        await this.filmApplyActors(film, actors);
+
+        const artists = await this.getStaffsByNames(dto.artist);
+        await this.filmApplyArtists(film, artists);
+
+        const directors = await this.getStaffsByNames(dto.director);
+        await this.filmApplyDirectors(film, directors);
+
+        const montages = await this.getStaffsByNames(dto.montage);
+        await this.filmApplyMontages(film, montages);
+
+        const operators = await this.getStaffsByNames(dto.operator);
+        await this.filmApplyOperators(film, operators);
+
+        return film;
     }
 
-    async findAll() {
+    /*
+     * Получить все фильмы из бд
+     */
+    async findAll(): Promise<Film[]> {
         const films = await this.filmRepository.findAll({
             include: { all: true },
         });
@@ -275,7 +325,10 @@ export class FilmService {
         return films;
     }
 
-    async findOne(id: number) {
+    /*
+     * Получить фильм по id из бд
+     */
+    async findOne(id: number): Promise<Film> {
         const film = await this.filmRepository.findOne({ where: { id } });
 
         if (!film) {
@@ -285,10 +338,85 @@ export class FilmService {
         return film;
     }
 
-    async update(id: number, updateFilmDto: UpdateFilmDto) {
-        return { id, ...updateFilmDto };
+    /*
+     * Обновить данные о фильме
+     */
+    async update(id: number, dto: UpdateFilmDto): Promise<Film> {
+        const film = await this.filmRepository.findOne({ where: { id } });
+
+        if (!film) {
+            throw new HttpException('Филь не найден', HttpStatus.NOT_FOUND);
+        }
+
+        dto.name ? (film.name = dto.name) : '';
+        dto.name_en ? (film.name_en = dto.name_en) : '';
+        dto.mainImg ? (film.mainImg = dto.mainImg) : '';
+        dto.year ? (film.year = Number(dto.year)) : '';
+        dto.tagline ? (film.tagline = dto.tagline) : '';
+        dto.budget ? (film.budget = dto.budget) : '';
+        dto.fees ? (film.fees = dto.fees) : '';
+        dto.feesRU ? (film.feesRU = dto.feesRU) : '';
+        dto.feesUS ? (film.feesUS = dto.feesUS) : '';
+        dto.premiere ? (film.premiere = dto.premiere) : '';
+        dto.premiereRU ? (film.premiereRU = dto.premiereRU) : '';
+        dto.releaseDVD ? (film.releaseDVD = dto.releaseDVD) : '';
+        dto.releaseBluRay ? (film.releaseBluRay = dto.releaseBluRay) : '';
+        dto.age ? (film.age = dto.age) : '';
+        dto.ratingMPAA ? (film.ratingMPAA = dto.ratingMPAA) : '';
+        dto.description ? (film.description = dto.description) : '';
+        dto.type ? (film.type = dto.type) : '';
+
+        if (dto.genre) {
+            const genres = await this.getGenresByNames(dto.genre);
+            await this.filmApplyGenres(film, genres);
+        }
+
+        if (dto.country) {
+            const countries = await this.getCountriesByNames(dto.country);
+            await this.filmApplyCountries(film, countries);
+        }
+
+        if (dto.scenario) {
+            const scenarios = await this.getStaffsByNames(dto.scenario);
+            await this.filmApplyScenarios(film, scenarios);
+        }
+
+        if (dto.compositor) {
+            const compositors = await this.getStaffsByNames(dto.compositor);
+            await this.filmApplyCompositors(film, compositors);
+        }
+
+        if (dto.actors) {
+            const actors = await this.getStaffsByNames(dto.actors);
+            await this.filmApplyActors(film, actors);
+        }
+
+        if (dto.artist) {
+            const artists = await this.getStaffsByNames(dto.artist);
+            await this.filmApplyArtists(film, artists);
+        }
+
+        if (dto.director) {
+            const directors = await this.getStaffsByNames(dto.director);
+            await this.filmApplyDirectors(film, directors);
+        }
+
+        if (dto.montage) {
+            const montages = await this.getStaffsByNames(dto.montage);
+            await this.filmApplyMontages(film, montages);
+        }
+
+        if (dto.operator) {
+            const operators = await this.getStaffsByNames(dto.operator);
+            await this.filmApplyOperators(film, operators);
+        }
+
+        return film;
     }
 
+    /*
+     * Удалить фильм из бд
+     */
     async remove(id: number) {
         const film = await this.findOne(id);
 
