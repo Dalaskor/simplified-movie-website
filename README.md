@@ -9,6 +9,32 @@ POST http://localhost:3000/fill-db
 
 ```
 
+### JWT
+
+### Создать пользователя с ролью "admin" для тестирования
+
+```
+POST http://localhost:3000/create-test-admin
+```
+
+### Регистрация
+
+```
+POST http://localhost:3000/registration
+```
+
+### Авторизация
+
+```
+POST http://localhost:3000/login
+```
+
+### Получить пользователя по ID
+
+```
+GET http://localhost:3000/user/:id
+```
+
 ### Фильмы
 
 ### Создать фильм
