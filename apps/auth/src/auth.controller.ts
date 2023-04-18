@@ -47,4 +47,12 @@ export class AuthController {
     async getUser(@Payload() id: number) {
         return await this.authService.getUser(id);
     }
+
+    @MessagePattern('googleAuth')
+    async googleAuth(@Payload() req: any) {}
+
+    @MessagePattern('googleAuthRedirect')
+    async googleAuthRedirect(@Payload() req: any) {
+        return await this.authService.googleLogin(req);
+    }
 }

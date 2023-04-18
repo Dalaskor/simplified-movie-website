@@ -6,6 +6,7 @@ import {
     ROLES,
     STAFF_SERVICE,
 } from '@app/common';
+import { GoogleAuthGuard } from '@app/common/auth/google-auth.decorator';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { AUTH_SERVICE } from '@app/common/auth/service';
@@ -19,6 +20,7 @@ import {
     Param,
     Post,
     Put,
+    Req,
     UseGuards,
 } from '@nestjs/common';
 import { ClientProxy, Payload } from '@nestjs/microservices';
@@ -67,11 +69,20 @@ export class AppController {
         return this.authClient.send('createSuperUser', dto);
     }
 
-
     @UseGuards(JwtAuthGuard)
     @Get('/user/:id')
     async getUser(@Param('id') id: number) {
         return this.authClient.send('getUser', id);
+    }
+
+    @Get('/google')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuth(@Req() req: any) {}
+
+    @Get('/google/redirect')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@Req() req: any) {
+        return this.authClient.send('googleAuthRedirect', req);
     }
 
     // Film endpoints

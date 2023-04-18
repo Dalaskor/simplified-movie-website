@@ -18,6 +18,8 @@ import { AppService } from './app.service';
             isGlobal: true,
             validationSchema: Joi.object({
                 PORT: Joi.number().required(),
+                GOOGLE_CLIENT_ID: Joi.string().required(),
+                GOOGLE_SECRET: Joi.string().required(),
             }),
             envFilePath: './apps/main_app/.env',
         }),
