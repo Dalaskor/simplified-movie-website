@@ -10,11 +10,6 @@ import { UsersService } from './users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from './users/users.model';
 
-export interface TokenPayload {
-    id: number;
-    email: string;
-}
-
 @Injectable()
 export class AuthService {
     constructor(
@@ -82,7 +77,11 @@ export class AuthService {
     }
 
     private async generateToken(user: User) {
-        const payload: TokenPayload = { id: user.id, email: user.email };
+        const payload = {
+            id: user.id,
+            email: user.email,
+            roles: user.roles,
+        };
 
         return {
             token: this.jwtService.sign(payload),
@@ -91,6 +90,20 @@ export class AuthService {
 
     async handleValidateUser(data) {
         return this.jwtService.verify(data.token);
+    }
+
+    async handleValidateUserWithRoles(data) {
+        const checkToken = this.jwtService.verify(data.token);
+
+        const checkRoles = checkToken.roles.some((role) =>
+            data.requiredRoles.includes(role.value),
+        );
+
+        if (checkToken && checkRoles) {
+            return checkToken;
+        }
+
+        throw new HttpException('Нет доступа', HttpStatus.FORBIDDEN);
     }
 
     async getUser(id: number) {

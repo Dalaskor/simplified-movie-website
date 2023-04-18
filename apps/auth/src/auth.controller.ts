@@ -32,6 +32,12 @@ export class AuthController {
         return await this.authService.handleValidateUser(data);
     }
 
+    @MessagePattern('validate_user_with_roles')
+    async handleValidateUserWithRoles(@Payload() data: any, @Ctx() context: RmqContext) {
+        this.rmqService.ack(context);
+        return await this.authService.handleValidateUserWithRoles(data);
+    }
+
     @MessagePattern('createSuperUser')
     async createSuperUser(@Payload() dto: CreateUserDto) {
         return await this.authService.createSuperUser(dto);

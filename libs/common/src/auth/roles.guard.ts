@@ -44,14 +44,12 @@ export class RolesGuard implements CanActivate {
                 });
             }
 
-            return this.authClient.send('validate_user', { token }).pipe(
+            return this.authClient.send('validate_user_with_roles', { token, requiredRoles }).pipe(
                 tap((res) => {
-                    req.user = res;
-                    return res.roles.some((role) =>
-                        requiredRoles.includes(role.value),
-                    );
+                    this.addUser(res, context);
                 }),
                 catchError(() => {
+                    console.log('error');
                     throw new UnauthorizedException();
                 }),
             );
@@ -59,5 +57,9 @@ export class RolesGuard implements CanActivate {
             console.log(e);
             throw new HttpException('Нет доступа', HttpStatus.FORBIDDEN);
         }
+    }
+
+    private addUser(user: any, request: ExecutionContext) {
+        request.switchToHttp().getRequest().user = user;
     }
 }

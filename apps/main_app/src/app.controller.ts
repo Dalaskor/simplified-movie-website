@@ -3,8 +3,11 @@ import {
     FILM_SERVICE,
     GENRE_SERVICE,
     JwtAuthGuard,
+    ROLES,
     STAFF_SERVICE,
 } from '@app/common';
+import { Roles } from '@app/common/auth/roles-auth.decorator';
+import { RolesGuard } from '@app/common/auth/roles.guard';
 import { AUTH_SERVICE } from '@app/common/auth/service';
 import {
     Body,
@@ -64,6 +67,7 @@ export class AppController {
         return this.authClient.send('createSuperUser', dto);
     }
 
+
     @UseGuards(JwtAuthGuard)
     @Get('/user/:id')
     async getUser(@Param('id') id: number) {
@@ -71,7 +75,8 @@ export class AppController {
     }
 
     // Film endpoints
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Post('/films')
     async createFilm(@Body() dto: CreateFilmDto) {
         return this.filmClient.send('createFilm', dto);
@@ -87,20 +92,23 @@ export class AppController {
         return this.filmClient.send('findOneFilm', id);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Put('/film-update')
     async updateFilm(@Body() dto: UpdateFilmDto) {
         return this.filmClient.send('updateFilm', dto);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Delete('/films/:id')
     async deleteFilm(@Param('id') id: number) {
         return this.filmClient.send('removeFilm', id);
     }
 
     // Genre endpoints
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Post('/genres')
     async createGenre(@Body() dto: CreateGenreDto) {
         return this.genreClient.send('createGenre', dto);
@@ -116,20 +124,23 @@ export class AppController {
         return this.genreClient.send('findOneGenre', id);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Put('/genre-update')
     async updateGenre(@Body() dto: UpdateGenreDto) {
         return this.genreClient.send('updateGenre', dto);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Delete('/genres/:id')
     async deleteGenre(@Param('id') id: number) {
         return this.genreClient.send('removeGenre', id);
     }
 
     // Staff endpoints
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Post('/staffs')
     async createStaff(@Body() dto: CreateStaffDto) {
         return this.staffClient.send('createStaff', dto);
@@ -145,20 +156,23 @@ export class AppController {
         return this.staffClient.send('findOneStaff', id);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Put('/staff-update')
     async updateStaff(@Body() dto: UpdateStaffDto) {
         return this.staffClient.send('updateStaff', dto);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Delete('/staffs/:id')
     async deleteStaff(@Param('id') id: number) {
         return this.staffClient.send('removeStaff', id);
     }
 
     // Country endpoints
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Post('/countries')
     async createCountry(@Body() dto: CreateCountryDto) {
         return this.countryClient.send('createCountry', dto);
@@ -174,13 +188,15 @@ export class AppController {
         return this.countryClient.send('findOneCountry', id);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Put('/country-update')
     async updateCountry(@Body() dto: UpdateCountryDto) {
         return this.countryClient.send('updateCountry', dto);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
     @Delete('/countries/:id')
     async deleteCountry(@Param('id') id: number) {
         return this.countryClient.send('removeCountry', id);
