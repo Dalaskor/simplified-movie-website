@@ -2,6 +2,7 @@ import {
     COUNTRY_SERVICE,
     FILM_SERVICE,
     GENRE_SERVICE,
+    JwtAuthGuard,
     STAFF_SERVICE,
 } from '@app/common';
 import { AUTH_SERVICE } from '@app/common/auth/service';
@@ -15,6 +16,7 @@ import {
     Param,
     Post,
     Put,
+    UseGuards,
 } from '@nestjs/common';
 import { ClientProxy, Payload } from '@nestjs/microservices';
 import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
@@ -62,12 +64,14 @@ export class AppController {
         return this.authClient.send('createSuperUser', dto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('/user/:id')
     async getUser(@Param('id') id: number) {
         return this.authClient.send('getUser', id);
     }
 
     // Film endpoints
+    @UseGuards(JwtAuthGuard)
     @Post('/films')
     async createFilm(@Body() dto: CreateFilmDto) {
         return this.filmClient.send('createFilm', dto);
@@ -83,17 +87,20 @@ export class AppController {
         return this.filmClient.send('findOneFilm', id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Put('/film-update')
     async updateFilm(@Body() dto: UpdateFilmDto) {
         return this.filmClient.send('updateFilm', dto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete('/films/:id')
     async deleteFilm(@Param('id') id: number) {
         return this.filmClient.send('removeFilm', id);
     }
 
     // Genre endpoints
+    @UseGuards(JwtAuthGuard)
     @Post('/genres')
     async createGenre(@Body() dto: CreateGenreDto) {
         return this.genreClient.send('createGenre', dto);
@@ -109,17 +116,20 @@ export class AppController {
         return this.genreClient.send('findOneGenre', id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Put('/genre-update')
     async updateGenre(@Body() dto: UpdateGenreDto) {
         return this.genreClient.send('updateGenre', dto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete('/genres/:id')
     async deleteGenre(@Param('id') id: number) {
         return this.genreClient.send('removeGenre', id);
     }
 
     // Staff endpoints
+    @UseGuards(JwtAuthGuard)
     @Post('/staffs')
     async createStaff(@Body() dto: CreateStaffDto) {
         return this.staffClient.send('createStaff', dto);
@@ -135,17 +145,20 @@ export class AppController {
         return this.staffClient.send('findOneStaff', id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Put('/staff-update')
     async updateStaff(@Body() dto: UpdateStaffDto) {
         return this.staffClient.send('updateStaff', dto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete('/staffs/:id')
     async deleteStaff(@Param('id') id: number) {
         return this.staffClient.send('removeStaff', id);
     }
 
     // Country endpoints
+    @UseGuards(JwtAuthGuard)
     @Post('/countries')
     async createCountry(@Body() dto: CreateCountryDto) {
         return this.countryClient.send('createCountry', dto);
@@ -161,11 +174,13 @@ export class AppController {
         return this.countryClient.send('findOneCountry', id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Put('/country-update')
     async updateCountry(@Body() dto: UpdateCountryDto) {
         return this.countryClient.send('updateCountry', dto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete('/countries/:id')
     async deleteCountry(@Param('id') id: number) {
         return this.countryClient.send('removeCountry', id);
