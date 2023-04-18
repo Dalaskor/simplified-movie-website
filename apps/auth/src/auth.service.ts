@@ -22,6 +22,25 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) {}
 
+    async createSuperUser(dto: CreateUserDto) {
+        const candidate = await this.userService.getUserByEmail(dto.email);
+
+        if (candidate) {
+            throw new HttpException(
+                'Пользователь с такой электронной почтой уже существует',
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        const hashPassword = await bcrypt.hash(dto.password, 5);
+        const user = await this.userService.createAdmin({
+            email: dto.email,
+            password: hashPassword,
+        });
+
+        return await this.generateToken(user);
+    }
+
     async login(dto: CreateUserDto) {
         const user = await this.validateUser(dto);
         return await this.generateToken(user);
@@ -72,5 +91,18 @@ export class AuthService {
 
     async handleValidateUser(data) {
         return this.jwtService.verify(data.token);
+    }
+
+    async getUser(id: number) {
+        const user = await this.userService.getUser(id);
+
+        if (!user) {
+            throw new HttpException(
+                'Пользователь не найден',
+                HttpStatus.NOT_FOUND,
+            );
+        }
+
+        return user;
     }
 }

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './roles.model';
@@ -21,10 +21,6 @@ export class RolesService {
 
     async getRoleByValue(value: string) {
         const role = await this.roleRepository.findOne({ where: { value } });
-
-        if (!role) {
-            throw new HttpException('Роль не найдена', HttpStatus.NOT_FOUND);
-        }
 
         return role;
     }

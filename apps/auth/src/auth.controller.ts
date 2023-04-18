@@ -1,5 +1,5 @@
 import { RmqService } from '@app/common';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import {
     Ctx,
     MessagePattern,
@@ -9,7 +9,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './users/dto/create-user.dto';
 
-@Controller('/auth')
+@Controller()
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
@@ -30,5 +30,15 @@ export class AuthController {
     async handleValidateUser(@Payload() data: any, @Ctx() context: RmqContext) {
         this.rmqService.ack(context);
         return await this.authService.handleValidateUser(data);
+    }
+
+    @MessagePattern('createSuperUser')
+    async createSuperUser(@Payload() dto: CreateUserDto) {
+        return await this.authService.createSuperUser(dto);
+    }
+
+    @MessagePattern('getUser')
+    async getUser(@Payload() id: number) {
+        return await this.authService.getUser(id);
     }
 }

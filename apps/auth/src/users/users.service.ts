@@ -1,6 +1,6 @@
+import { ROLES } from '@app/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { USER_ROLES } from 'apps/auth/constants/roles';
 import { RolesService } from '../roles/roles.service';
 import { AddRoleDto } from './dto/add-role.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,16 +15,26 @@ export class UsersService {
 
     async createUser(dto: CreateUserDto) {
         const user = await this.usersRepository.create(dto);
-        let role = await this.roleService.getRoleByValue(USER_ROLES.USER);
+        let role = await this.roleService.getRoleByValue(ROLES.USER);
 
         if (!role) {
-            role = await this.roleService.create({ value: USER_ROLES.USER });
+            role = await this.roleService.create({ value: ROLES.USER });
         }
 
         await user.$set('roles', [role.id]);
-        user.roles = [role];
 
-        await user.save();
+        return user;
+    }
+
+    async createAdmin(dto: CreateUserDto) {
+        const user = await this.createUser(dto);
+        let role = await this.roleService.getRoleByValue(ROLES.ADMIN);
+
+        if (!role) {
+            role = await this.roleService.create({ value: ROLES.ADMIN });
+        }
+
+        await user.$add('roles', [role.id]);
 
         return user;
     }
@@ -38,7 +48,10 @@ export class UsersService {
     }
 
     async getUser(id: number) {
-        return await this.usersRepository.findOne({ where: { id } });
+        return await this.usersRepository.findOne({
+            where: { id },
+            include: { all: true },
+        });
     }
 
     async getUserByEmail(email: string) {

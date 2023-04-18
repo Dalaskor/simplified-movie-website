@@ -26,13 +26,11 @@ import { CreateGenreDto } from 'apps/genre/src/dto/create-genre.dto';
 import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
 import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
 import { UpdateStaffDto } from 'apps/staff/src/dto/update-staff.dto';
-import { lastValueFrom, tap } from 'rxjs';
-import { AppService } from './app.service';
+import { lastValueFrom } from 'rxjs';
 
 @Controller()
 export class AppController {
     constructor(
-        private readonly appService: AppService,
         @Inject(FILM_SERVICE) private filmClient: ClientProxy,
         @Inject(GENRE_SERVICE) private genreClient: ClientProxy,
         @Inject(STAFF_SERVICE) private staffClient: ClientProxy,
@@ -57,6 +55,16 @@ export class AppController {
     @Post('/login')
     async login(@Body() dto: CreateUserDto) {
         return this.authClient.send('login', dto);
+    }
+
+    @Post('/create-test-admin')
+    async createTestAdmin(@Body() dto: CreateUserDto) {
+        return this.authClient.send('createSuperUser', dto);
+    }
+
+    @Get('/user/:id')
+    async getUser(@Param('id') id: number) {
+        return this.authClient.send('getUser', id);
     }
 
     // Film endpoints

@@ -1,4 +1,3 @@
-import { DatabaseModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Role } from '../roles/roles.model';
@@ -10,7 +9,6 @@ import { UsersService } from './users.service';
 
 @Module({
     imports: [
-        DatabaseModule,
         SequelizeModule.forFeature([User, Role, UserRoles]),
         RolesModule,
     ],

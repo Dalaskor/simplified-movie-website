@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import * as Joi from 'joi';
 import { JwtModule } from '@nestjs/jwt';
-import { RmqModule } from '@app/common';
+import { DatabaseModule, RmqModule } from '@app/common';
 import { UserModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 
@@ -30,6 +30,7 @@ import { RolesModule } from './roles/roles.module';
             }),
             inject: [ConfigService],
         }),
+        DatabaseModule,
         RmqModule,
         UserModule,
         RolesModule,
