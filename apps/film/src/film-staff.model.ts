@@ -115,3 +115,22 @@ export class FilmMontages extends Model<FilmMontages> {
     @Column({type: DataType.INTEGER})
     staffId: number;
 }
+
+@Table({ tableName: 'film_scenario', createdAt: false, updatedAt: false })
+export class FilmScenario extends Model<FilmScenario> {
+    @Column({
+        type: DataType.INTEGER,
+        unique: true,
+        autoIncrement: true,
+        primaryKey: true,
+    })
+    id: number;
+
+    @ForeignKey(() => Film)
+    @Column({type: DataType.INTEGER})
+    filmId: number;
+
+    @ForeignKey(() => Staff)
+    @Column({type: DataType.INTEGER})
+    staffId: number;
+}

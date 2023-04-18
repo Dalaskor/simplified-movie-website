@@ -19,6 +19,6 @@ export class Genre extends Model<Genre, GenreCreationAttrs> {
     @Column({ type: DataType.STRING, unique: true, allowNull: false })
     name: string;
 
-    // @BelongsToMany(() => Film, () => FilmGenres)
-    // films: Film[];
+    @BelongsToMany(() => Film, () => FilmGenres)
+    films: Film[];
 }

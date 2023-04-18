@@ -16,7 +16,7 @@ import {
     STAFF_SERVICE,
 } from '../constants/services';
 import { FilmCountries } from './film-country.model';
-import { FilmSpectators } from './film-spectator.model';
+import { FilmSpectators, Spectators } from './film-spectator.model';
 import {
     FilmActors,
     FilmArtists,
@@ -24,6 +24,7 @@ import {
     FilmDirectors,
     FilmMontages,
     FilmOperators,
+    FilmScenario,
 } from './film-staff.model';
 import { FilmController } from './film.controller';
 import { Film } from './film.model';
@@ -47,6 +48,7 @@ import { FilmService } from './film.service';
             Genre,
             Country,
             Staff,
+            Spectators,
             FilmGenres,
             FilmOperators,
             FilmCompositors,
@@ -54,8 +56,9 @@ import { FilmService } from './film.service';
             FilmArtists,
             FilmDirectors,
             FilmMontages,
-            FilmSpectators,
+            FilmScenario,
             FilmCountries,
+            FilmSpectators,
         ]),
         RmqModule,
         RmqModule.register({ name: STAFF_SERVICE }),

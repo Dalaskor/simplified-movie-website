@@ -63,7 +63,7 @@ export class StaffService {
     }
 
     async getStaffByNamesArray(names: string[]) {
-        const staffs = this.staffRepository.findAll({
+        const staffs = await this.staffRepository.findAll({
             where: {
                 name: {
                     [Op.or]: names

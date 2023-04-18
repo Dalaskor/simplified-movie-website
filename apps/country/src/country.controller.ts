@@ -28,6 +28,11 @@ export class CountryController {
         return await this.countryService.findOne(id);
     }
 
+    @MessagePattern('findOneByNameCountry')
+    async findOneByName(@Payload() name: string) {
+        return await this.countryService.findByname(name);
+    }
+
     @MessagePattern('updateCountry')
     async update(@Payload() updateCountryDto: UpdateCountryDto) {
         return await this.countryService.update(

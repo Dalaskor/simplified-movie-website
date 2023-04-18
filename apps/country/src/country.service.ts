@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Country } from './country.model';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { UpdateCountryDto } from './dto/update-country.dto';
@@ -11,7 +12,9 @@ export class CountryService {
     ) {}
 
     async createMany(createCountryDtoArray: CreateCountryDto[]) {
-        const countries = await this.countryRepository.bulkCreate(createCountryDtoArray);
+        const countries = await this.countryRepository.bulkCreate(
+            createCountryDtoArray,
+        );
 
         return countries;
     }
@@ -40,6 +43,16 @@ export class CountryService {
         return country;
     }
 
+    async findByname(name: string) {
+        const country = this.countryRepository.findOne({ where: { name } });
+
+        if (!country) {
+            throw new HttpException('Страна не найдена', HttpStatus.NOT_FOUND);
+        }
+
+        return country;
+    }
+
     async update(id: number, updateCountryDto: UpdateCountryDto) {
         const country = await this.findOne(id);
 
@@ -59,9 +72,11 @@ export class CountryService {
     }
 
     async getCountriesByNamesArray(names: string[]) {
-        const countries = this.countryRepository.findAll({
+        const countries = await this.countryRepository.findAll({
             where: {
-                name: names,
+                name: {
+                    [Op.or]: names,
+                },
             },
         });
 

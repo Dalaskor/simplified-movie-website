@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
 import { Genre } from './genre.model';
@@ -7,7 +8,6 @@ import { Genre } from './genre.model';
 @Injectable()
 export class GenreService {
     constructor(@InjectModel(Genre) private genreRepository: typeof Genre) {}
-
     async createMany(createGenreDtoArray: CreateGenreDto[]) {
         const genres = await this.genreRepository.bulkCreate(
             createGenreDtoArray,
@@ -59,9 +59,11 @@ export class GenreService {
     }
 
     async getGenresByNamesArray(names: string[]) {
-        const genres = this.genreRepository.findAll({
+        const genres = await this.genreRepository.findAll({
             where: {
-                name: names,
+                name: {
+                    [Op.or]: names
+                },
             },
         });
 

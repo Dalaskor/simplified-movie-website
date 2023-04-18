@@ -2,7 +2,9 @@ import { DatabaseModule, RmqModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { Film } from 'apps/film/src/film.model';
 import * as Joi from 'joi';
+import { FilmGenres } from './film-genres.model';
 import { GenreController } from './genre.controller';
 import { Genre } from './genre.model';
 import { GenreService } from './genre.service';
@@ -19,7 +21,7 @@ import { GenreService } from './genre.service';
             envFilePath: './apps/genre/.env',
         }),
         DatabaseModule,
-        SequelizeModule.forFeature([Genre]),
+        SequelizeModule.forFeature([Genre, Film, FilmGenres]),
         RmqModule,
     ],
     controllers: [GenreController],

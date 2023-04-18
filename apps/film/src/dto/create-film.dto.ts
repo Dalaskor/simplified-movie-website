@@ -17,7 +17,7 @@ export class CreateFilmDto {
     feesUS: string;
     feesRU: string;
     fees: string;
-    spectators: {country: string, count: string}[];
+    spectators: [{country: string, count: string}];
     premiereRU: string;
     premiere: string;
     releaseDVD: string;
