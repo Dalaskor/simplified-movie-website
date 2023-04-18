@@ -11,6 +11,15 @@ POST http://localhost:3000/fill-db
 
 ### JWT
 
+### Тело запроса
+
+```
+{
+    "email": "test@mail.ru",
+    "password": "testpass",
+}
+```
+
 ### Создать пользователя с ролью "admin" для тестирования
 
 ```
@@ -74,6 +83,12 @@ GET http://localhost:3000/films/:id
 
 ### Жанры
 
+```
+{
+    "name": "test",
+}
+```
+
 ### Создать жанр 
 
 ```
@@ -111,6 +126,12 @@ GET http://localhost:3000/genres/:id
 
 ### Участники
 
+```
+{
+    "name": "test",
+}
+```
+
 ### Создать
 
 ```
@@ -147,6 +168,12 @@ GET http://localhost:3000/staffs/:id
 ```
 
 ### Страны
+
+```
+{
+    "name": "test",
+}
+```
 
 ### Создать
 
