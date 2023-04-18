@@ -3,6 +3,7 @@ import { StaffService } from './staff.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
+import { Staff } from './staff.model';
 
 @Controller()
 export class StaffController {
@@ -41,8 +42,8 @@ export class StaffController {
         return await this.staffService.remove(id);
     }
 
-    @MessagePattern('getStaffByNames')
-    async getStaffByNamesHandle(@Payload() names: string[]) {
+    @MessagePattern({ cmd: 'getStaffByNames' })
+    async getStaffByNamesHandle(@Payload() names: string[]): Promise<Staff[]> {
         return await this.staffService.getStaffByNamesArray(names);
     }
 }

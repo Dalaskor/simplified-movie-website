@@ -3,6 +3,7 @@ import { CountryService } from './country.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { UpdateCountryDto } from './dto/update-country.dto';
+import { Country } from './country.model';
 
 @Controller()
 export class CountryController {
@@ -28,8 +29,8 @@ export class CountryController {
         return await this.countryService.findOne(id);
     }
 
-    @MessagePattern('findOneByNameCountry')
-    async findOneByName(@Payload() name: string) {
+    @MessagePattern({ cmd: 'findOneByNameCountry' })
+    async findOneByName(@Payload() name: string): Promise<Country> {
         return await this.countryService.findByname(name);
     }
 
@@ -46,8 +47,10 @@ export class CountryController {
         return await this.countryService.remove(id);
     }
 
-    @MessagePattern('getCountriesByNames')
-    async getStaffByNamesHandle(@Payload() names: string[]) {
+    @MessagePattern({ cmd: 'getCountriesByNames' })
+    async getStaffByNamesHandle(
+        @Payload() names: string[],
+    ): Promise<Country[]> {
         return await this.countryService.getCountriesByNamesArray(names);
     }
 }

@@ -62,11 +62,11 @@ export class StaffService {
         return { status: HttpStatus.OK };
     }
 
-    async getStaffByNamesArray(names: string[]) {
+    async getStaffByNamesArray(names: string[]): Promise<Staff[]> {
         const staffs = await this.staffRepository.findAll({
             where: {
                 name: {
-                    [Op.or]: names
+                    [Op.or]: names,
                 },
             },
         });

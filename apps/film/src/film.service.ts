@@ -5,17 +5,15 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CreateStaffDto } from './../../staff/src/dto/create-staff.dto';
 import { CreateCountryDto } from './../../country/src/dto/create-country.dto';
 import { CreateGenreDto } from './../../genre/src/dto/create-genre.dto';
-import { lastValueFrom, tap } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/sequelize';
 import { Film } from './film.model';
 import { COUNTRY_SERVICE, GENRE_SERVICE, STAFF_SERVICE } from '@app/common';
 import { Spectators } from './film-spectator.model';
+import { Genre } from 'apps/genre/src/genre.model';
 import { Country } from 'apps/country/src/country.model';
-
-interface spectatorAttrs {
-    country: string;
-    count: string;
-}
+import { Staff } from 'apps/staff/src/staff.model';
+import { CreateSpectatorDto } from './dto/create-spectator.dto';
 
 @Injectable()
 export class FilmService {
@@ -28,7 +26,9 @@ export class FilmService {
         private spectatorsRepository: typeof Spectators,
     ) {}
 
-    // использовать один раз
+    /*
+     * Сервис для заполнения бд из файла json
+     */
     async createMany(createFilmDtoArray: CreateFilmDto[]) {
         let staffArray: CreateStaffDto[] =
             this.getStaffArray(createFilmDtoArray);
@@ -85,81 +85,178 @@ export class FilmService {
                 continue;
             }
 
-            const scenario = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', dto.scenario),
-            );
-            await curFilm.$set('scenario', scenario);
-            curFilm.scenario = scenario;
-
-            const compositors = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', dto.compositor),
-            );
-            await curFilm.$set('compositors', compositors);
-            curFilm.compositors = compositors;
-
-            const actors = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', dto.actors),
-            );
-            await curFilm.$set('actors', actors);
-            curFilm.actors = actors;
-
-            const artists = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', dto.artist),
-            );
-            await curFilm.$set('artists', artists);
-            curFilm.artists = artists;
-
-            const directors = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', dto.director),
-            );
-            await curFilm.$set('directors', directors);
-            curFilm.directors = directors;
-
-            const montages = await lastValueFrom(
-                this.staffClient.send('getStaffByNames', dto.montage),
-            );
-            await curFilm.$set('montages', montages);
-            curFilm.montages = montages;
-
-            const countries = await lastValueFrom(
-                this.countryClient.send('getCountriesByNames', dto.country),
-            );
-            await curFilm.$set('countries', countries);
-            curFilm.countries = countries;
-
             const genres = await this.getGenresByNames(dto.genre);
-            await curFilm.$set('genres', genres);
-            curFilm.genres = genres;
+            await this.filmApplyGenres(curFilm, genres);
 
+            const countries = await this.getCountriesByNames(dto.country);
+            await this.filmApplyCountries(curFilm, countries);
+
+            const scenarios = await this.getStaffsByNames(dto.scenario);
+            await this.filmApplyScenarios(curFilm, scenarios);
+
+            const compositors = await this.getStaffsByNames(dto.compositor);
+            await this.filmApplyCompositors(curFilm, compositors);
+
+            const actors = await this.getStaffsByNames(dto.actors);
+            await this.filmApplyActors(curFilm, actors);
+
+            const artists = await this.getStaffsByNames(dto.artist);
+            await this.filmApplyArtists(curFilm, artists);
+
+            const directors = await this.getStaffsByNames(dto.director);
+            await this.filmApplyDirectors(curFilm, directors);
+
+            const montages = await this.getStaffsByNames(dto.montage);
+            await this.filmApplyMontages(curFilm, montages);
+
+            const operators = await this.getStaffsByNames(dto.operator);
+            await this.filmApplyOperators(curFilm, operators);
+
+            /* const spectatorIds = [];
             for (const spectator of dto.spectators) {
                 const createdSpectator = await this.createSpectator(spectator);
-
-                await curFilm.$set('spectators', createdSpectator);
-                curFilm.spectators = [createdSpectator];
+                if(!createdSpectator) {
+                    continue;
+                }
+                spectatorIds.push(createdSpectator.id);
             }
+            await curFilm.$set('spectators', spectatorIds); */
         }
 
         return createFilmDtoArray;
     }
 
-    async getGenresByNames(names: string[]) {
-        const genres = await this.genreClient.send('getGenresByNames', names);
-        return genres;
+    /*
+     * Сервис для получения массива жанров по массиву названий
+     */
+    async getGenresByNames(names: string[]): Promise<Genre[]> {
+        return lastValueFrom(
+            this.genreClient.send<Genre[]>({ cmd: 'getGenresByNames' }, names),
+        );
     }
 
-    async createSpectator(spectator: spectatorAttrs) {
-        let country = await lastValueFrom(
-            this.countryClient.send('findOneByNameCountry', spectator.country),
+    /*
+     * Сервис для получения массива стран по массиву названий
+     */
+    async getCountriesByNames(names: string[]): Promise<Country[]> {
+        return lastValueFrom(
+            this.countryClient.send<Country[]>(
+                { cmd: 'getCountriesByNames' },
+                names,
+            ),
         );
+    }
+
+    /*
+     * Сервис для получения массива участников фильма по массиву названий
+     */
+    async getStaffsByNames(names: string[]): Promise<Staff[]> {
+        return lastValueFrom(
+            this.staffClient.send<Staff[]>({ cmd: 'getStaffByNames' }, names),
+        );
+    }
+
+    /*
+     * Сервис для присвоения жанров фильму
+     */
+    async filmApplyGenres(film: Film, genres: Genre[]) {
+        const ids = genres.map((item) => item.id);
+        await film.$set('genres', ids);
+    }
+
+    /*
+     * Сервис для присвоения стран фильму
+     */
+    async filmApplyCountries(film: Film, countries: Country[]) {
+        const ids = countries.map((item) => item.id);
+        await film.$set('countries', ids);
+    }
+
+    /*
+     * Сервис для присвоения сценаристов фильму
+     */
+    async filmApplyScenarios(film: Film, scenarios: Staff[]) {
+        const ids = scenarios.map((item) => item.id);
+        await film.$set('scenario', ids);
+    }
+
+    /*
+     * Сервис для присвоения композиторов фильму
+     */
+    async filmApplyCompositors(film: Film, compositors: Staff[]) {
+        const ids = compositors.map((item) => item.id);
+        await film.$set('compositors', ids);
+    }
+
+    /*
+     * Сервис для присвоения актеров фильму
+     */
+    async filmApplyActors(film: Film, actors: Staff[]) {
+        const ids = actors.map((item) => item.id);
+        await film.$set('actors', ids);
+    }
+
+    /*
+     * Сервис для присвоения художников фильму
+     */
+    async filmApplyArtists(film: Film, artists: Staff[]) {
+        const ids = artists.map((item) => item.id);
+        await film.$set('artists', ids);
+    }
+
+    /*
+     * Сервис для присвоения директоров фильму
+     */
+    async filmApplyDirectors(film: Film, directors: Staff[]) {
+        const ids = directors.map((item) => item.id);
+        await film.$set('directors', ids);
+    }
+
+    /*
+     * Сервис для присвоения монтажа фильму
+     */
+    async filmApplyMontages(film: Film, montages: Staff[]) {
+        const ids = montages.map((item) => item.id);
+        await film.$set('montages', ids);
+    }
+
+    /*
+     * Сервис для присвоения операторов фильму
+     */
+    async filmApplyOperators(film: Film, operators: Staff[]) {
+        const ids = operators.map((item) => item.id);
+        await film.$set('operators', ids);
+    }
+
+    /*
+     * Сервис для создание зрителя
+     */
+    async createSpectator(spectator: CreateSpectatorDto): Promise<Spectators> {
+        const country = await this.getCountryByName(spectator.country);
+
+        if (!country) {
+            throw new HttpException('Страна не найдена', HttpStatus.NOT_FOUND);
+        }
 
         const newSpectator = await this.spectatorsRepository.create({
             count: spectator.count,
         });
 
         newSpectator.$set('country', country);
-        newSpectator.country = country;
 
         return newSpectator;
+    }
+
+    /*
+     * Сервис для получения страны по названию
+     */
+    async getCountryByName(name: string): Promise<Country> {
+        return lastValueFrom(
+            this.countryClient.send<Country>(
+                { cmd: 'findOneByNameCountry' },
+                name,
+            ),
+        );
     }
 
     //не готова

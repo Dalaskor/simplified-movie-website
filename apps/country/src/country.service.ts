@@ -43,7 +43,7 @@ export class CountryService {
         return country;
     }
 
-    async findByname(name: string) {
+    async findByname(name: string): Promise<Country> {
         const country = this.countryRepository.findOne({ where: { name } });
 
         if (!country) {
@@ -71,7 +71,7 @@ export class CountryService {
         return { status: HttpStatus.OK };
     }
 
-    async getCountriesByNamesArray(names: string[]) {
+    async getCountriesByNamesArray(names: string[]): Promise<Country[]> {
         const countries = await this.countryRepository.findAll({
             where: {
                 name: {

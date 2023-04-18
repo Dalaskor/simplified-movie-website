@@ -4,17 +4,18 @@ import {
     Column,
     DataType,
     ForeignKey,
+    HasOne,
     Model,
     Table,
 } from 'sequelize-typescript';
 import { Film } from './film.model';
 
-interface spectatorCreationAttrs {
+interface SpectatorCreationAttrs {
     count: string;
 }
 
 @Table({ tableName: 'spectators', createdAt: false, updatedAt: false })
-export class Spectators extends Model<Spectators, spectatorCreationAttrs> {
+export class Spectators extends Model<Spectators, SpectatorCreationAttrs> {
     @Column({
         type: DataType.INTEGER,
         unique: true,
@@ -23,14 +24,14 @@ export class Spectators extends Model<Spectators, spectatorCreationAttrs> {
     })
     id: number;
 
-    @BelongsTo(() => Country, 'fk_countryid')
-    country: Country
+    @HasOne(() => Country, 'fk_countryid')
+    country: Country;
 
-    @Column({ type: DataType.INTEGER })
+    @Column({ type: DataType.STRING })
     count: string;
 }
 
-@Table({tableName: 'film_spectators', createdAt: false, updatedAt: false})
+@Table({ tableName: 'film_spectators', createdAt: false, updatedAt: false })
 export class FilmSpectators extends Model<FilmSpectators> {
     @Column({
         type: DataType.INTEGER,

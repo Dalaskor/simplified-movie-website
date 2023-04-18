@@ -8,6 +8,7 @@ import { Genre } from './genre.model';
 @Injectable()
 export class GenreService {
     constructor(@InjectModel(Genre) private genreRepository: typeof Genre) {}
+
     async createMany(createGenreDtoArray: CreateGenreDto[]) {
         const genres = await this.genreRepository.bulkCreate(
             createGenreDtoArray,
@@ -58,11 +59,11 @@ export class GenreService {
         return { status: HttpStatus.OK };
     }
 
-    async getGenresByNamesArray(names: string[]) {
+    async getGenresByNamesArray(names: string[]): Promise<Genre[]> {
         const genres = await this.genreRepository.findAll({
             where: {
                 name: {
-                    [Op.or]: names
+                    [Op.or]: names,
                 },
             },
         });

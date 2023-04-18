@@ -1,3 +1,5 @@
+import { Type } from "class-transformer";
+
 export class CreateFilmDto {
     name: string;
     name_en: string;
@@ -17,7 +19,6 @@ export class CreateFilmDto {
     feesUS: string;
     feesRU: string;
     fees: string;
-    spectators: [{country: string, count: string}];
     premiereRU: string;
     premiere: string;
     releaseDVD: string;
@@ -28,4 +29,12 @@ export class CreateFilmDto {
     description: string;
     mainImg: string;
     actors: string[];
+
+    @Type(() => Spectator)
+    spectators: Spectator[];
+}
+
+class Spectator {
+    country: string;
+    count: string;
 }
