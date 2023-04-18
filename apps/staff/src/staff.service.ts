@@ -71,6 +71,10 @@ export class StaffService {
             },
         });
 
+        if(!staffs) {
+            throw new HttpException('Сотрудники не найдены', HttpStatus.NOT_FOUND);
+        }
+
         return staffs;
     }
 }

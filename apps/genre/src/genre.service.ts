@@ -68,6 +68,10 @@ export class GenreService {
             },
         });
 
+        if(!genres) {
+            throw new HttpException('Жанры не найдены', HttpStatus.NOT_FOUND);
+        }
+
         return genres;
     }
 }

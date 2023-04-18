@@ -80,6 +80,10 @@ export class CountryService {
             },
         });
 
+        if(!countries) {
+            throw new HttpException('Страны не найдены', HttpStatus.NOT_FOUND);
+        }
+
         return countries;
     }
 }
