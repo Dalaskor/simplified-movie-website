@@ -38,6 +38,12 @@ POST http://localhost:3000/registration
 POST http://localhost:3000/login
 ```
 
+### Google OAuth (На выходе jwt токен)
+
+```
+GET http://localhost:3000/google
+```
+
 ### Получить пользователя по ID
 
 ```
