@@ -8,6 +8,7 @@ async function bootstrap() {
     const app = await NestFactory.create(AuthModule);
     const rmqService = app.get<RmqService>(RmqService);
 
+    app.enableCors();
     app.connectMicroservice<RmqOptions>(rmqService.getOptions('AUTH', false));
     app.useGlobalPipes(new ValidationPipe());
 

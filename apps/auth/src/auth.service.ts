@@ -88,14 +88,14 @@ export class AuthService {
         };
     }
 
-    async handleValidateUser(data) {
+    async handleValidateUser(data: any) {
         return this.jwtService.verify(data.token);
     }
 
-    async handleValidateUserWithRoles(data) {
+    async handleValidateUserWithRoles(data: any) {
         const checkToken = this.jwtService.verify(data.token);
 
-        const checkRoles = checkToken.roles.some((role) =>
+        const checkRoles = checkToken.roles.some((role: any) =>
             data.requiredRoles.includes(role.value),
         );
 
@@ -119,14 +119,34 @@ export class AuthService {
         return user;
     }
 
-    async googleLogin(req) {
-        if (!req.user) {
+    async googleLogin(user: any) {
+        if (!user) {
             return 'No user from Google';
         }
 
-        return {
-            message: 'User information from Google',
-            user: req.user,
-        };
+        const userEmail = user.email;
+        const candidate = await this.userService.getUserByEmail(userEmail);
+
+        if (candidate) {
+            return this.generateToken(candidate);
+        }
+
+        const password = this.gen_password(15);
+
+        return await this.registration({ email: userEmail, password });
+    }
+
+    gen_password(len) {
+        let password = '';
+        const symbols =
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!№;%:?*()_+=';
+
+        for (var i = 0; i < len; i++) {
+            password += symbols.charAt(
+                Math.floor(Math.random() * symbols.length),
+            );
+        }
+
+        return password;
     }
 }

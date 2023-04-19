@@ -1,11 +1,12 @@
 import {
     AuthModule,
+    RmqModule,
     COUNTRY_SERVICE,
     FILM_SERVICE,
     GENRE_SERVICE,
-    RmqModule,
     STAFF_SERVICE,
 } from '@app/common';
+import { GoogleStrategy } from '@app/common/auth/google.strategy';
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -30,6 +31,6 @@ import { AppService } from './app.service';
         forwardRef(() => AuthModule),
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [AppService, GoogleStrategy],
 })
 export class AppModule {}

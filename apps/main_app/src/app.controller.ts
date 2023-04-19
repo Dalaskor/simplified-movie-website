@@ -82,7 +82,8 @@ export class AppController {
     @Get('/google/redirect')
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Req() req: any) {
-        return this.authClient.send('googleAuthRedirect', req);
+        return this.authClient.send('googleAuthRedirect', req.user);
+        // return {status: 'success'}
     }
 
     // Film endpoints
