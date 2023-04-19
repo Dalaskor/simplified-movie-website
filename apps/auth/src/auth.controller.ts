@@ -33,7 +33,10 @@ export class AuthController {
     }
 
     @MessagePattern('validate_user_with_roles')
-    async handleValidateUserWithRoles(@Payload() data: any, @Ctx() context: RmqContext) {
+    async handleValidateUserWithRoles(
+        @Payload() data: any,
+        @Ctx() context: RmqContext,
+    ) {
         this.rmqService.ack(context);
         return await this.authService.handleValidateUserWithRoles(data);
     }
@@ -48,11 +51,13 @@ export class AuthController {
         return await this.authService.getUser(id);
     }
 
-    @MessagePattern('googleAuth')
-    async googleAuth(@Payload() req: any) {}
-
     @MessagePattern('googleAuthRedirect')
     async googleAuthRedirect(@Payload() user: any) {
         return await this.authService.googleLogin(user);
+    }
+
+    @MessagePattern('loginByVk')
+    async vkLogin(@Payload() query: any) {
+        return await this.authService.vkLogin(query);
     }
 }

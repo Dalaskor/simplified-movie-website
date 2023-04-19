@@ -9,12 +9,15 @@ import { CreateUserDto } from './users/dto/create-user.dto';
 import { UsersService } from './users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from './users/users.model';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UsersService,
         private readonly jwtService: JwtService,
+        private readonly httpService: HttpService,
     ) {}
 
     async createSuperUser(dto: CreateUserDto) {
@@ -136,7 +139,7 @@ export class AuthService {
         return await this.registration({ email: userEmail, password });
     }
 
-    gen_password(len) {
+    gen_password(len: number) {
         let password = '';
         const symbols =
             'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!№;%:?*()_+=';
@@ -148,5 +151,53 @@ export class AuthService {
         }
 
         return password;
+    }
+
+    async vkLogin(query: any) {
+        if (query.access_token && query.user_id) {
+            const checkToken = await this.validateVkToken(query.access_token);
+
+            if (checkToken === false) {
+                throw new HttpException(
+                    'Токен не валидный',
+                    HttpStatus.UNAUTHORIZED,
+                );
+            }
+
+            const password = this.gen_password(15);
+            const userDto: CreateUserDto = {
+                email: `${query.user_id}@vk.com`,
+                password,
+            };
+
+            const candidate = await this.userService.getUserByEmail(
+                userDto.email,
+            );
+
+            if (candidate) {
+                console.log('GENERATE TOKEN');
+                return await this.generateToken(candidate);
+            }
+
+            return await this.registration(userDto);
+        }
+
+        throw new HttpException(
+            'Пользователь не авторизован',
+            HttpStatus.UNAUTHORIZED,
+        );
+    }
+
+    async validateVkToken(token: string) {
+        const url = `https://api.vk.com/method/users.get?access_token=${token}&v=5.131`;
+        const req = await lastValueFrom(this.httpService.get(url));
+        const tokenData = req.data.response[0];
+        console.log(tokenData.id);
+
+        if (tokenData.id) {
+            return true;
+        }
+
+        return false;
     }
 }

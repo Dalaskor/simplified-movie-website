@@ -42,6 +42,27 @@ POST http://localhost:3000/login
 
 ```
 GET http://localhost:3000/google
+GET http://localhost:3000/google/redirect
+```
+
+### VK OAuth (На выходе jwt токен)
+
+### Запрос на авторизацию в VK
+
+```
+GET http://localhost:3000/vk
+GET http://localhost:3000/vk/callback
+```
+
+### Получить jwt токен на основе данных VK
+
+```
+POST http://localhost:3000/vk/login
+{
+    "access_token": string,
+    "expires_in": number,
+    "user_id": number
+}
 ```
 
 ### Получить пользователя по ID
@@ -95,7 +116,7 @@ GET http://localhost:3000/films/:id
 }
 ```
 
-### Создать жанр 
+### Создать жанр
 
 ```
 POST http://localhost:3000/genre

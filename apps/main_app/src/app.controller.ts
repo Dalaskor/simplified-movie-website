@@ -10,6 +10,7 @@ import { GoogleAuthGuard } from '@app/common/auth/google-auth.decorator';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { AUTH_SERVICE } from '@app/common/auth/service';
+import { HttpService } from '@nestjs/axios';
 import {
     Body,
     Controller,
@@ -20,9 +21,12 @@ import {
     Param,
     Post,
     Put,
+    Query,
     Req,
+    Res,
     UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ClientProxy, Payload } from '@nestjs/microservices';
 import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
 import { CreateCountryDto } from 'apps/country/src/dto/create-country.dto';
@@ -34,6 +38,7 @@ import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
 import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
 import { UpdateStaffDto } from 'apps/staff/src/dto/update-staff.dto';
 import { lastValueFrom } from 'rxjs';
+import { VkLoginDto } from './dto/vk-login.dto';
 
 @Controller()
 export class AppController {
@@ -43,6 +48,7 @@ export class AppController {
         @Inject(STAFF_SERVICE) private staffClient: ClientProxy,
         @Inject(COUNTRY_SERVICE) private countryClient: ClientProxy,
         @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+        private configService: ConfigService,
     ) {}
 
     // Заполнить базу данных из json
@@ -83,7 +89,35 @@ export class AppController {
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Req() req: any) {
         return this.authClient.send('googleAuthRedirect', req.user);
-        // return {status: 'success'}
+    }
+
+    @Get('/vk')
+    async vkAuth(@Res() res: any) {
+        const VKDATA = {
+            client_id: this.configService.get('VK_CLIENT_ID'),
+            callback: this.configService.get('VK_CALLBACK'),
+            display: 'popup',
+        };
+        const url = `https://oauth.vk.com/authorize?client_id=${VKDATA.client_id}&redirect_uri=${VKDATA.callback}&display=${VKDATA.display}&scope=phone_number&response_type=code&v=5.131`;
+
+        return res.redirect(url);
+    }
+
+    @Get('/vk/callback')
+    async vkAuthRedirect(@Res() res: any, @Query() query: any) {
+        const VKDATA = {
+            client_id: this.configService.get('VK_CLIENT_ID'),
+            client_secret: this.configService.get('VK_CLIENT_SECRET'),
+            callback: this.configService.get('VK_CALLBACK'),
+        };
+
+        const url = `https://oauth.vk.com/access_token?client_id=${VKDATA.client_id}&client_secret=${VKDATA.client_secret}&redirect_uri=${VKDATA.callback}&code=${query.code}`;
+        res.redirect(url);
+    }
+
+    @Post('/vk/login')
+    async vkAuthResult(@Body() vkLoginDto: VkLoginDto) {
+        return this.authClient.send('loginByVk', vkLoginDto);
     }
 
     // Film endpoints

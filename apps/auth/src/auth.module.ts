@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { DatabaseModule, RmqModule } from '@app/common';
 import { UserModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
     imports: [
@@ -34,6 +35,7 @@ import { RolesModule } from './roles/roles.module';
         RmqModule,
         UserModule,
         RolesModule,
+        HttpModule
     ],
     controllers: [AuthController],
     providers: [AuthService],
