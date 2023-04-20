@@ -37,80 +37,80 @@ export class FilmService {
         let genreArray: CreateGenreDto[] =
             this.getGenreArray(createFilmDtoArray);
 
-        await lastValueFrom(
+        const staffModelArr = await lastValueFrom(
             this.staffClient.send('createManyStaff', staffArray),
         );
 
-        await lastValueFrom(
+        const countriesModelArr = await lastValueFrom(
             this.countryClient.send('createManyCountry', countryArray),
         );
 
-        await lastValueFrom(
+        const genresModelArr = await lastValueFrom(
             this.genreClient.send('createManyGenre', genreArray),
         );
 
-        const filmDtos = [];
-
-        for (const dto of createFilmDtoArray) {
-            filmDtos.push({
-                name: dto.name,
-                name_en: dto.name_en,
-                mainImg: dto.mainImg,
-                year: dto.year,
-                tagline: dto.tagline,
-                budget: dto.budget,
-                fees: dto.fees,
-                feesRU: dto.feesRU,
-                feesUS: dto.feesUS,
-                premiere: dto.premiere,
-                premiereRU: dto.premiereRU,
-                releaseDVD: dto.releaseDVD,
-                releaseBluRay: dto.releaseBluRay,
-                age: dto.age,
-                ratingMPAA: dto.ratingMPAA,
-                description: dto.description,
-                type: dto.type,
-                time: dto.time,
-            });
-        }
-
+        const filmDtos = this.validateDtos(createFilmDtoArray);
         const films = await this.filmRepository.bulkCreate(filmDtos);
 
-        for (const dto of createFilmDtoArray) {
+        for (const dto of filmDtos) {
             const curFilm = films.find((film) => {
                 return film.name === dto.name;
             });
 
-            if (!curFilm) {
+            if(!curFilm) {
                 continue;
             }
 
-            const genres = await this.getGenresByNames(dto.genre);
-            await this.filmApplyGenres(curFilm, genres);
+            const genresId = this.getIdsFromModelArr(
+                dto.genres,
+                genresModelArr,
+            );
+            await curFilm.$set('genres', genresId);
 
-            const countries = await this.getCountriesByNames(dto.country);
-            await this.filmApplyCountries(curFilm, countries);
+            const countriesId = this.getIdsFromModelArr(
+                dto.countries,
+                countriesModelArr,
+            );
+            await curFilm.$set('countries', countriesId);
 
-            const scenarios = await this.getStaffsByNames(dto.scenario);
-            await this.filmApplyScenarios(curFilm, scenarios);
+            const scenariosId = this.getIdsFromModelArr(
+                dto.scenario,
+                staffModelArr,
+            );
+            await curFilm.$set('scenario', scenariosId);
 
-            const compositors = await this.getStaffsByNames(dto.compositor);
-            await this.filmApplyCompositors(curFilm, compositors);
+            const compositorId = this.getIdsFromModelArr(
+                dto.compositors,
+                staffModelArr,
+            );
+            await curFilm.$set('compositors', compositorId);
 
-            const actors = await this.getStaffsByNames(dto.actors);
-            await this.filmApplyActors(curFilm, actors);
+            const actorsId = this.getIdsFromModelArr(dto.actors, staffModelArr);
+            await curFilm.$set('actors', actorsId);
 
-            const artists = await this.getStaffsByNames(dto.artist);
-            await this.filmApplyArtists(curFilm, artists);
+            const artistsId = this.getIdsFromModelArr(
+                dto.artists,
+                staffModelArr,
+            );
+            await curFilm.$set('artists', artistsId);
 
-            const directors = await this.getStaffsByNames(dto.director);
-            await this.filmApplyDirectors(curFilm, directors);
+            const directorsId = this.getIdsFromModelArr(
+                dto.directors,
+                staffModelArr,
+            );
+            await curFilm.$set('directors', directorsId);
 
-            const montages = await this.getStaffsByNames(dto.montage);
-            await this.filmApplyMontages(curFilm, montages);
+            const montageId = this.getIdsFromModelArr(
+                dto.montages,
+                staffModelArr,
+            );
+            await curFilm.$set('montages', montageId);
 
-            const operators = await this.getStaffsByNames(dto.operator);
-            await this.filmApplyOperators(curFilm, operators);
+            const operarotsId = this.getIdsFromModelArr(
+                dto.operators,
+                staffModelArr,
+            );
+            await curFilm.$set('operators', operarotsId);
 
             /* const spectatorIds = [];
             for (const spectator of dto.spectators) {
@@ -123,109 +123,15 @@ export class FilmService {
             await curFilm.$set('spectators', spectatorIds); */
         }
 
-        return createFilmDtoArray;
+        return { status: 'Created' };
     }
 
-    /*
-     * Сервис для получения массива жанров по массиву названий
-     */
-    async getGenresByNames(names: string[]): Promise<Genre[]> {
-        return lastValueFrom(
-            this.genreClient.send<Genre[]>({ cmd: 'getGenresByNames' }, names),
-        );
-    }
-
-    /*
-     * Сервис для получения массива стран по массиву названий
-     */
-    async getCountriesByNames(names: string[]): Promise<Country[]> {
-        return lastValueFrom(
-            this.countryClient.send<Country[]>(
-                { cmd: 'getCountriesByNames' },
-                names,
-            ),
-        );
-    }
-
-    /*
-     * Сервис для получения массива участников фильма по массиву названий
-     */
-    async getStaffsByNames(names: string[]): Promise<Staff[]> {
-        return lastValueFrom(
-            this.staffClient.send<Staff[]>({ cmd: 'getStaffByNames' }, names),
-        );
-    }
-
-    /*
-     * Сервис для присвоения жанров фильму
-     */
-    async filmApplyGenres(film: Film, genres: Genre[]) {
-        const ids = genres.map((item) => item.id);
-        await film.$set('genres', ids);
-    }
-
-    /*
-     * Сервис для присвоения стран фильму
-     */
-    async filmApplyCountries(film: Film, countries: Country[]) {
-        const ids = countries.map((item) => item.id);
-        await film.$set('countries', ids);
-    }
-
-    /*
-     * Сервис для присвоения сценаристов фильму
-     */
-    async filmApplyScenarios(film: Film, scenarios: Staff[]) {
-        const ids = scenarios.map((item) => item.id);
-        await film.$set('scenario', ids);
-    }
-
-    /*
-     * Сервис для присвоения композиторов фильму
-     */
-    async filmApplyCompositors(film: Film, compositors: Staff[]) {
-        const ids = compositors.map((item) => item.id);
-        await film.$set('compositors', ids);
-    }
-
-    /*
-     * Сервис для присвоения актеров фильму
-     */
-    async filmApplyActors(film: Film, actors: Staff[]) {
-        const ids = actors.map((item) => item.id);
-        await film.$set('actors', ids);
-    }
-
-    /*
-     * Сервис для присвоения художников фильму
-     */
-    async filmApplyArtists(film: Film, artists: Staff[]) {
-        const ids = artists.map((item) => item.id);
-        await film.$set('artists', ids);
-    }
-
-    /*
-     * Сервис для присвоения директоров фильму
-     */
-    async filmApplyDirectors(film: Film, directors: Staff[]) {
-        const ids = directors.map((item) => item.id);
-        await film.$set('directors', ids);
-    }
-
-    /*
-     * Сервис для присвоения монтажа фильму
-     */
-    async filmApplyMontages(film: Film, montages: Staff[]) {
-        const ids = montages.map((item) => item.id);
-        await film.$set('montages', ids);
-    }
-
-    /*
-     * Сервис для присвоения операторов фильму
-     */
-    async filmApplyOperators(film: Film, operators: Staff[]) {
-        const ids = operators.map((item) => item.id);
-        await film.$set('operators', ids);
+    getIdsFromModelArr(names: string[], fromArr: any[]) {
+        return fromArr.map((item) => {
+            if (names.includes(item.name)) {
+                return item.id;
+            }
+        });
     }
 
     /*
@@ -267,7 +173,7 @@ export class FilmService {
             name: dto.name,
             name_en: dto.name_en,
             mainImg: dto.mainImg,
-            year: Number(dto.year),
+            year: dto.year,
             tagline: dto.tagline,
             budget: dto.budget,
             fees: dto.fees,
@@ -494,5 +400,184 @@ export class FilmService {
         });
 
         return genreArray;
+    }
+
+    validateDtos(dtoArray: CreateFilmDto[]) {
+        const filmDtos = [];
+
+        for (const dto of dtoArray) {
+            const filmDto = {
+                name: dto.name,
+                name_en: dto.name_en,
+                type: dto.type,
+                mainImg: dto.mainImg,
+                year: dto.year,
+                tagline: dto.tagline,
+                budget: dto.budget,
+                feesUS: dto.feesUS,
+                feesRU: dto.feesRU,
+                fees: dto.fees,
+                premiere: dto.premiere,
+                premiereRU: dto.premiereRU,
+                releaseDVD: dto.releaseDVD,
+                releaseBluRay: dto.releaseBluRay,
+                age: dto.age,
+                ratingMPAA: dto.ratingMPAA,
+                time: dto.time,
+                description: dto.description,
+                genres: [],
+                countries: [],
+                operators: [],
+                compositors: [],
+                actors: [],
+                artists: [],
+                directors: [],
+                montages: [],
+                scenario: [],
+                // spectators: [],
+            };
+
+            for (const genre of dto.genre) {
+                filmDto.genres.push(genre);
+            }
+
+            for (const country of dto.country) {
+                filmDto.countries.push(country);
+            }
+
+            for (const operator of dto.operator) {
+                filmDto.operators.push(operator);
+            }
+
+            for (const compositor of dto.compositor) {
+                filmDto.compositors.push(compositor);
+            }
+
+            for (const actor of dto.actors) {
+                filmDto.actors.push(actor);
+            }
+
+            for (const artist of dto.artist) {
+                filmDto.artists.push(artist);
+            }
+
+            for (const director of dto.director) {
+                filmDto.directors.push(director);
+            }
+
+            for (const montage of dto.montage) {
+                filmDto.montages.push(montage);
+            }
+
+            for (const scenario of dto.scenario) {
+                filmDto.scenario.push(scenario);
+            }
+
+            filmDtos.push(filmDto);
+        }
+
+        return filmDtos;
+    }
+
+    /*
+     * Сервис для получения массива жанров по массиву названий
+     */
+    async getGenresByNames(names: string[]): Promise<Genre[]> {
+        return await lastValueFrom(
+            this.genreClient.send<Genre[]>({ cmd: 'getGenresByNames' }, names),
+        );
+    }
+
+    /*
+     * Сервис для получения массива стран по массиву названий
+     */
+    async getCountriesByNames(names: string[]): Promise<Country[]> {
+        return await lastValueFrom(
+            this.countryClient.send<Country[]>(
+                { cmd: 'getCountriesByNames' },
+                names,
+            ),
+        );
+    }
+
+    /*
+     * Сервис для получения массива участников фильма по массиву названий
+     */
+    async getStaffsByNames(names: string[]): Promise<Staff[]> {
+        return await lastValueFrom(
+            this.staffClient.send<Staff[]>({ cmd: 'getStaffByNames' }, names),
+        );
+    }
+
+    /*
+     * Сервис для присвоения жанров фильму
+     */
+    async filmApplyGenres(film: Film, genres: Genre[]) {
+        const ids = genres.map((item) => item.id);
+        await film.$set('genres', ids);
+    }
+
+    /*
+     * Сервис для присвоения стран фильму
+     */
+    async filmApplyCountries(film: Film, countries: Country[]) {
+        const ids = countries.map((item) => item.id);
+        await film.$set('countries', ids);
+    }
+
+    /*
+     * Сервис для присвоения сценаристов фильму
+     */
+    async filmApplyScenarios(film: Film, scenarios: Staff[]) {
+        const ids = scenarios.map((item) => item.id);
+        await film.$set('scenario', ids);
+    }
+
+    /*
+     * Сервис для присвоения композиторов фильму
+     */
+    async filmApplyCompositors(film: Film, compositors: Staff[]) {
+        const ids = compositors.map((item) => item.id);
+        await film.$set('compositors', ids);
+    }
+
+    /*
+     * Сервис для присвоения актеров фильму
+     */
+    async filmApplyActors(film: Film, actors: Staff[]) {
+        const ids = actors.map((item) => item.id);
+        await film.$set('actors', ids);
+    }
+
+    /*
+     * Сервис для присвоения художников фильму
+     */
+    async filmApplyArtists(film: Film, artists: Staff[]) {
+        const ids = artists.map((item) => item.id);
+        await film.$set('artists', ids);
+    }
+
+    /*
+     * Сервис для присвоения директоров фильму
+     */
+    async filmApplyDirectors(film: Film, directors: Staff[]) {
+        const ids = directors.map((item) => item.id);
+        await film.$set('directors', ids);
+    }
+
+    /*
+     * Сервис для присвоения монтажа фильму
+     */
+    async filmApplyMontages(film: Film, montages: Staff[]) {
+        const ids = montages.map((item) => item.id);
+        await film.$set('montages', ids);
+    }
+
+    /*
+     * Сервис для присвоения операторов фильму
+     */
+    async filmApplyOperators(film: Film, operators: Staff[]) {
+        const ids = operators.map((item) => item.id);
+        await film.$set('operators', ids);
     }
 }

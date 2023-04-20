@@ -68,15 +68,12 @@ export class Film extends Model<Film, FilmCreationAttrs> {
     })
     type: string;
 
-    @Column({
-        type: DataType.TEXT,
-    })
-    description: string;
 
     @Column({
         type: DataType.STRING,
     })
     mainImg: string;
+
 
     @Column({
         type: DataType.INTEGER,
@@ -142,6 +139,12 @@ export class Film extends Model<Film, FilmCreationAttrs> {
         type: DataType.STRING,
     })
     time: string;
+
+    @Column({
+        type: DataType.TEXT,
+    })
+    description: string;
+
 
     @BelongsToMany(() => Country, () => FilmCountries)
     countries: Country[];

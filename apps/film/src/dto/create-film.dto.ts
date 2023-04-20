@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
 
 export class CreateFilmDto {
     @IsString({ message: 'Должно быть строкой' })
@@ -11,8 +11,8 @@ export class CreateFilmDto {
     @IsString({ message: 'Должно быть строкой' })
     type: string;
 
-    @IsString({ message: 'Должно быть строкой' })
-    year: string;
+    @IsNumber({}, { message: 'Должно быть целым числом' })
+    year: number;
 
     @IsString({ message: 'Должно быть строкой', each: true })
     country: string[];

@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { FilmService } from './film.service';
-import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { RmqService } from '@app/common';

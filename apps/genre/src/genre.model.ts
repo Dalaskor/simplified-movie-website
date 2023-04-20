@@ -1,6 +1,4 @@
-import { Film } from 'apps/film/src/film.model';
-import { BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
-import { FilmGenres } from './film-genres.model';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 interface GenreCreationAttrs {
     name: string;
