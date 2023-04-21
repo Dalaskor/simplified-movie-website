@@ -5,3 +5,4 @@ export * from './auth/auth.module';
 export * from './auth/jwt-auth.guard';
 export * from './constants/services';
 export * from './constants/roles';
+export * from './constants/order';

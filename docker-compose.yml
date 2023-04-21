@@ -16,6 +16,20 @@ services:
       - /usr/src/app/node_modules
     ports:
       - '3000:3000'
+  page:
+    build:
+      context: .
+      dockerfile: ./apps/page/Dockerfile
+      target: development
+    command: npm run start:dev page
+    env_file:
+      - ./apps/page/.env
+    depends_on:
+      - rabbitmq
+      - postgres-main
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
   film:
     build:
       context: .

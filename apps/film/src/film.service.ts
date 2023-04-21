@@ -50,7 +50,9 @@ export class FilmService {
         );
 
         const filmDtos = this.validateDtos(createFilmDtoArray);
-        const films = await this.filmRepository.bulkCreate(filmDtos);
+        const films = await this.filmRepository.bulkCreate(filmDtos, {
+            ignoreDuplicates: true,
+        });
 
         for (const dto of filmDtos) {
             const curFilm = films.find((film) => {

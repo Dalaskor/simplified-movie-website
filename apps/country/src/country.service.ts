@@ -14,6 +14,7 @@ export class CountryService {
     async createMany(createCountryDtoArray: CreateCountryDto[]) {
         const countries = await this.countryRepository.bulkCreate(
             createCountryDtoArray,
+            { ignoreDuplicates: true },
         );
 
         return countries;
@@ -80,7 +81,7 @@ export class CountryService {
             },
         });
 
-        if(!countries) {
+        if (!countries) {
             throw new HttpException('Страны не найдены', HttpStatus.NOT_FOUND);
         }
 

@@ -12,6 +12,7 @@ export class StaffService {
     async createMany(createStaffDtoArray: CreateStaffDto[]) {
         const staffs = await this.staffRepository.bulkCreate(
             createStaffDtoArray,
+            { ignoreDuplicates: true },
         );
 
         return staffs;
@@ -71,8 +72,11 @@ export class StaffService {
             },
         });
 
-        if(!staffs) {
-            throw new HttpException('Сотрудники не найдены', HttpStatus.NOT_FOUND);
+        if (!staffs) {
+            throw new HttpException(
+                'Сотрудники не найдены',
+                HttpStatus.NOT_FOUND,
+            );
         }
 
         return staffs;

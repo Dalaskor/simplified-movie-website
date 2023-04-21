@@ -12,6 +12,7 @@ export class GenreService {
     async createMany(createGenreDtoArray: CreateGenreDto[]) {
         const genres = await this.genreRepository.bulkCreate(
             createGenreDtoArray,
+            { ignoreDuplicates: true },
         );
 
         return genres;
@@ -68,7 +69,7 @@ export class GenreService {
             },
         });
 
-        if(!genres) {
+        if (!genres) {
             throw new HttpException('Жанры не найдены', HttpStatus.NOT_FOUND);
         }
 
