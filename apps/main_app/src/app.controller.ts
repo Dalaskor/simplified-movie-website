@@ -3,6 +3,7 @@ import {
     FILM_SERVICE,
     GENRE_SERVICE,
     JwtAuthGuard,
+    PageOptionsDto,
     ROLES,
     STAFF_SERVICE,
 } from '@app/common';
@@ -27,7 +28,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBody,
+    ApiParam,
+    ApiQuery,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
 import { CreateCountryDto } from 'apps/country/src/dto/create-country.dto';
 import { UpdateCountryDto } from 'apps/country/src/dto/update-country.dto';
@@ -192,15 +199,26 @@ export class AppController {
     }
 
     @ApiTags('Фильмы')
-    @Get('/films')
+    @Get('/all-films')
     @ApiResponse({
         type: CreateFilmDto,
         isArray: true,
-        description: 'Получить список фильмов',
+        description: 'Получить список всех фильмов',
         status: HttpStatus.OK,
     })
     async getFilms() {
         return this.filmClient.send('findAllFilm', {});
+    }
+
+    @ApiTags('Фильмы')
+    @Get('/films')
+    @ApiResponse({
+        type: CreateFilmDto,
+        status: HttpStatus.OK,
+        isArray: true,
+    })
+    async getFilmWithPag(@Query() pageOptionsDto: PageOptionsDto) {
+        return this.filmClient.send('getFilmsWithPag', pageOptionsDto);
     }
 
     @ApiTags('Фильмы')
@@ -353,15 +371,26 @@ export class AppController {
     }
 
     @ApiTags('Участники')
-    @Get('/staffs')
+    @Get('/all-staffs')
     @ApiResponse({
         type: CreateStaffDto,
         isArray: true,
-        description: 'Получить список участников',
+        description: 'Получить список всех участников',
         status: HttpStatus.OK,
     })
     async getStaffs() {
         return this.staffClient.send('findAllStaff', {});
+    }
+
+    @ApiTags('Участники')
+    @Get('/staffs')
+    @ApiResponse({
+        type: CreateStaffDto,
+        status: HttpStatus.OK,
+        isArray: true,
+    })
+    async getStaffsWithPag(@Query() pageOptionsDto: PageOptionsDto) {
+        return this.staffClient.send('getStaffsWithPag', pageOptionsDto);
     }
 
     @ApiTags('Участники')

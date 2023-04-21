@@ -1,3 +1,4 @@
+import { Order, PageOptionsDto } from '@app/common';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
@@ -78,6 +79,27 @@ export class StaffService {
                 HttpStatus.NOT_FOUND,
             );
         }
+
+        return staffs;
+    }
+
+    /*
+     * Сервис для получения списка участников с пагинацией
+     */
+    async getStaffsWithPag(pageOptionsDto: PageOptionsDto) {
+        const order: string = pageOptionsDto.order
+            ? pageOptionsDto.order
+            : Order.ASC;
+        const page: number = pageOptionsDto.page ? pageOptionsDto.page : 1;
+        const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
+        const skip = (page - 1) * take;
+
+        const staffs = await this.staffRepository.findAll({
+            order: [['createdAt', order]],
+            offset: skip,
+            limit: take,
+            include: { all: true },
+        });
 
         return staffs;
     }

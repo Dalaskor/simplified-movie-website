@@ -8,12 +8,21 @@ import { CreateGenreDto } from './../../genre/src/dto/create-genre.dto';
 import { lastValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/sequelize';
 import { Film } from './film.model';
-import { COUNTRY_SERVICE, GENRE_SERVICE, STAFF_SERVICE } from '@app/common';
+import {
+    COUNTRY_SERVICE,
+    GENRE_SERVICE,
+    Order,
+    PageDto,
+    PageMetaDto,
+    PageOptionsDto,
+    STAFF_SERVICE,
+} from '@app/common';
 import { Spectators } from './film-spectator.model';
 import { Genre } from 'apps/genre/src/genre.model';
 import { Country } from 'apps/country/src/country.model';
 import { Staff } from 'apps/staff/src/staff.model';
 import { CreateSpectatorDto } from './dto/create-spectator.dto';
+import { string } from 'joi';
 
 @Injectable()
 export class FilmService {
@@ -584,5 +593,26 @@ export class FilmService {
     async filmApplyOperators(film: Film, operators: Staff[]) {
         const ids = operators.map((item) => item.id);
         await film.$set('operators', ids);
+    }
+
+    /*
+     * Сервис для получения списка фильмов с пагинацией
+     */
+    async getFilmWithPag(
+        pageOptionsDto: PageOptionsDto,
+    ) {
+        const order: string = pageOptionsDto.order ? pageOptionsDto.order : Order.ASC;
+        const page: number = pageOptionsDto.page ? pageOptionsDto.page : 1;
+        const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
+        const skip = (page - 1) * take;
+
+        const films = await this.filmRepository.findAll({
+            order: [['createdAt', order]],
+            offset: skip,
+            limit: take,
+            include: { all: true },
+        });
+
+        return films
     }
 }

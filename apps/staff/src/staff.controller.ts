@@ -4,6 +4,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { Staff } from './staff.model';
+import { PageOptionsDto } from '@app/common';
 
 @Controller()
 export class StaffController {
@@ -45,5 +46,10 @@ export class StaffController {
     @MessagePattern({ cmd: 'getStaffByNames' })
     async getStaffByNamesHandle(@Payload() names: string[]): Promise<Staff[]> {
         return await this.staffService.getStaffByNamesArray(names);
+    }
+
+    @MessagePattern('getStaffsWithPag')
+    async getStaffsWithPag(@Payload() pageOptionsDto: PageOptionsDto) {
+        return await this.staffService.getStaffsWithPag(pageOptionsDto);
     }
 }

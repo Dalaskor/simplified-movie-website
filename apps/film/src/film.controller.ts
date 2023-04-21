@@ -1,16 +1,27 @@
 import { Controller } from '@nestjs/common';
 import { FilmService } from './film.service';
-import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import {
+    Ctx,
+    MessagePattern,
+    Payload,
+    RmqContext,
+} from '@nestjs/microservices';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
-import { RmqService } from '@app/common';
+import { PageOptionsDto, RmqService } from '@app/common';
 
 @Controller()
 export class FilmController {
-    constructor(private readonly filmService: FilmService, private readonly rmqService: RmqService) {}
+    constructor(
+        private readonly filmService: FilmService,
+        private readonly rmqService: RmqService,
+    ) {}
 
     @MessagePattern('createManyFilm')
-    async createMany(@Payload() createFilmDtoArray: CreateFilmDto[], @Ctx() context: RmqContext) {
+    async createMany(
+        @Payload() createFilmDtoArray: CreateFilmDto[],
+        @Ctx() context: RmqContext,
+    ) {
         this.rmqService.ack(context);
         return await this.filmService.createMany(createFilmDtoArray);
     }
@@ -38,5 +49,10 @@ export class FilmController {
     @MessagePattern('removeFilm')
     async remove(@Payload() id: number) {
         return await this.filmService.remove(id);
+    }
+
+    @MessagePattern('getFilmsWithPag')
+    async getFilmsWithPag(@Payload() pageOptionsDto: PageOptionsDto) {
+        return await this.filmService.getFilmWithPag(pageOptionsDto);
     }
 }
