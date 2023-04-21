@@ -11,7 +11,6 @@ async function bootstrap() {
         .setTitle('Simplified Movie Website')
         .setDescription('Документация REST API')
         .setVersion('1.0.0')
-        .addTag('Hotels')
         .build();
 
 

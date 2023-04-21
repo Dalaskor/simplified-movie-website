@@ -15,7 +15,6 @@ import {
     Controller,
     Delete,
     Get,
-    HttpCode,
     HttpStatus,
     Inject,
     Param,
@@ -28,13 +27,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
-import {
-    ApiBody,
-    ApiOAuth2,
-    ApiParam,
-    ApiResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
 import { CreateCountryDto } from 'apps/country/src/dto/create-country.dto';
 import { UpdateCountryDto } from 'apps/country/src/dto/update-country.dto';
@@ -59,6 +52,7 @@ export class AppController {
     ) {}
 
     // Заполнить базу данных из json
+    @ApiTags('Заполнение базы данных')
     @Post('/fill-db')
     @ApiBody({ type: [CreateFilmDto] })
     @ApiResponse({
@@ -423,33 +417,82 @@ export class AppController {
     }
 
     // Country endpoints
+    @ApiTags('Страны')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/countries')
+    @ApiBody({
+        type: CreateCountryDto,
+        description: 'Создание страны',
+    })
+    @ApiResponse({
+        type: CreateCountryDto,
+        status: HttpStatus.OK,
+    })
     async createCountry(@Body() dto: CreateCountryDto) {
         return this.countryClient.send('createCountry', dto);
     }
 
+    @ApiTags('Страны')
     @Get('/countries')
+    @ApiResponse({
+        type: CreateCountryDto,
+        isArray: true,
+        description: 'Получить список стран',
+        status: HttpStatus.OK,
+    })
     async getCountry() {
         return this.countryClient.send('findAllCountry', {});
     }
 
+    @ApiTags('Страны')
     @Get('/countries/:id')
+    @ApiParam({
+        name: 'id',
+        example: 1,
+        required: true,
+        description: 'Идентификатор страны в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        type: CreateCountryDto,
+        status: HttpStatus.OK,
+    })
     async getOneCountry(@Param('id') id: number) {
         return this.countryClient.send('findOneCountry', id);
     }
 
+    @ApiTags('Страны')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/country-update')
+    @ApiBody({
+        type: UpdateCountryDto,
+        description: 'Обновить данные о стране',
+    })
+    @ApiResponse({
+        type: CreateCountryDto,
+        status: HttpStatus.OK,
+    })
     async updateCountry(@Body() dto: UpdateCountryDto) {
         return this.countryClient.send('updateCountry', dto);
     }
 
+    @ApiTags('Страны')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/countries/:id')
+    @ApiParam({
+        name: 'id',
+        example: 1,
+        required: true,
+        description: 'Идентификатор страны в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Успешно удалено',
+    })
     async deleteCountry(@Param('id') id: number) {
         return this.countryClient.send('removeCountry', id);
     }
