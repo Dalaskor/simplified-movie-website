@@ -133,7 +133,7 @@ export class AppController {
     @ApiTags('Авторизация')
     @Get('/google/redirect')
     @ApiResponse({
-        type: GoogleResponseDto
+        type: GoogleResponseDto,
     })
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Req() req: any) {
@@ -180,33 +180,76 @@ export class AppController {
     }
 
     // Film endpoints
+    @ApiTags('Фильмы')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/films')
+    @ApiBody({
+        type: CreateFilmDto,
+        description: 'Создание фильма',
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateFilmDto,
+    })
     async createFilm(@Body() dto: CreateFilmDto) {
         return this.filmClient.send('createFilm', dto);
     }
 
+    @ApiTags('Фильмы')
     @Get('/films')
+    @ApiResponse({
+        type: CreateFilmDto,
+        status: HttpStatus.OK,
+        isArray: true,
+    })
     async getFilms() {
         return this.filmClient.send('findAllFilm', {});
     }
 
+    @ApiTags('Фильмы')
     @Get('/films/:id')
+    @ApiParam({
+        name: 'id',
+        required: true,
+        description: 'Идентификатор фильма в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        type: CreateFilmDto,
+        status: HttpStatus.OK,
+    })
     async getFilmById(@Param('id') id: number) {
         return this.filmClient.send('findOneFilm', id);
     }
 
+    @ApiTags('Фильмы')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/film-update')
+    @ApiBody({
+        type: UpdateFilmDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+    })
     async updateFilm(@Body() dto: UpdateFilmDto) {
         return this.filmClient.send('updateFilm', dto);
     }
 
+    @ApiTags('Фильмы')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/films/:id')
+    @ApiParam({
+        name: 'id',
+        required: true,
+        description: 'Идентификатор фильма в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+    })
     async deleteFilm(@Param('id') id: number) {
         return this.filmClient.send('removeFilm', id);
     }
