@@ -254,7 +254,7 @@ export class AppController {
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Успешно удалено'
+        description: 'Успешно удалено',
     })
     async deleteFilm(@Param('id') id: number) {
         return this.filmClient.send('removeFilm', id);
@@ -335,7 +335,7 @@ export class AppController {
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        description: 'Успешно удалено'
+        description: 'Успешно удалено',
     })
     async deleteGenre(@Param('id') id: number) {
         return this.genreClient.send('removeGenre', id);
@@ -346,18 +346,43 @@ export class AppController {
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/staffs')
+    @ApiBody({
+        type: CreateStaffDto,
+        description: 'Создание участника',
+    })
+    @ApiResponse({
+        type: CreateStaffDto,
+        status: HttpStatus.OK,
+    })
     async createStaff(@Body() dto: CreateStaffDto) {
         return this.staffClient.send('createStaff', dto);
     }
 
     @ApiTags('Участники')
     @Get('/staffs')
+    @ApiResponse({
+        type: CreateStaffDto,
+        isArray: true,
+        description: 'Получить список участников',
+        status: HttpStatus.OK,
+    })
     async getStaffs() {
         return this.staffClient.send('findAllStaff', {});
     }
 
     @ApiTags('Участники')
     @Get('/staffs/:id')
+    @ApiParam({
+        name: 'id',
+        example: 1,
+        required: true,
+        description: 'Идентификатор участника в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        type: CreateStaffDto,
+        status: HttpStatus.OK,
+    })
     async getOneStaff(@Param('id') id: number) {
         return this.staffClient.send('findOneStaff', id);
     }
@@ -366,6 +391,14 @@ export class AppController {
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/staff-update')
+    @ApiBody({
+        type: UpdateStaffDto,
+        description: 'Обновить данные о участнике',
+    })
+    @ApiResponse({
+        type: CreateStaffDto,
+        status: HttpStatus.OK,
+    })
     async updateStaff(@Body() dto: UpdateStaffDto) {
         return this.staffClient.send('updateStaff', dto);
     }
@@ -374,6 +407,17 @@ export class AppController {
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/staffs/:id')
+    @ApiParam({
+        name: 'id',
+        example: 1,
+        required: true,
+        description: 'Идентификатор участника в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Успешно удалено',
+    })
     async deleteStaff(@Param('id') id: number) {
         return this.staffClient.send('removeStaff', id);
     }
