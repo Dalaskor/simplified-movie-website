@@ -34,5 +34,5 @@ docker compose up --build -V
 Документация доступна по маршруту:
 
 ```
-GET https://localhost:3000/api/docs
+GET localhost:3000/api/docs
 ```
