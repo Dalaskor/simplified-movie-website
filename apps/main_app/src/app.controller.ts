@@ -113,6 +113,7 @@ export class AppController {
     @Get('/user/:id')
     @ApiParam({
         name: 'id',
+        example: 1,
         required: true,
         description: 'Идентификатор пользователя в базе данных',
         type: Number,
@@ -200,8 +201,9 @@ export class AppController {
     @Get('/films')
     @ApiResponse({
         type: CreateFilmDto,
-        status: HttpStatus.OK,
         isArray: true,
+        description: 'Получить список фильмов',
+        status: HttpStatus.OK,
     })
     async getFilms() {
         return this.filmClient.send('findAllFilm', {});
@@ -211,6 +213,7 @@ export class AppController {
     @Get('/films/:id')
     @ApiParam({
         name: 'id',
+        example: 1,
         required: true,
         description: 'Идентификатор фильма в базе данных',
         type: Number,
@@ -232,6 +235,7 @@ export class AppController {
     })
     @ApiResponse({
         status: HttpStatus.OK,
+        type: CreateFilmDto,
     })
     async updateFilm(@Body() dto: UpdateFilmDto) {
         return this.filmClient.send('updateFilm', dto);
@@ -243,50 +247,102 @@ export class AppController {
     @Delete('/films/:id')
     @ApiParam({
         name: 'id',
+        example: 1,
         required: true,
         description: 'Идентификатор фильма в базе данных',
         type: Number,
     })
     @ApiResponse({
         status: HttpStatus.OK,
+        description: 'Успешно удалено'
     })
     async deleteFilm(@Param('id') id: number) {
         return this.filmClient.send('removeFilm', id);
     }
 
     // Genre endpoints
+    @ApiTags('Жанры')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/genres')
+    @ApiBody({
+        type: CreateGenreDto,
+        description: 'Создание жанра',
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateGenreDto,
+    })
     async createGenre(@Body() dto: CreateGenreDto) {
         return this.genreClient.send('createGenre', dto);
     }
 
+    @ApiTags('Жанры')
     @Get('/genres')
+    @ApiResponse({
+        type: CreateGenreDto,
+        isArray: true,
+        description: 'Получить список жанров',
+        status: HttpStatus.OK,
+    })
     async getGenres() {
         return this.genreClient.send('findAllGenre', {});
     }
 
+    @ApiTags('Жанры')
     @Get('/genres/:id')
+    @ApiParam({
+        name: 'id',
+        example: 1,
+        required: true,
+        description: 'Идентификатор жанра в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        type: CreateGenreDto,
+        status: HttpStatus.OK,
+    })
     async getOneGenre(@Param('id') id: number) {
         return this.genreClient.send('findOneGenre', id);
     }
 
+    @ApiTags('Жанры')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/genre-update')
+    @ApiBody({
+        type: UpdateGenreDto,
+        description: 'Обновить данные о жанре',
+    })
+    @ApiResponse({
+        type: CreateGenreDto,
+        status: HttpStatus.OK,
+    })
     async updateGenre(@Body() dto: UpdateGenreDto) {
         return this.genreClient.send('updateGenre', dto);
     }
 
+    @ApiTags('Жанры')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/genres/:id')
+    @ApiParam({
+        name: 'id',
+        example: 1,
+        required: true,
+        description: 'Идентификатор жанра в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Успешно удалено'
+    })
     async deleteGenre(@Param('id') id: number) {
         return this.genreClient.send('removeGenre', id);
     }
 
     // Staff endpoints
+    @ApiTags('Участники')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/staffs')
@@ -294,16 +350,19 @@ export class AppController {
         return this.staffClient.send('createStaff', dto);
     }
 
+    @ApiTags('Участники')
     @Get('/staffs')
     async getStaffs() {
         return this.staffClient.send('findAllStaff', {});
     }
 
+    @ApiTags('Участники')
     @Get('/staffs/:id')
     async getOneStaff(@Param('id') id: number) {
         return this.staffClient.send('findOneStaff', id);
     }
 
+    @ApiTags('Участники')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/staff-update')
@@ -311,6 +370,7 @@ export class AppController {
         return this.staffClient.send('updateStaff', dto);
     }
 
+    @ApiTags('Участники')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/staffs/:id')
