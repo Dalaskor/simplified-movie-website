@@ -57,7 +57,7 @@ export class FilmService {
                 return film.name === dto.name;
             });
 
-            if(!curFilm) {
+            if (!curFilm) {
                 continue;
             }
 
@@ -235,7 +235,10 @@ export class FilmService {
      * Получить фильм по id из бд
      */
     async findOne(id: number): Promise<Film> {
-        const film = await this.filmRepository.findOne({ where: { id } });
+        const film = await this.filmRepository.findOne({
+            where: { id },
+            include: { all: true },
+        });
 
         if (!film) {
             throw new HttpException('Фильм не найден', HttpStatus.NOT_FOUND);
