@@ -75,15 +75,6 @@
       "compilerOptions": {
         "tsConfigPath": "apps/auth/tsconfig.app.json"
       }
-    },
-    "page": {
-      "type": "application",
-      "root": "apps/page",
-      "entryFile": "main",
-      "sourceRoot": "apps/page/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/page/tsconfig.app.json"
-      }
     }
   }
 }
