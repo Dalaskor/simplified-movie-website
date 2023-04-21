@@ -10,12 +10,12 @@ import { GoogleAuthGuard } from '@app/common/auth/google-auth.decorator';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { AUTH_SERVICE } from '@app/common/auth/service';
-import { HttpService } from '@nestjs/axios';
 import {
     Body,
     Controller,
     Delete,
     Get,
+    HttpCode,
     HttpStatus,
     Inject,
     Param,
@@ -27,7 +27,14 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ClientProxy, Payload } from '@nestjs/microservices';
+import { ClientProxy } from '@nestjs/microservices';
+import {
+    ApiBody,
+    ApiOAuth2,
+    ApiParam,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
 import { CreateCountryDto } from 'apps/country/src/dto/create-country.dto';
 import { UpdateCountryDto } from 'apps/country/src/dto/update-country.dto';
@@ -37,7 +44,7 @@ import { CreateGenreDto } from 'apps/genre/src/dto/create-genre.dto';
 import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
 import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
 import { UpdateStaffDto } from 'apps/staff/src/dto/update-staff.dto';
-import { lastValueFrom } from 'rxjs';
+import { GoogleResponseDto } from './dto/google-response.dto';
 import { VkLoginDto } from './dto/vk-login.dto';
 
 @Controller()
@@ -53,45 +60,87 @@ export class AppController {
 
     // Заполнить базу данных из json
     @Post('/fill-db')
+    @ApiBody({ type: [CreateFilmDto] })
+    @ApiResponse({
+        status: HttpStatus.CREATED,
+        description: 'База данных заполнена успешно',
+    })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        description: 'Произошла ошибка при заполнении',
+    })
     async fillDb(@Body() dtoArray: CreateFilmDto[]) {
-        // await lastValueFrom(this.filmClient.emit('createManyFilm', dtoArray));
-        // return { status: HttpStatus.CREATED };
-
         return this.filmClient.send('createManyFilm', dtoArray);
     }
 
     //Auth endpoints
+    @ApiTags('Авторизация')
     @Post('/registration')
+    @ApiBody({ type: CreateUserDto })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Успешная регистрация',
+    })
+    @ApiBody({ type: CreateUserDto })
     async registration(@Body() dto: CreateUserDto) {
         return this.authClient.send('registration', dto);
     }
 
+    @ApiTags('Авторизация')
     @Post('/login')
+    @ApiBody({ type: CreateUserDto })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Успешная авторизация',
+    })
     async login(@Body() dto: CreateUserDto) {
         return this.authClient.send('login', dto);
     }
 
+    @ApiTags('Авторизация')
     @Post('/create-test-admin')
+    @ApiBody({ type: CreateUserDto })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Успешная регистрация администратора',
+    })
     async createTestAdmin(@Body() dto: CreateUserDto) {
         return this.authClient.send('createSuperUser', dto);
     }
 
+    @ApiTags('Авторизация')
     @UseGuards(JwtAuthGuard)
     @Get('/user/:id')
+    @ApiParam({
+        name: 'id',
+        required: true,
+        description: 'Идентификатор пользователя в базе данных',
+        type: Number,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Получены данные пользователя',
+    })
     async getUser(@Param('id') id: number) {
         return this.authClient.send('getUser', id);
     }
 
+    @ApiTags('Авторизация')
     @Get('/google')
     @UseGuards(GoogleAuthGuard)
-    async googleAuth(@Req() req: any) {}
+    async googleAuth() {}
 
+    @ApiTags('Авторизация')
     @Get('/google/redirect')
+    @ApiResponse({
+        type: GoogleResponseDto
+    })
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Req() req: any) {
         return this.authClient.send('googleAuthRedirect', req.user);
     }
 
+    @ApiTags('Авторизация')
     @Get('/vk')
     async vkAuth(@Res() res: any) {
         const VKDATA = {
@@ -104,7 +153,12 @@ export class AppController {
         return res.redirect(url);
     }
 
+    @ApiTags('Авторизация')
     @Get('/vk/callback')
+    @ApiResponse({
+        type: VkLoginDto,
+        status: HttpStatus.OK,
+    })
     async vkAuthRedirect(@Res() res: any, @Query() query: any) {
         const VKDATA = {
             client_id: this.configService.get('VK_CLIENT_ID'),
@@ -116,7 +170,11 @@ export class AppController {
         res.redirect(url);
     }
 
+    @ApiTags('Авторизация')
     @Post('/vk/login')
+    @ApiBody({
+        type: VkLoginDto,
+    })
     async vkAuthResult(@Body() vkLoginDto: VkLoginDto) {
         return this.authClient.send('loginByVk', vkLoginDto);
     }
