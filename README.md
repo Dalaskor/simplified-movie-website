@@ -23,9 +23,11 @@ docker compose build
 
 ```
 docker compose up
+```
 
 или
 
+```
 docker compose up --build -V
 ```
 
