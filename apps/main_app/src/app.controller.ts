@@ -24,7 +24,6 @@ import {
     Query,
     Req,
     Res,
-    UnauthorizedException,
     UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -40,7 +39,7 @@ import { CreateGenreDto } from 'apps/genre/src/dto/create-genre.dto';
 import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
 import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
 import { UpdateStaffDto } from 'apps/staff/src/dto/update-staff.dto';
-import { catchError, lastValueFrom, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { ExceptionDto } from './dto/exception.dto';
 import { GoogleResponseDto } from './dto/google-response.dto';
 import { TokenResponseDto } from './dto/token-response.dto';
@@ -70,7 +69,13 @@ export class AppController {
         description: 'Произошла ошибка при заполнении',
     })
     async fillDb(@Body() dtoArray: CreateFilmDto[]) {
-        return this.filmClient.send('createManyFilm', dtoArray);
+        return this.filmClient
+            .send('createManyFilm', dtoArray)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     //Auth endpoints
@@ -248,11 +253,17 @@ export class AppController {
         description: 'Создание фильма',
     })
     @ApiResponse({
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
         type: CreateFilmDto,
     })
     async createFilm(@Body() dto: CreateFilmDto) {
-        return this.filmClient.send('createFilm', dto);
+        return this.filmClient
+            .send('createFilm', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Фильмы')
@@ -264,7 +275,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getFilms() {
-        return this.filmClient.send('findAllFilm', {});
+        return this.filmClient
+            .send('findAllFilm', {})
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Фильмы')
@@ -275,7 +292,13 @@ export class AppController {
         isArray: true,
     })
     async getFilmWithPag(@Query() pageOptionsDto: FilmPagFilterDto) {
-        return this.filmClient.send('getFilmsWithPag', pageOptionsDto);
+        return this.filmClient
+            .send('getFilmsWithPag', pageOptionsDto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Фильмы')
@@ -292,7 +315,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getFilmById(@Param('id') id: number) {
-        return this.filmClient.send('findOneFilm', id);
+        return this.filmClient
+            .send('findOneFilm', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Фильмы')
@@ -307,7 +336,13 @@ export class AppController {
         type: CreateFilmDto,
     })
     async updateFilm(@Body() dto: UpdateFilmDto) {
-        return this.filmClient.send('updateFilm', dto);
+        return this.filmClient
+            .send('updateFilm', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Фильмы')
@@ -326,7 +361,13 @@ export class AppController {
         description: 'Успешно удалено',
     })
     async deleteFilm(@Param('id') id: number) {
-        return this.filmClient.send('removeFilm', id);
+        return this.filmClient
+            .send('removeFilm', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     // Genre endpoints
@@ -339,11 +380,17 @@ export class AppController {
         description: 'Создание жанра',
     })
     @ApiResponse({
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
         type: CreateGenreDto,
     })
     async createGenre(@Body() dto: CreateGenreDto) {
-        return this.genreClient.send('createGenre', dto);
+        return this.genreClient
+            .send('createGenre', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Жанры')
@@ -355,7 +402,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getGenres() {
-        return this.genreClient.send('findAllGenre', {});
+        return this.genreClient
+            .send('findAllGenre', {})
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Жанры')
@@ -372,7 +425,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getOneGenre(@Param('id') id: number) {
-        return this.genreClient.send('findOneGenre', id);
+        return this.genreClient
+            .send('findOneGenre', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Жанры')
@@ -388,7 +447,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async updateGenre(@Body() dto: UpdateGenreDto) {
-        return this.genreClient.send('updateGenre', dto);
+        return this.genreClient
+            .send('updateGenre', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Жанры')
@@ -407,7 +472,13 @@ export class AppController {
         description: 'Успешно удалено',
     })
     async deleteGenre(@Param('id') id: number) {
-        return this.genreClient.send('removeGenre', id);
+        return this.genreClient
+            .send('removeGenre', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     // Staff endpoints
@@ -421,10 +492,16 @@ export class AppController {
     })
     @ApiResponse({
         type: CreateStaffDto,
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
     })
     async createStaff(@Body() dto: CreateStaffDto) {
-        return this.staffClient.send('createStaff', dto);
+        return this.staffClient
+            .send('createStaff', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Участники')
@@ -436,7 +513,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getStaffs() {
-        return this.staffClient.send('findAllStaff', {});
+        return this.staffClient
+            .send('findAllStaff', {})
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Участники')
@@ -447,7 +530,13 @@ export class AppController {
         isArray: true,
     })
     async getStaffsWithPag(@Query() pageOptionsDto: PageOptionsDto) {
-        return this.staffClient.send('getStaffsWithPag', pageOptionsDto);
+        return this.staffClient
+            .send('getStaffsWithPag', pageOptionsDto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Участники')
@@ -464,7 +553,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getOneStaff(@Param('id') id: number) {
-        return this.staffClient.send('findOneStaff', id);
+        return this.staffClient
+            .send('findOneStaff', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Участники')
@@ -480,7 +575,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async updateStaff(@Body() dto: UpdateStaffDto) {
-        return this.staffClient.send('updateStaff', dto);
+        return this.staffClient
+            .send('updateStaff', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Участники')
@@ -499,7 +600,13 @@ export class AppController {
         description: 'Успешно удалено',
     })
     async deleteStaff(@Param('id') id: number) {
-        return this.staffClient.send('removeStaff', id);
+        return this.staffClient
+            .send('removeStaff', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     // Country endpoints
@@ -513,10 +620,16 @@ export class AppController {
     })
     @ApiResponse({
         type: CreateCountryDto,
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
     })
     async createCountry(@Body() dto: CreateCountryDto) {
-        return this.countryClient.send('createCountry', dto);
+        return this.countryClient
+            .send('createCountry', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Страны')
@@ -528,7 +641,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getCountry() {
-        return this.countryClient.send('findAllCountry', {});
+        return this.countryClient
+            .send('findAllCountry', {})
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Страны')
@@ -545,7 +664,13 @@ export class AppController {
         status: HttpStatus.OK,
     })
     async getOneCountry(@Param('id') id: number) {
-        return this.countryClient.send('findOneCountry', id);
+        return this.countryClient
+            .send('findOneCountry', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Страны')
@@ -558,10 +683,16 @@ export class AppController {
     })
     @ApiResponse({
         type: CreateCountryDto,
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
     })
     async updateCountry(@Body() dto: UpdateCountryDto) {
-        return this.countryClient.send('updateCountry', dto);
+        return this.countryClient
+            .send('updateCountry', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Страны')
@@ -576,10 +707,16 @@ export class AppController {
         type: Number,
     })
     @ApiResponse({
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
         description: 'Успешно удалено',
     })
     async deleteCountry(@Param('id') id: number) {
-        return this.countryClient.send('removeCountry', id);
+        return this.countryClient
+            .send('removeCountry', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 }

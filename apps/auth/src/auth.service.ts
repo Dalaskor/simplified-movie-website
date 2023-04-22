@@ -1,8 +1,6 @@
 import {
     BadRequestException,
     ForbiddenException,
-    HttpException,
-    HttpStatus,
     Injectable,
     NotFoundException,
     UnauthorizedException,

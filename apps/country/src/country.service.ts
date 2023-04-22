@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Country } from './country.model';
@@ -38,7 +44,7 @@ export class CountryService {
         const country = this.countryRepository.findOne({ where: { id } });
 
         if (!country) {
-            throw new HttpException('Страна не найдена', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Страна не найдена'));
         }
 
         return country;
@@ -48,7 +54,7 @@ export class CountryService {
         const country = this.countryRepository.findOne({ where: { name } });
 
         if (!country) {
-            throw new HttpException('Страна не найдена', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Страна не найдена'));
         }
 
         return country;
@@ -82,7 +88,7 @@ export class CountryService {
         });
 
         if (!countries) {
-            throw new HttpException('Страны не найдены', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Страны не найдены'));
         }
 
         return countries;

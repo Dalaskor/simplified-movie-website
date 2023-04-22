@@ -1,5 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
+import { NotFoundError } from 'rxjs';
 import { Op } from 'sequelize';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
@@ -36,7 +43,7 @@ export class GenreService {
         const genre = this.genreRepository.findOne({ where: { id } });
 
         if (!genre) {
-            throw new HttpException('Жанр не найден', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Жанр не найден'));
         }
 
         return genre;
@@ -70,7 +77,7 @@ export class GenreService {
         });
 
         if (!genres) {
-            throw new HttpException('Жанры не найдены', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Жанры не найдены'));
         }
 
         return genres;

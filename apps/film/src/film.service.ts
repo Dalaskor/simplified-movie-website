@@ -1,7 +1,13 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+    HttpException,
+    HttpStatus,
+    Inject,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateStaffDto } from './../../staff/src/dto/create-staff.dto';
 import { CreateCountryDto } from './../../country/src/dto/create-country.dto';
 import { CreateGenreDto } from './../../genre/src/dto/create-genre.dto';
@@ -12,9 +18,6 @@ import {
     COUNTRY_SERVICE,
     GENRE_SERVICE,
     Order,
-    PageDto,
-    PageMetaDto,
-    PageOptionsDto,
     STAFF_SERVICE,
 } from '@app/common';
 import { Spectators } from './film-spectator.model';
@@ -153,7 +156,7 @@ export class FilmService {
         const country = await this.getCountryByName(spectator.country);
 
         if (!country) {
-            throw new HttpException('Страна не найдена', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Страна не найдена'));
         }
 
         const newSpectator = await this.spectatorsRepository.create({
@@ -253,7 +256,7 @@ export class FilmService {
         });
 
         if (!film) {
-            throw new HttpException('Фильм не найден', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Фильм не найден'));
         }
 
         return film;
@@ -266,7 +269,7 @@ export class FilmService {
         const film = await this.filmRepository.findOne({ where: { id } });
 
         if (!film) {
-            throw new HttpException('Филь не найден', HttpStatus.NOT_FOUND);
+            throw new RpcException(new NotFoundException('Фильм не найден'));
         }
 
         dto.name ? (film.name = dto.name) : '';

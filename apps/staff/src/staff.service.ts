@@ -1,5 +1,11 @@
 import { Order, PageOptionsDto } from '@app/common';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { CreateStaffDto } from './dto/create-staff.dto';
@@ -37,9 +43,8 @@ export class StaffService {
         const staff = await this.staffRepository.findOne({ where: { id } });
 
         if (!staff) {
-            throw new HttpException(
-                'Участник фильма не найден',
-                HttpStatus.NOT_FOUND,
+            throw new RpcException(
+                new NotFoundException('Участник фильма не найден'),
             );
         }
 
@@ -74,9 +79,8 @@ export class StaffService {
         });
 
         if (!staffs) {
-            throw new HttpException(
-                'Сотрудники не найдены',
-                HttpStatus.NOT_FOUND,
+            throw new RpcException(
+                new NotFoundException('Участник фильма не найден'),
             );
         }
 
