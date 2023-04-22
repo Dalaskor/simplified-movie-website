@@ -24,16 +24,12 @@ import {
     Query,
     Req,
     Res,
+    UnauthorizedException,
     UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ClientProxy } from '@nestjs/microservices';
-import {
-    ApiBody,
-    ApiParam,
-    ApiResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
 import { CreateCountryDto } from 'apps/country/src/dto/create-country.dto';
 import { UpdateCountryDto } from 'apps/country/src/dto/update-country.dto';
@@ -44,7 +40,10 @@ import { CreateGenreDto } from 'apps/genre/src/dto/create-genre.dto';
 import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
 import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
 import { UpdateStaffDto } from 'apps/staff/src/dto/update-staff.dto';
+import { catchError, lastValueFrom, throwError } from 'rxjs';
+import { ExceptionDto } from './dto/exception.dto';
 import { GoogleResponseDto } from './dto/google-response.dto';
+import { TokenResponseDto } from './dto/token-response.dto';
 import { VkLoginDto } from './dto/vk-login.dto';
 
 @Controller()
@@ -79,34 +78,70 @@ export class AppController {
     @Post('/registration')
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
         description: 'Успешная регистрация',
+        type: TokenResponseDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Пользователь с такой электронной почтой уже существует',
+        type: ExceptionDto,
     })
     @ApiBody({ type: CreateUserDto })
     async registration(@Body() dto: CreateUserDto) {
-        return this.authClient.send('registration', dto);
+        return this.authClient
+            .send('registration', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Авторизация')
     @Post('/login')
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({
-        status: HttpStatus.OK,
+        status: HttpStatus.CREATED,
         description: 'Успешная авторизация',
+        type: TokenResponseDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.UNAUTHORIZED,
+        description: 'Неккоректные электронная почта или пароль',
+        type: ExceptionDto,
     })
     async login(@Body() dto: CreateUserDto) {
-        return this.authClient.send('login', dto);
+        return this.authClient
+            .send('login', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Авторизация')
     @Post('/create-test-admin')
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({
-        status: HttpStatus.OK,
-        description: 'Успешная регистрация администратора',
+        status: HttpStatus.CREATED,
+        description: 'Успешная регистрация',
+        type: TokenResponseDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Пользователь с такой электронной почтой уже существует',
+        type: ExceptionDto,
     })
     async createTestAdmin(@Body() dto: CreateUserDto) {
-        return this.authClient.send('createSuperUser', dto);
+        return this.authClient
+            .send('createSuperUser', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Авторизация')
@@ -123,8 +158,18 @@ export class AppController {
         status: HttpStatus.OK,
         description: 'Получены данные пользователя',
     })
+    @ApiResponse({
+        status: HttpStatus.NOT_FOUND,
+        description: 'Пользователь не найден',
+    })
     async getUser(@Param('id') id: number) {
-        return this.authClient.send('getUser', id);
+        return this.authClient
+            .send('getUser', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Авторизация')
@@ -139,7 +184,13 @@ export class AppController {
     })
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Req() req: any) {
-        return this.authClient.send('googleAuthRedirect', req.user);
+        return this.authClient
+            .send('googleAuthRedirect', req.user)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     @ApiTags('Авторизация')
@@ -178,7 +229,13 @@ export class AppController {
         type: VkLoginDto,
     })
     async vkAuthResult(@Body() vkLoginDto: VkLoginDto) {
-        return this.authClient.send('loginByVk', vkLoginDto);
+        return this.authClient
+            .send('loginByVk', vkLoginDto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     // Film endpoints

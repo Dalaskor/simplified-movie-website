@@ -6,7 +6,8 @@ export * from './auth/jwt-auth.guard';
 export * from './constants/services';
 export * from './constants/roles';
 export * from './constants/order';
-export * from './pagination/page.dto'
-export * from './pagination/page-meta.dto'
-export * from './pagination/page-options.dto'
-export * from './pagination/page-meta-dto-parameters'
+export * from './pagination/page.dto';
+export * from './pagination/page-meta.dto';
+export * from './pagination/page-options.dto';
+export * from './pagination/page-meta-dto-parameters';
+export * from './filters/rpc-exception.filter';

@@ -36,6 +36,7 @@ export class UsersService {
         }
 
         await user.$add('roles', [role.id]);
+        user.roles.push(role);
 
         return user;
     }

@@ -1,7 +1,10 @@
 import {
+    BadRequestException,
+    ForbiddenException,
     HttpException,
     HttpStatus,
     Injectable,
+    NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -11,6 +14,7 @@ import * as bcrypt from 'bcryptjs';
 import { User } from './users/users.model';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -24,9 +28,10 @@ export class AuthService {
         const candidate = await this.userService.getUserByEmail(dto.email);
 
         if (candidate) {
-            throw new HttpException(
-                'Пользователь с такой электронной почтой уже существует',
-                HttpStatus.BAD_REQUEST,
+            throw new RpcException(
+                new BadRequestException(
+                    'Пользователь с такой электронной почтой уже существует',
+                ),
             );
         }
 
@@ -48,9 +53,10 @@ export class AuthService {
         const candidate = await this.userService.getUserByEmail(dto.email);
 
         if (candidate) {
-            throw new HttpException(
-                'Пользователь с такой электронной почтой уже существует',
-                HttpStatus.BAD_REQUEST,
+            throw new RpcException(
+                new BadRequestException(
+                    'Пользователь с такой электронной почтой уже существует',
+                ),
             );
         }
 
@@ -65,6 +71,15 @@ export class AuthService {
 
     private async validateUser(dto: CreateUserDto) {
         const user = await this.userService.getUserByEmail(dto.email);
+
+        if (!user) {
+            throw new RpcException(
+                new UnauthorizedException(
+                    'Неккоректные электронная почта или пароль',
+                ),
+            );
+        }
+
         const passwordEquals = await bcrypt.compare(
             dto.password,
             user.password,
@@ -74,9 +89,11 @@ export class AuthService {
             return user;
         }
 
-        throw new UnauthorizedException({
-            message: 'Неккоректные электронная почта или пароль',
-        });
+        throw new RpcException(
+            new UnauthorizedException(
+                'Неккоректные электронная почта или пароль',
+            ),
+        );
     }
 
     private async generateToken(user: User) {
@@ -106,16 +123,15 @@ export class AuthService {
             return checkToken;
         }
 
-        throw new HttpException('Нет доступа', HttpStatus.FORBIDDEN);
+        throw new RpcException(new ForbiddenException('Нет доступа'));
     }
 
     async getUser(id: number) {
         const user = await this.userService.getUser(id);
 
         if (!user) {
-            throw new HttpException(
-                'Пользователь не найден',
-                HttpStatus.NOT_FOUND,
+            throw new RpcException(
+                new NotFoundException('Пользователь не найден'),
             );
         }
 
@@ -158,9 +174,8 @@ export class AuthService {
             const checkToken = await this.validateVkToken(query.access_token);
 
             if (checkToken === false) {
-                throw new HttpException(
-                    'Токен не валидный',
-                    HttpStatus.UNAUTHORIZED,
+                throw new RpcException(
+                    new UnauthorizedException('Токен не валидный'),
                 );
             }
 
@@ -182,9 +197,8 @@ export class AuthService {
             return await this.registration(userDto);
         }
 
-        throw new HttpException(
-            'Пользователь не авторизован',
-            HttpStatus.UNAUTHORIZED,
+        throw new RpcException(
+            new UnauthorizedException('Пользователь не авторизован'),
         );
     }
 
