@@ -22,7 +22,8 @@ import { Genre } from 'apps/genre/src/genre.model';
 import { Country } from 'apps/country/src/country.model';
 import { Staff } from 'apps/staff/src/staff.model';
 import { CreateSpectatorDto } from './dto/create-spectator.dto';
-import { string } from 'joi';
+import { Op } from 'sequelize';
+import { FilmPagFilterDto } from './dto/film-pag-filter.dto';
 
 @Injectable()
 export class FilmService {
@@ -598,21 +599,88 @@ export class FilmService {
     /*
      * Сервис для получения списка фильмов с пагинацией
      */
-    async getFilmWithPag(
-        pageOptionsDto: PageOptionsDto,
-    ) {
-        const order: string = pageOptionsDto.order ? pageOptionsDto.order : Order.ASC;
+    async getFilmWithPag(pageOptionsDto: FilmPagFilterDto) {
+        const order: string = pageOptionsDto.order
+            ? pageOptionsDto.order
+            : Order.ASC;
         const page: number = pageOptionsDto.page ? pageOptionsDto.page : 1;
         const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
         const skip = (page - 1) * take;
 
+        let genreFilter: string[] = pageOptionsDto.genres
+            ? pageOptionsDto.genres
+            : [];
+        let countryFilter: string[] = pageOptionsDto.countries
+            ? pageOptionsDto.countries
+            : [];
+        let actorFilter: string[] = pageOptionsDto.actors
+            ? pageOptionsDto.actors
+            : [];
+        let directorFilter: string[] = pageOptionsDto.directors
+            ? pageOptionsDto.directors
+            : [];
+
+        if (!Array.isArray(genreFilter)) {
+            genreFilter = [genreFilter];
+        }
+
+        if (!Array.isArray(countryFilter)) {
+            countryFilter = [countryFilter];
+        }
+
+        if (!Array.isArray(actorFilter)) {
+            actorFilter = [actorFilter];
+        }
+
+        if (!Array.isArray(directorFilter)) {
+            directorFilter = [directorFilter];
+        }
+
         const films = await this.filmRepository.findAll({
+            include: [
+                {
+                    model: Genre,
+                    where: {
+                        name: {
+                            [Op.or]: genreFilter,
+                        },
+                    },
+                },
+                {
+                    model: Country,
+                    where: {
+                        name: {
+                            [Op.or]: countryFilter,
+                        },
+                    },
+                },
+                {
+                    model: Staff,
+                    as: 'actors',
+                    where: {
+                        name: {
+                            [Op.or]: actorFilter,
+                        },
+                    },
+                },
+                {
+                    model: Staff,
+                    as: 'directors',
+                    where: {
+                        name: {
+                            [Op.or]: directorFilter,
+                        },
+                    },
+                },
+                {
+                    all: true,
+                },
+            ],
             order: [['createdAt', order]],
             offset: skip,
             limit: take,
-            include: { all: true },
         });
 
-        return films
+        return films;
     }
 }

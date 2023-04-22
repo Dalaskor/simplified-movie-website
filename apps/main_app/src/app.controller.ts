@@ -31,7 +31,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import {
     ApiBody,
     ApiParam,
-    ApiQuery,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
@@ -39,6 +38,7 @@ import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
 import { CreateCountryDto } from 'apps/country/src/dto/create-country.dto';
 import { UpdateCountryDto } from 'apps/country/src/dto/update-country.dto';
 import { CreateFilmDto } from 'apps/film/src/dto/create-film.dto';
+import { FilmPagFilterDto } from 'apps/film/src/dto/film-pag-filter.dto';
 import { UpdateFilmDto } from 'apps/film/src/dto/update-film.dto';
 import { CreateGenreDto } from 'apps/genre/src/dto/create-genre.dto';
 import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
@@ -217,7 +217,7 @@ export class AppController {
         status: HttpStatus.OK,
         isArray: true,
     })
-    async getFilmWithPag(@Query() pageOptionsDto: PageOptionsDto) {
+    async getFilmWithPag(@Query() pageOptionsDto: FilmPagFilterDto) {
         return this.filmClient.send('getFilmsWithPag', pageOptionsDto);
     }
 

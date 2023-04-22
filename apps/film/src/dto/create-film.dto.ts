@@ -56,7 +56,7 @@ export class CreateFilmDto {
 
     @ApiProperty({
         example: '["Рустам Мосафир"]',
-        description: 'Директора',
+        description: 'Режисеры',
         isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })

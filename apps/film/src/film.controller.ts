@@ -9,6 +9,7 @@ import {
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { PageOptionsDto, RmqService } from '@app/common';
+import { FilmPagFilterDto } from './dto/film-pag-filter.dto';
 
 @Controller()
 export class FilmController {
@@ -52,7 +53,7 @@ export class FilmController {
     }
 
     @MessagePattern('getFilmsWithPag')
-    async getFilmsWithPag(@Payload() pageOptionsDto: PageOptionsDto) {
+    async getFilmsWithPag(@Payload() pageOptionsDto: FilmPagFilterDto) {
         return await this.filmService.getFilmWithPag(pageOptionsDto);
     }
 }
