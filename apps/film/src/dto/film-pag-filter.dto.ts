@@ -16,6 +16,16 @@ export class FilmPagFilterDto extends PageOptionsDto {
 
     @ApiPropertyOptional({
         default: [],
+        example: ['action', 'comedy'],
+        description: 'Фильтр по списку жанров на английском',
+    })
+    @Type(() => Array<string>)
+    @IsArray()
+    @IsOptional()
+    readonly genres_en?: string[] = [];
+
+    @ApiPropertyOptional({
+        default: [],
         example: ['Россия'],
         description: 'Фильтр по списку стран',
     })

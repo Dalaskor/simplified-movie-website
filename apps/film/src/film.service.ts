@@ -1,5 +1,4 @@
 import {
-    HttpException,
     HttpStatus,
     Inject,
     Injectable,
@@ -613,6 +612,9 @@ export class FilmService {
         let genreFilter: string[] = pageOptionsDto.genres
             ? pageOptionsDto.genres
             : [];
+        let genreEnFilter: string[] = pageOptionsDto.genres_en
+            ? pageOptionsDto.genres_en
+            : [];
         let countryFilter: string[] = pageOptionsDto.countries
             ? pageOptionsDto.countries
             : [];
@@ -625,6 +627,10 @@ export class FilmService {
 
         if (!Array.isArray(genreFilter)) {
             genreFilter = [genreFilter];
+        }
+
+        if (!Array.isArray(genreEnFilter)) {
+            genreEnFilter = [genreEnFilter];
         }
 
         if (!Array.isArray(countryFilter)) {
@@ -647,6 +653,9 @@ export class FilmService {
                         name: {
                             [Op.or]: genreFilter,
                         },
+                        name_en: {
+                            [Op.or]: genreEnFilter,
+                        }
                     },
                 },
                 {
