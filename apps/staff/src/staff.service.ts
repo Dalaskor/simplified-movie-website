@@ -1,16 +1,9 @@
 import { Order, PageOptionsDto } from '@app/common';
-import {
-    HttpException,
-    HttpStatus,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { CreateStaffDto, Staff, UpdateStaffDto } from '@app/models';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
-import { CreateStaffDto } from './dto/create-staff.dto';
-import { UpdateStaffDto } from './dto/update-staff.dto';
-import { Staff } from './staff.model';
 
 @Injectable()
 export class StaffService {

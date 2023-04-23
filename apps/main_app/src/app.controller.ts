@@ -12,6 +12,22 @@ import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { AUTH_SERVICE } from '@app/common/auth/service';
 import {
+    CreateCountryDto,
+    CreateFilmDto,
+    CreateGenreDto,
+    CreateStaffDto,
+    CreateUserDto,
+    ExceptionDto,
+    FilmPagFilterDto,
+    GoogleResponseDto,
+    TokenResponseDto,
+    UpdateCountryDto,
+    UpdateFilmDto,
+    UpdateGenreDto,
+    UpdateStaffDto,
+    VkLoginDto,
+} from '@app/models';
+import {
     Body,
     Controller,
     Delete,
@@ -29,21 +45,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from 'apps/auth/src/users/dto/create-user.dto';
-import { CreateCountryDto } from 'apps/country/src/dto/create-country.dto';
-import { UpdateCountryDto } from 'apps/country/src/dto/update-country.dto';
-import { CreateFilmDto } from 'apps/film/src/dto/create-film.dto';
-import { FilmPagFilterDto } from 'apps/film/src/dto/film-pag-filter.dto';
-import { UpdateFilmDto } from 'apps/film/src/dto/update-film.dto';
-import { CreateGenreDto } from 'apps/genre/src/dto/create-genre.dto';
-import { UpdateGenreDto } from 'apps/genre/src/dto/update-genre.dto';
-import { CreateStaffDto } from 'apps/staff/src/dto/create-staff.dto';
-import { UpdateStaffDto } from 'apps/staff/src/dto/update-staff.dto';
 import { catchError, throwError } from 'rxjs';
-import { ExceptionDto } from './dto/exception.dto';
-import { GoogleResponseDto } from './dto/google-response.dto';
-import { TokenResponseDto } from './dto/token-response.dto';
-import { VkLoginDto } from './dto/vk-login.dto';
 
 @Controller()
 export class AppController {

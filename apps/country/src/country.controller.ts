@@ -1,9 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { CountryService } from './country.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateCountryDto } from './dto/create-country.dto';
-import { UpdateCountryDto } from './dto/update-country.dto';
-import { Country } from './country.model';
+import { Country, CreateCountryDto, UpdateCountryDto } from '@app/models';
 
 @Controller()
 export class CountryController {

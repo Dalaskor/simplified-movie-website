@@ -35,7 +35,7 @@ import { HttpModule } from '@nestjs/axios';
         RmqModule,
         UserModule,
         RolesModule,
-        HttpModule
+        HttpModule,
     ],
     controllers: [AuthController],
     providers: [AuthService],

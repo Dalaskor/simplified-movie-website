@@ -6,13 +6,12 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from './users/dto/create-user.dto';
 import { UsersService } from './users/users.service';
 import * as bcrypt from 'bcryptjs';
-import { User } from './users/users.model';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
+import { CreateUserDto, User } from '@app/models';
 
 @Injectable()
 export class AuthService {

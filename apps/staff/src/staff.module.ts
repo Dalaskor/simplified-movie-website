@@ -1,10 +1,10 @@
 import { DatabaseModule, RmqModule } from '@app/common';
+import { Staff } from '@app/models';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import * as Joi from 'joi';
 import { StaffController } from './staff.controller';
-import { Staff } from './staff.model';
 import { StaffService } from './staff.service';
 
 @Module({

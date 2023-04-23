@@ -4,28 +4,30 @@ import {
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
-import { CreateFilmDto } from './dto/create-film.dto';
-import { UpdateFilmDto } from './dto/update-film.dto';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { CreateStaffDto } from './../../staff/src/dto/create-staff.dto';
-import { CreateCountryDto } from './../../country/src/dto/create-country.dto';
-import { CreateGenreDto } from './../../genre/src/dto/create-genre.dto';
 import { lastValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/sequelize';
-import { Film } from './film.model';
 import {
     COUNTRY_SERVICE,
     GENRE_SERVICE,
     Order,
     STAFF_SERVICE,
 } from '@app/common';
-import { Spectators } from './film-spectator.model';
-import { Genre } from 'apps/genre/src/genre.model';
-import { Country } from 'apps/country/src/country.model';
-import { Staff } from 'apps/staff/src/staff.model';
-import { CreateSpectatorDto } from './dto/create-spectator.dto';
 import { Op } from 'sequelize';
-import { FilmPagFilterDto } from './dto/film-pag-filter.dto';
+import {
+    Country,
+    CreateCountryDto,
+    CreateFilmDto,
+    CreateGenreDto,
+    CreateSpectatorDto,
+    CreateStaffDto,
+    Film,
+    FilmPagFilterDto,
+    Genre,
+    Spectators,
+    Staff,
+    UpdateFilmDto,
+} from '@app/models';
 
 @Injectable()
 export class FilmService {
@@ -655,7 +657,7 @@ export class FilmService {
                         },
                         name_en: {
                             [Op.or]: genreEnFilter,
-                        }
+                        },
                     },
                 },
                 {

@@ -6,10 +6,8 @@ import {
     Payload,
     RmqContext,
 } from '@nestjs/microservices';
-import { CreateFilmDto } from './dto/create-film.dto';
-import { UpdateFilmDto } from './dto/update-film.dto';
-import { PageOptionsDto, RmqService } from '@app/common';
-import { FilmPagFilterDto } from './dto/film-pag-filter.dto';
+import { RmqService } from '@app/common';
+import { CreateFilmDto, FilmPagFilterDto, UpdateFilmDto } from '@app/models';
 
 @Controller()
 export class FilmController {

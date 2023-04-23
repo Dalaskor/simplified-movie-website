@@ -1,10 +1,10 @@
 import { DatabaseModule, RmqModule } from '@app/common';
+import { Country } from '@app/models';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import * as Joi from 'joi';
 import { CountryController } from './country.controller';
-import { Country } from './country.model';
 import { CountryService } from './country.service';
 
 @Module({

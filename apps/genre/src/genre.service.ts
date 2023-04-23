@@ -1,16 +1,8 @@
-import {
-    HttpException,
-    HttpStatus,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { CreateGenreDto, Genre, UpdateGenreDto } from '@app/models';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
-import { NotFoundError } from 'rxjs';
 import { Op } from 'sequelize';
-import { CreateGenreDto } from './dto/create-genre.dto';
-import { UpdateGenreDto } from './dto/update-genre.dto';
-import { Genre } from './genre.model';
 
 @Injectable()
 export class GenreService {

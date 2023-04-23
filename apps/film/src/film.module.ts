@@ -1,33 +1,35 @@
-import { DatabaseModule, RmqModule } from '@app/common';
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Country } from 'apps/country/src/country.model';
-import { CountryModule } from 'apps/country/src/country.module';
-import { FilmGenres } from 'apps/genre/src/film-genres.model';
-import { Genre } from 'apps/genre/src/genre.model';
-import { GenreModule } from 'apps/genre/src/genre.module';
-import { Staff } from 'apps/staff/src/staff.model';
-import { StaffModule } from 'apps/staff/src/staff.module';
-import * as Joi from 'joi';
 import {
+    DatabaseModule,
+    RmqModule,
     COUNTRY_SERVICE,
     GENRE_SERVICE,
     STAFF_SERVICE,
-} from '../constants/services';
-import { FilmCountries } from './film-country.model';
-import { FilmSpectators, Spectators } from './film-spectator.model';
+} from '@app/common';
 import {
+    Country,
+    Film,
     FilmActors,
     FilmArtists,
     FilmCompositors,
+    FilmCountries,
     FilmDirectors,
+    FilmGenres,
     FilmMontages,
     FilmOperators,
     FilmScenario,
-} from './film-staff.model';
+    FilmSpectators,
+    Genre,
+    Spectators,
+    Staff,
+} from '@app/models';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { CountryModule } from 'apps/country/src/country.module';
+import { GenreModule } from 'apps/genre/src/genre.module';
+import { StaffModule } from 'apps/staff/src/staff.module';
+import * as Joi from 'joi';
 import { FilmController } from './film.controller';
-import { Film } from './film.model';
 import { FilmService } from './film.service';
 
 @Module({

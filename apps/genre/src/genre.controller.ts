@@ -1,9 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateGenreDto } from './dto/create-genre.dto';
-import { UpdateGenreDto } from './dto/update-genre.dto';
-import { Genre } from './genre.model';
+import { CreateGenreDto, Genre, UpdateGenreDto } from '@app/models';
 
 @Controller()
 export class GenreController {
@@ -42,8 +40,8 @@ export class GenreController {
         return await this.genreService.remove(id);
     }
 
-    @MessagePattern({cmd: 'getGenresByNames'})
-    async getGenresByNamesHandle(@Payload() names: string[]): Promise<Genre[]>  {
+    @MessagePattern({ cmd: 'getGenresByNames' })
+    async getGenresByNamesHandle(@Payload() names: string[]): Promise<Genre[]> {
         return await this.genreService.getGenresByNamesArray(names);
     }
 }

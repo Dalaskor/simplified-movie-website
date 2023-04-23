@@ -7,7 +7,7 @@ import {
     RmqContext,
 } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './users/dto/create-user.dto';
+import { CreateUserDto } from '@app/models';
 
 @Controller()
 export class AuthController {

@@ -1,15 +1,8 @@
-import {
-    HttpException,
-    HttpStatus,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { Country, CreateCountryDto, UpdateCountryDto } from '@app/models';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
-import { Country } from './country.model';
-import { CreateCountryDto } from './dto/create-country.dto';
-import { UpdateCountryDto } from './dto/update-country.dto';
 
 @Injectable()
 export class CountryService {

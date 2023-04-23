@@ -5,8 +5,8 @@ import {
     FILM_SERVICE,
     GENRE_SERVICE,
     STAFF_SERVICE,
+    GoogleStrategy,
 } from '@app/common';
-import { GoogleStrategy } from '@app/common/auth/google.strategy';
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';

@@ -1,10 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { StaffService } from './staff.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateStaffDto } from './dto/create-staff.dto';
-import { UpdateStaffDto } from './dto/update-staff.dto';
-import { Staff } from './staff.model';
 import { PageOptionsDto } from '@app/common';
+import { CreateStaffDto, Staff, UpdateStaffDto } from '@app/models';
 
 @Controller()
 export class StaffController {
