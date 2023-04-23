@@ -5,6 +5,7 @@ import {
     JwtAuthGuard,
     PageOptionsDto,
     ROLES,
+    SCORE_SERVICE,
     STAFF_SERVICE,
 } from '@app/common';
 import { GoogleAuthGuard } from '@app/common/auth/google-auth.decorator';
@@ -15,8 +16,10 @@ import {
     CreateCountryDto,
     CreateFilmDto,
     CreateGenreDto,
+    CreateScoreDto,
     CreateStaffDto,
     CreateUserDto,
+    DeleteScoreDto,
     ExceptionDto,
     FilmPagFilterDto,
     GoogleResponseDto,
@@ -27,6 +30,7 @@ import {
     UpdateStaffDto,
     VkLoginDto,
 } from '@app/models';
+import { UpdateScoreDto } from '@app/models/dtos/update-score.dto';
 import {
     Body,
     Controller,
@@ -44,7 +48,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBody,
+    ApiOperation,
+    ApiParam,
+    ApiQuery,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { catchError, throwError } from 'rxjs';
 
 @Controller()
@@ -55,6 +66,7 @@ export class AppController {
         @Inject(STAFF_SERVICE) private staffClient: ClientProxy,
         @Inject(COUNTRY_SERVICE) private countryClient: ClientProxy,
         @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+        @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
         private configService: ConfigService,
     ) {}
 
@@ -611,7 +623,9 @@ export class AppController {
             );
     }
 
+    ////
     // Country endpoints
+    ////
     @ApiTags('Страны')
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
@@ -715,6 +729,77 @@ export class AppController {
     async deleteCountry(@Param('id') id: number) {
         return this.countryClient
             .send('removeCountry', id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    ////
+    // Scores endpoints
+    ////
+    @ApiTags('Оценки')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Post('/scores')
+    @ApiOperation({ summary: 'Поставить пользовательскую оценку фильму' })
+    @ApiBody({
+        type: CreateScoreDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.CREATED,
+        type: CreateScoreDto,
+    })
+    async createScore(@Body() dto: CreateScoreDto) {
+        return this.scoreClient
+            .send('createScore', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Оценки')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Put('/scores')
+    @ApiOperation({
+        summary: 'Обновить значение пользовательской оценки фильма',
+    })
+    @ApiBody({
+        type: UpdateScoreDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateScoreDto,
+    })
+    async updateScore(@Body() dto: UpdateScoreDto) {
+        return this.scoreClient
+            .send('updateScore', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Оценки')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Delete('/scores')
+    @ApiOperation({ summary: 'Удалить пользовательскую оценку фильма' })
+    @ApiBody({
+        type: DeleteScoreDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateScoreDto,
+    })
+    async deleteScore(@Body() dto: DeleteScoreDto) {
+        return this.scoreClient
+            .send('deleteScore', dto)
             .pipe(
                 catchError((error) =>
                     throwError(() => new RpcException(error.response)),

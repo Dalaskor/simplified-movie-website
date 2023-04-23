@@ -17,8 +17,10 @@ import {
     FilmMontages,
     FilmOperators,
     FilmScenario,
+    FilmScores,
     FilmSpectators,
     Genre,
+    Score,
     Spectators,
     Staff,
 } from '@app/models';

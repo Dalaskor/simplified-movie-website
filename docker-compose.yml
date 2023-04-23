@@ -30,6 +30,7 @@ services:
       - staff
       - country
       - genre
+      - score
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -69,6 +70,20 @@ services:
     command: npm run start:dev genre
     env_file:
       - ./apps/genre/.env
+    depends_on:
+      - postgres-main
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  score:
+    build:
+      context: .
+      dockerfile: ./apps/score/Dockerfile
+      target: development
+    command: npm run start:dev score
+    env_file:
+      - ./apps/score/.env
     depends_on:
       - postgres-main
       - rabbitmq

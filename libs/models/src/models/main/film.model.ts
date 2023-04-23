@@ -1,4 +1,5 @@
 import {
+    BelongsTo,
     BelongsToMany,
     Column,
     DataType,
@@ -15,8 +16,10 @@ import { FilmGenres } from './film-genres.model';
 import { FilmMontages } from './film-montages.model';
 import { FilmOperators } from './film-operators.model';
 import { FilmScenario } from './film-scenarios.model';
+import { FilmScores } from './film-scores.model';
 import { FilmSpectators } from './film-spectators.model';
 import { Genre } from './genre.model';
+import { Score } from './score.model';
 import { Spectators } from './spectators.model';
 import { Staff } from './staff.model';
 
@@ -137,10 +140,11 @@ export class Film extends Model<Film, FilmCreationAttrs> {
     })
     time: string;
 
-    @Column({
-        type: DataType.TEXT,
-    })
+    @Column({ type: DataType.TEXT })
     description: string;
+
+    @Column({ type: DataType.FLOAT, allowNull: true })
+    scoreAVG: number;
 
     @BelongsToMany(() => Country, () => FilmCountries)
     countries: Country[];

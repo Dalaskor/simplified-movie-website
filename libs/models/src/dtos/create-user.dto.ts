@@ -6,9 +6,11 @@ export class CreateUserDto {
         example: 'test@mail.ru',
         description: 'Электронная почта',
     })
-    @IsString({ message: 'Должно быть строкой' })
-    @IsEmail({}, { message: 'Некорректный email' })
-    readonly email: string;
+    @IsEmail(
+        { allow_utf8_local_part: false },
+        { message: 'Некорректный email' },
+    )
+    email: string;
 
     @ApiProperty({
         example: 'pass0550',
@@ -18,5 +20,5 @@ export class CreateUserDto {
     @Length(6, 24, {
         message: 'Длина пароля должна быть не меньше 6 и не больше 24',
     })
-    readonly password: string;
+    password: string;
 }

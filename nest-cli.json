@@ -84,6 +84,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/models/tsconfig.lib.json"
       }
+    },
+    "score": {
+      "type": "application",
+      "root": "apps/score",
+      "entryFile": "main",
+      "sourceRoot": "apps/score/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/score/tsconfig.app.json"
+      }
     }
   }
 }
