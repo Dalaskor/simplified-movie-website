@@ -192,6 +192,34 @@ export class AppController {
     }
 
     @ApiTags('Авторизация')
+    @ApiOperation({ summary: 'Проверка занаята ли электронная почта' })
+    @Get('/check-email/:email')
+    @ApiParam({
+        name: 'email',
+        example: 'test@email.ru',
+        required: true,
+        description: 'Электронная почта',
+        type: String,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Электронная почта свободна',
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Электронная почта занята',
+    })
+    async checkEmail(@Param('email') email: string) {
+        return this.authClient
+            .send('checkUserEmail', email)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Авторизация')
     @Get('/google')
     @UseGuards(GoogleAuthGuard)
     async googleAuth() {}

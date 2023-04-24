@@ -1,6 +1,7 @@
 import {
     BadRequestException,
     ForbiddenException,
+    HttpStatus,
     Injectable,
     NotFoundException,
     UnauthorizedException,
@@ -210,5 +211,20 @@ export class AuthService {
         }
 
         return false;
+    }
+
+    async checkUserEmail(email: string) {
+        const user = await this.userService.getUserByEmail(email);
+
+        if (user) {
+            throw new RpcException(
+                new BadRequestException('Электронная почта уже занята'),
+            );
+        }
+
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Электронная почта свободна',
+        };
     }
 }

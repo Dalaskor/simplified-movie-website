@@ -60,4 +60,9 @@ export class AuthController {
     async vkLogin(@Payload() query: any) {
         return await this.authService.vkLogin(query);
     }
+
+    @MessagePattern('checkUserEmail')
+    async checkUserEmail(@Payload() email: string) {
+        return await this.authService.checkUserEmail(email);
+    }
 }
