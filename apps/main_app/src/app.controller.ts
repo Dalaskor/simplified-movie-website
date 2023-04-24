@@ -833,6 +833,26 @@ export class AppController {
     }
 
     @ApiTags('Оценки')
+    @Get('/scores/:film_id/:user_id')
+    @ApiOperation({ summary: 'Получить оценку пользователя на фильм' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateScoreDto,
+    })
+    async getScoreByUser(
+        @Param('film_id') film_id: number,
+        @Param('user_id') user_id: number,
+    ) {
+        return this.scoreClient
+            .send('getScoreByUser', { film_id, user_id })
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Оценки')
     @Roles(ROLES.USER)
     @UseGuards(RolesGuard)
     @Put('/scores')

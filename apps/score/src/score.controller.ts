@@ -13,6 +13,14 @@ export class ScoreController {
         return await this.scoreService.create(dto);
     }
 
+    @MessagePattern('getScoreByUser')
+    async getScoreByUser(@Payload() data: any) {
+        return await this.scoreService.getScoreByUser(
+            data.film_id,
+            data.user_id,
+        );
+    }
+
     @MessagePattern('updateScore')
     async update(@Payload() dto: UpdateScoreDto) {
         return await this.scoreService.update(dto);

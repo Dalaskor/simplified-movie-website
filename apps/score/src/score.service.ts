@@ -105,6 +105,21 @@ export class ScoreService {
         };
     }
 
+    async getScoreByUser(film_id: number, user_id: number) {
+        const score = await this.scoreRepository.findOne({
+            where: {
+                film_id,
+                user_id,
+            },
+        });
+
+        if (!score) {
+            throw new RpcException(new NotFoundException('Оценка не найден'));
+        }
+
+        return score;
+    }
+
     private async findOne(film_id: number, user_id: number) {
         const score = await this.scoreRepository.findOne({
             where: {
