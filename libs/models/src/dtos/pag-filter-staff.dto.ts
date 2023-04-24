@@ -6,7 +6,7 @@ import { PageOptionsDto } from './page-options.dto';
 export class StaffPagFilter extends PageOptionsDto {
     @ApiPropertyOptional({
         enum: STAFF_TYPES,
-        description: 'Сортировка по дате создания объекта',
+        description: 'Сортировка по типу участника',
     })
     @IsEnum(STAFF_TYPES)
     @IsOptional()

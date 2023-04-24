@@ -23,6 +23,7 @@ import {
     ExceptionDto,
     FilmPagFilterDto,
     GoogleResponseDto,
+    StaffPagFilter,
     TokenResponseDto,
     UpdateCountryDto,
     UpdateFilmDto,
@@ -605,7 +606,7 @@ export class AppController {
         status: HttpStatus.OK,
         isArray: true,
     })
-    async getStaffsWithPag(@Query() pageOptionsDto: PageOptionsDto) {
+    async getStaffsWithPag(@Query() pageOptionsDto: StaffPagFilter) {
         return this.staffClient
             .send('getStaffsWithPag', pageOptionsDto)
             .pipe(
