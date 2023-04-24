@@ -72,6 +72,7 @@ export class AppController {
 
     // Заполнить базу данных из json
     @ApiTags('Заполнение базы данных')
+    @ApiOperation({ summary: 'Заполнение базы данных из файла JSON' })
     @Post('/fill-db')
     @ApiBody({ type: [CreateFilmDto] })
     @ApiResponse({
@@ -94,6 +95,7 @@ export class AppController {
 
     //Auth endpoints
     @ApiTags('Авторизация')
+    @ApiOperation({ summary: 'Регистрация пользователя' })
     @Post('/registration')
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({
@@ -118,6 +120,7 @@ export class AppController {
     }
 
     @ApiTags('Авторизация')
+    @ApiOperation({ summary: 'Авторизация пользователя' })
     @Post('/login')
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({
@@ -141,6 +144,9 @@ export class AppController {
     }
 
     @ApiTags('Авторизация')
+    @ApiOperation({
+        summary: 'Создания администратора для тестирования (временно)',
+    })
     @Post('/create-test-admin')
     @ApiBody({ type: CreateUserDto })
     @ApiResponse({
@@ -164,6 +170,7 @@ export class AppController {
     }
 
     @ApiTags('Авторизация')
+    @ApiOperation({ summary: 'Получить данные пользователя по ID' })
     @UseGuards(JwtAuthGuard)
     @Get('/user/:id')
     @ApiParam({
@@ -220,11 +227,15 @@ export class AppController {
     }
 
     @ApiTags('Авторизация')
+    @ApiOperation({ summary: 'OAuth через Google' })
     @Get('/google')
     @UseGuards(GoogleAuthGuard)
     async googleAuth() {}
 
     @ApiTags('Авторизация')
+    @ApiOperation({
+        summary: 'Редирект для OAuth через Google (Возвращает JWT токен)',
+    })
     @Get('/google/redirect')
     @ApiResponse({
         type: GoogleResponseDto,
@@ -241,6 +252,7 @@ export class AppController {
     }
 
     @ApiTags('Авторизация')
+    @ApiOperation({ summary: 'OAuth через VK' })
     @Get('/vk')
     async vkAuth(@Res() res: any) {
         const VKDATA = {
@@ -255,6 +267,9 @@ export class AppController {
 
     @ApiTags('Авторизация')
     @Get('/vk/callback')
+    @ApiOperation({
+        summary: 'Редирект для OAuth через VK (Возвращает данные из VK)',
+    })
     @ApiResponse({
         type: VkLoginDto,
         status: HttpStatus.OK,
@@ -272,6 +287,9 @@ export class AppController {
 
     @ApiTags('Авторизация')
     @Post('/vk/login')
+    @ApiOperation({
+        summary: 'Принимает данные из VK, возвращает JWT токен',
+    })
     @ApiBody({
         type: VkLoginDto,
     })
@@ -287,6 +305,7 @@ export class AppController {
 
     // Film endpoints
     @ApiTags('Фильмы')
+    @ApiOperation({ summary: 'Создать фильм' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/films')
@@ -309,6 +328,7 @@ export class AppController {
     }
 
     @ApiTags('Фильмы')
+    @ApiOperation({ summary: 'Получить всех список фильмов' })
     @Get('/all-films')
     @ApiResponse({
         type: CreateFilmDto,
@@ -327,6 +347,9 @@ export class AppController {
     }
 
     @ApiTags('Фильмы')
+    @ApiOperation({
+        summary: 'Получить список фильмов с пагинацией и фильтрацией',
+    })
     @Get('/films')
     @ApiResponse({
         type: CreateFilmDto,
@@ -344,6 +367,7 @@ export class AppController {
     }
 
     @ApiTags('Фильмы')
+    @ApiOperation({ summary: 'Получить данные о фильме по ID' })
     @Get('/films/:id')
     @ApiParam({
         name: 'id',
@@ -367,6 +391,7 @@ export class AppController {
     }
 
     @ApiTags('Фильмы')
+    @ApiOperation({ summary: 'Обновить данные о фильме' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/film-update')
@@ -388,6 +413,7 @@ export class AppController {
     }
 
     @ApiTags('Фильмы')
+    @ApiOperation({ summary: 'Удалить фильм' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/films/:id')
@@ -414,6 +440,7 @@ export class AppController {
 
     // Genre endpoints
     @ApiTags('Жанры')
+    @ApiOperation({ summary: 'Создать жанр' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/genres')
@@ -436,6 +463,7 @@ export class AppController {
     }
 
     @ApiTags('Жанры')
+    @ApiOperation({ summary: 'Получить список всех жанров' })
     @Get('/genres')
     @ApiResponse({
         type: CreateGenreDto,
@@ -454,6 +482,7 @@ export class AppController {
     }
 
     @ApiTags('Жанры')
+    @ApiOperation({ summary: 'Получить данные о жанре по ID' })
     @Get('/genres/:id')
     @ApiParam({
         name: 'id',
@@ -477,6 +506,7 @@ export class AppController {
     }
 
     @ApiTags('Жанры')
+    @ApiOperation({ summary: 'Обновить данные о жанре' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/genre-update')
@@ -499,6 +529,7 @@ export class AppController {
     }
 
     @ApiTags('Жанры')
+    @ApiOperation({ summary: 'Удалить жанр' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/genres/:id')
@@ -525,6 +556,7 @@ export class AppController {
 
     // Staff endpoints
     @ApiTags('Участники')
+    @ApiOperation({ summary: 'Создать участника' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/staffs')
@@ -547,6 +579,7 @@ export class AppController {
     }
 
     @ApiTags('Участники')
+    @ApiOperation({ summary: 'Получить список всех участников' })
     @Get('/all-staffs')
     @ApiResponse({
         type: CreateStaffDto,
@@ -565,6 +598,7 @@ export class AppController {
     }
 
     @ApiTags('Участники')
+    @ApiOperation({ summary: 'Получить список участников с пагинацией' })
     @Get('/staffs')
     @ApiResponse({
         type: CreateStaffDto,
@@ -582,6 +616,7 @@ export class AppController {
     }
 
     @ApiTags('Участники')
+    @ApiOperation({ summary: 'Получить данные участника по ID' })
     @Get('/staffs/:id')
     @ApiParam({
         name: 'id',
@@ -605,6 +640,7 @@ export class AppController {
     }
 
     @ApiTags('Участники')
+    @ApiOperation({ summary: 'Обновить данные участника' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/staff-update')
@@ -627,6 +663,7 @@ export class AppController {
     }
 
     @ApiTags('Участники')
+    @ApiOperation({ summary: 'Удалить участника по ID' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/staffs/:id')
@@ -655,6 +692,7 @@ export class AppController {
     // Country endpoints
     ////
     @ApiTags('Страны')
+    @ApiOperation({ summary: 'Создать страну' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Post('/countries')
@@ -677,6 +715,7 @@ export class AppController {
     }
 
     @ApiTags('Страны')
+    @ApiOperation({ summary: 'Получить список всех стран' })
     @Get('/countries')
     @ApiResponse({
         type: CreateCountryDto,
@@ -695,6 +734,7 @@ export class AppController {
     }
 
     @ApiTags('Страны')
+    @ApiOperation({ summary: 'Получить данные по стране по ID' })
     @Get('/countries/:id')
     @ApiParam({
         name: 'id',
@@ -718,6 +758,7 @@ export class AppController {
     }
 
     @ApiTags('Страны')
+    @ApiOperation({ summary: 'Обновить данные по стране' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Put('/country-update')
@@ -740,6 +781,7 @@ export class AppController {
     }
 
     @ApiTags('Страны')
+    @ApiOperation({ summary: 'Удалить страну' })
     @Roles(ROLES.ADMIN)
     @UseGuards(RolesGuard)
     @Delete('/countries/:id')
@@ -751,7 +793,7 @@ export class AppController {
         type: Number,
     })
     @ApiResponse({
-        status: HttpStatus.CREATED,
+        status: HttpStatus.OK,
         description: 'Успешно удалено',
     })
     async deleteCountry(@Param('id') id: number) {
