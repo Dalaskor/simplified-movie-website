@@ -22,4 +22,9 @@ export class ScoreController {
     async delete(@Payload() dto: DeleteScoreDto) {
         return await this.scoreService.delete(dto);
     }
+
+    @MessagePattern('deleteAllByFilm')
+    async deleteAllByFilm(@Payload() film_id: number) {
+        return await this.scoreService.deleteAllByFilm(film_id);
+    }
 }

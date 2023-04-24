@@ -11,6 +11,7 @@ import {
     COUNTRY_SERVICE,
     GENRE_SERVICE,
     Order,
+    SCORE_SERVICE,
     STAFF_SERVICE,
 } from '@app/common';
 import { Op } from 'sequelize';
@@ -35,6 +36,7 @@ export class FilmService {
         @Inject(STAFF_SERVICE) private staffClient: ClientProxy,
         @Inject(COUNTRY_SERVICE) private countryClient: ClientProxy,
         @Inject(GENRE_SERVICE) private genreClient: ClientProxy,
+        @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
         @InjectModel(Film) private filmRepository: typeof Film,
         @InjectModel(Spectators)
         private spectatorsRepository: typeof Spectators,
@@ -345,9 +347,11 @@ export class FilmService {
     async remove(id: number) {
         const film = await this.findOne(id);
 
-        film.destroy();
+        await lastValueFrom(this.scoreClient.send('deleteAllByFilm', film.id));
 
-        return { status: HttpStatus.OK, value: 'Фильм удален' };
+        await film.destroy();
+
+        return { statusCode: HttpStatus.OK, value: 'Фильм удален' };
     }
 
     getStaffArray(createFilmDtoArray: CreateFilmDto[]): CreateStaffDto[] {

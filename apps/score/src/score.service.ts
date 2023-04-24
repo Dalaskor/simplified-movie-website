@@ -3,6 +3,8 @@ import { CreateScoreDto, DeleteScoreDto, Film, Score } from '@app/models';
 import { UpdateScoreDto } from '@app/models/dtos/update-score.dto';
 import {
     BadRequestException,
+    HttpCode,
+    HttpStatus,
     Inject,
     Injectable,
     NotFoundException,
@@ -89,6 +91,18 @@ export class ScoreService {
         await score.destroy();
 
         return { message: 'Оценка удалена' };
+    }
+
+    async deleteAllByFilm(film_id: number) {
+        const count = await this.scoreRepository.destroy({
+            where: { film_id },
+        });
+
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'Оценки успешно удалены',
+            count,
+        };
     }
 
     private async findOne(film_id: number, user_id: number) {
