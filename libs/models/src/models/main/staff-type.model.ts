@@ -6,14 +6,14 @@ import {
     Table,
 } from 'sequelize-typescript';
 import { StaffStaffTypes } from './staff-staff-types.model';
-import { StaffType } from './staff-type.model';
+import { Staff } from './staff.model';
 
-interface StaffCreationsAttrs {
+interface StaffTypeCreationsAttrs {
     name: string;
 }
 
-@Table({ tableName: 'staffs' })
-export class Staff extends Model<Staff, StaffCreationsAttrs> {
+@Table({ tableName: 'stafftype', timestamps: false, createdAt: false })
+export class StaffType extends Model<StaffType, StaffTypeCreationsAttrs> {
     @Column({
         type: DataType.INTEGER,
         unique: true,
@@ -29,6 +29,6 @@ export class Staff extends Model<Staff, StaffCreationsAttrs> {
     })
     name: string;
 
-    @BelongsToMany(() => StaffType, () => StaffStaffTypes)
-    types: StaffType[];
+    @BelongsToMany(() => Staff, () => StaffStaffTypes)
+    staffs: Staff[];
 }

@@ -1,11 +1,20 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateStaffDto {
     @ApiProperty({
         example: 'Иван Иванов',
         description: 'Имя участника',
     })
-    @IsNumber({}, { message: 'Должно быть целым числом' })
+    @IsString({ message: 'Должно быть строкой' })
     name: string;
+
+    @ApiPropertyOptional({
+        example: ['actor'],
+        description: 'Тип участника (Может быть несколько)',
+        isArray: true,
+    })
+    @IsOptional()
+    @IsString({ each: true, message: 'Должно быть строкой' })
+    types?: string[] = [];
 }

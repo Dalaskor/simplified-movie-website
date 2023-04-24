@@ -1,5 +1,11 @@
-import { Order, PageOptionsDto } from '@app/common';
-import { CreateStaffDto, Staff, UpdateStaffDto } from '@app/models';
+import { Order, PageOptionsDto, STAFF_SERVICE, STAFF_TYPES } from '@app/common';
+import {
+    CreateStaffDto,
+    CreateStaffTypeDto,
+    Staff,
+    StaffType,
+    UpdateStaffDto,
+} from '@app/models';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
@@ -7,15 +13,63 @@ import { Op } from 'sequelize';
 
 @Injectable()
 export class StaffService {
-    constructor(@InjectModel(Staff) private staffRepository: typeof Staff) {}
+    constructor(
+        @InjectModel(Staff) private staffRepository: typeof Staff,
+        @InjectModel(StaffType) private staffTypeRepository: typeof StaffType,
+    ) {}
 
     async createMany(createStaffDtoArray: CreateStaffDto[]) {
-        const staffs = await this.staffRepository.bulkCreate(
-            createStaffDtoArray,
-            { ignoreDuplicates: true },
-        );
+        const staffs = [];
+
+        const types = await this.createStaffTypes();
+
+        for (const dto of createStaffDtoArray) {
+            const staff = await this.staffRepository.create({ name: dto.name });
+
+            const typesIds = [];
+            const typesArray = [];
+
+            for (const dtoType of dto.types) {
+                types.map((item) => {
+                    if (item.name === dtoType) {
+                        typesIds.push(item.id);
+                    }
+                });
+                types.map((item) => {
+                    if (item.name === dtoType) {
+                        typesArray.push(item);
+                    }
+                });
+            }
+
+            await staff.$set('types', typesIds);
+            staff.types = typesArray;
+
+            await staff.save();
+
+            staffs.push(staff);
+        }
 
         return staffs;
+    }
+
+    async createStaffTypes() {
+        const dtos: CreateStaffTypeDto[] = [];
+
+        dtos.push({ name: STAFF_TYPES.ACTOR });
+        dtos.push({ name: STAFF_TYPES.DIRECTOR });
+        dtos.push({ name: STAFF_TYPES.MONTAGE });
+        dtos.push({ name: STAFF_TYPES.ARTIST });
+        dtos.push({ name: STAFF_TYPES.COMPOSITOR });
+        dtos.push({ name: STAFF_TYPES.OPERATOR });
+        dtos.push({ name: STAFF_TYPES.PRODUCER });
+        dtos.push({ name: STAFF_TYPES.SCENARIO });
+
+        const types = await this.staffTypeRepository.bulkCreate(dtos, {
+            ignoreDuplicates: true,
+        });
+
+        return types;
     }
 
     async create(createStaffDto: CreateStaffDto) {
@@ -100,4 +154,6 @@ export class StaffService {
 
         return staffs;
     }
+
+    async getActors() {}
 }

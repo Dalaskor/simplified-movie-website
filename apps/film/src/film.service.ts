@@ -13,6 +13,7 @@ import {
     Order,
     SCORE_SERVICE,
     STAFF_SERVICE,
+    STAFF_TYPES,
 } from '@app/common';
 import { Op } from 'sequelize';
 import {
@@ -359,36 +360,116 @@ export class FilmService {
 
         createFilmDtoArray.forEach((value) => {
             value.director.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.DIRECTOR] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.DIRECTOR),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.DIRECTOR);
+                }
             });
             value.scenario.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.SCENARIO] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.SCENARIO),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.SCENARIO);
+                }
             });
             value.producer.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.PRODUCER] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.PRODUCER),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.PRODUCER);
+                }
             });
             value.operator.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.OPERATOR] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.OPERATOR),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.OPERATOR);
+                }
             });
             value.compositor.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.COMPOSITOR] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.COMPOSITOR),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.COMPOSITOR);
+                }
             });
             value.artist.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.ARTIST] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.ARTIST),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.ARTIST);
+                }
             });
             value.montage.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.MONTAGE] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.MONTAGE),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.MONTAGE);
+                }
             });
             value.actors.forEach((name) => {
-                if (!staffArray.find((value) => value.name == name))
-                    staffArray.push({ name });
+                if (!staffArray.find((value) => value.name == name)) {
+                    staffArray.push({ name, types: [STAFF_TYPES.ACTOR] });
+                } else if (
+                    !staffArray.find((value) =>
+                        value.types.includes(STAFF_TYPES.ACTOR),
+                    )
+                ) {
+                    const foundInx = staffArray.findIndex(
+                        (item) => item.name == name,
+                    );
+                    staffArray[foundInx].types.push(STAFF_TYPES.ACTOR);
+                }
             });
         });
 

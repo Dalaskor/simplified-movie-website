@@ -1,5 +1,6 @@
 import { DatabaseModule, RmqModule } from '@app/common';
-import { Staff } from '@app/models';
+import { Staff, StaffStaffTypes } from '@app/models';
+import { StaffType } from '@app/models/models/main/staff-type.model';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -19,7 +20,7 @@ import { StaffService } from './staff.service';
             envFilePath: './apps/staff/.env',
         }),
         DatabaseModule,
-        SequelizeModule.forFeature([Staff]),
+        SequelizeModule.forFeature([Staff, StaffType, StaffStaffTypes]),
         RmqModule,
     ],
     controllers: [StaffController],
