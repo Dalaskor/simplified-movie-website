@@ -16,5 +16,5 @@ export class CreateStaffDto {
     })
     @IsOptional()
     @IsString({ each: true, message: 'Должно быть строкой' })
-    types?: string[] = [];
+    types: string[] = [];
 }

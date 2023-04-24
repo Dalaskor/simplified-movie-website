@@ -6,7 +6,12 @@ import {
     StaffType,
     UpdateStaffDto,
 } from '@app/models';
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
@@ -73,7 +78,46 @@ export class StaffService {
     }
 
     async create(createStaffDto: CreateStaffDto) {
+        const countTypes = await this.staffTypeRepository.count();
+
+        if (!countTypes) {
+            await this.createStaffTypes();
+        }
+
+        const candidate = await this.staffRepository.findOne({
+            where: {
+                name: createStaffDto.name,
+            },
+        });
+
+        if (candidate) {
+            throw new RpcException(
+                new BadRequestException('Такой человек уже существует'),
+            );
+        }
+
+        const staffTypes = await this.staffTypeRepository.findAll({
+            where: {
+                name: {
+                    [Op.or]: createStaffDto.types,
+                },
+            },
+        });
+
+        if (staffTypes.length === 0) {
+            throw new RpcException(
+                new BadRequestException('Такого типа участника не существует'),
+            );
+        }
+
         const staff = await this.staffRepository.create(createStaffDto);
+
+        const staffTypeIds = staffTypes.map((item) => item.id);
+
+        await staff.$set('types', staffTypeIds);
+        staff.types = staffTypes;
+
+        await staff.save();
 
         return staff;
     }
@@ -87,7 +131,10 @@ export class StaffService {
     }
 
     async findOne(id: number) {
-        const staff = await this.staffRepository.findOne({ where: { id } });
+        const staff = await this.staffRepository.findOne({
+            where: { id },
+            include: { all: true },
+        });
 
         if (!staff) {
             throw new RpcException(
@@ -99,13 +146,31 @@ export class StaffService {
     }
 
     async update(id: number, updateStaffDto: UpdateStaffDto) {
+        const staffTypes = await this.staffTypeRepository.findAll({
+            where: {
+                name: {
+                    [Op.or]: updateStaffDto.types,
+                },
+            },
+        });
+
+        if (staffTypes.length === 0) {
+            throw new RpcException(
+                new BadRequestException('Такого типа участника не существует'),
+            );
+        }
+
         const staff = await this.findOne(id);
+        const typeIds = staffTypes.map((item) => item.id);
+
+        await staff.$set('types', typeIds);
 
         staff.name = updateStaffDto.name;
+        staff.types = staffTypes;
 
         await staff.save();
 
-        return staff;
+        return updateStaffDto;
     }
 
     async remove(id: number) {
