@@ -1,18 +1,21 @@
+import { FILM_SERVICE } from '@app/common';
 import { CreateScoreDto, DeleteScoreDto, Film, Score } from '@app/models';
 import { UpdateScoreDto } from '@app/models/dtos/update-score.dto';
 import {
     BadRequestException,
+    Inject,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ScoreService {
     constructor(
         @InjectModel(Score) private readonly scoreRepository: typeof Score,
-        @InjectModel(Film) private readonly filmRepository: typeof Film,
+        @Inject(FILM_SERVICE) private filmClient: ClientProxy,
     ) {}
 
     async create(dto: CreateScoreDto) {
@@ -25,14 +28,6 @@ export class ScoreService {
             );
         }
 
-        const film = await this.filmRepository.findOne({
-            where: { id: dto.film_id },
-        });
-
-        if (!film) {
-            throw new RpcException(new NotFoundException('Фильм не найден'));
-        }
-
         const score = await this.scoreRepository.create(dto);
 
         if (!score) {
@@ -41,19 +36,13 @@ export class ScoreService {
             );
         }
 
-        if (count == 0) {
-            film.scoreAVG = score.value;
-        } else {
-            const newScoreAvg = this.incRating(
-                count,
-                film.scoreAVG,
-                score.value,
-            );
-
-            film.scoreAVG = newScoreAvg;
-
-            await film.save();
-        }
+        await lastValueFrom(
+            this.filmClient.send('incFilmRating', {
+                film_id: score.film_id,
+                count: count,
+                value: score.value,
+            }),
+        );
 
         return score;
     }
@@ -66,26 +55,17 @@ export class ScoreService {
             throw new RpcException(new NotFoundException('Оценка не найдена'));
         }
 
-        const film = await this.filmRepository.findOne({
-            where: { id: dto.film_id },
-        });
-
-        if (!film) {
-            throw new RpcException(new NotFoundException('Фильм не найден'));
-        }
-
-        const oldValue = score.value;
-
-        score.value = dto.value;
-        film.scoreAVG = this.updateRating(
-            count,
-            film.scoreAVG,
-            oldValue,
-            dto.value,
+        await lastValueFrom(
+            this.filmClient.send('updateFilmRating', {
+                film_id: score.film_id,
+                count: count,
+                old_value: score.value,
+                new_value: dto.value,
+            }),
         );
 
+        score.value = dto.value;
         await score.save();
-        await film.save();
 
         return score;
     }
@@ -98,15 +78,14 @@ export class ScoreService {
             throw new RpcException(new NotFoundException('Оценка не найдена'));
         }
 
-        const film = await this.filmRepository.findOne({
-            where: { id: dto.film_id },
-        });
+        await lastValueFrom(
+            this.filmClient.send('decFilmRating', {
+                film_id: score.film_id,
+                count: count,
+                value: score.value,
+            }),
+        );
 
-        if (!film) {
-            throw new RpcException(new NotFoundException('Фильм не найден'));
-        }
-
-        film.scoreAVG = this.decRating(count, film.scoreAVG, score.value);
         await score.destroy();
 
         return { message: 'Оценка удалена' };
@@ -129,46 +108,5 @@ export class ScoreService {
         });
 
         return count;
-    }
-
-    private incRating(count: number, currentRating: number, value: number) {
-        let newScoreAvg = currentRating;
-
-        newScoreAvg *= count;
-        newScoreAvg += value;
-        count++;
-        newScoreAvg /= count;
-
-        return newScoreAvg;
-    }
-
-    private decRating(count: number, currentRating: number, value: number) {
-        let newScoreAvg = currentRating;
-
-        newScoreAvg *= count;
-        newScoreAvg -= value;
-        count--;
-
-        if (count != 0) {
-            newScoreAvg /= count;
-        }
-
-        return newScoreAvg;
-    }
-
-    private updateRating(
-        count: number,
-        currentRating: number,
-        oldValue: number,
-        newValue: number,
-    ) {
-        let newScoreAvg = currentRating;
-
-        newScoreAvg *= count;
-        newScoreAvg -= oldValue;
-        newScoreAvg += newValue;
-        newScoreAvg /= count;
-
-        return newScoreAvg;
     }
 }

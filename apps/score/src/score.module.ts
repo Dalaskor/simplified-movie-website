@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScoreController } from './score.controller';
 import { ScoreService } from './score.service';
 import * as Joi from 'joi';
-import { DatabaseModule, RmqModule } from '@app/common';
+import { DatabaseModule, FILM_SERVICE, RmqModule } from '@app/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Score } from '@app/models';
 
@@ -19,6 +19,7 @@ import { Score } from '@app/models';
             envFilePath: './apps/score/.env',
         }),
         RmqModule,
+        RmqModule.register({ name: FILM_SERVICE }),
         DatabaseModule,
         SequelizeModule.forFeature([Score]),
     ],

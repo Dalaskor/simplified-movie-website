@@ -54,4 +54,32 @@ export class FilmController {
     async getFilmsWithPag(@Payload() pageOptionsDto: FilmPagFilterDto) {
         return await this.filmService.getFilmWithPag(pageOptionsDto);
     }
+
+    @MessagePattern('incFilmRating')
+    async incFilmRating(@Payload() data: any) {
+        return await this.filmService.incFilmRating(
+            data.film_id,
+            data.count,
+            data.value,
+        );
+    }
+
+    @MessagePattern('decFilmRating')
+    async decFilmRating(@Payload() data: any) {
+        return await this.filmService.decFilmRating(
+            data.film_id,
+            data.count,
+            data.value,
+        );
+    }
+
+    @MessagePattern('updateFilmRating')
+    async updateFilmRating(@Payload() data: any) {
+        return await this.filmService.updateFilmRating(
+            data.film_id,
+            data.count,
+            data.old_value,
+            data.new_value,
+        );
+    }
 }

@@ -697,4 +697,108 @@ export class FilmService {
 
         return films;
     }
+
+    async incFilmRating(film_id: number, count: number, value: number) {
+        const film = await this.filmRepository.findOne({
+            where: { id: film_id },
+        });
+
+        if (!film) {
+            throw new RpcException(new NotFoundException('Фильм не найден'));
+        }
+
+        const newAvgScore = this.incRating(count, film.scoreAVG, value);
+
+        film.scoreAVG = newAvgScore;
+        await film.save();
+
+        return { statusCode: HttpStatus.OK };
+    }
+
+    async decFilmRating(film_id: number, count: number, value: number) {
+        const film = await this.filmRepository.findOne({
+            where: { id: film_id },
+        });
+
+        if (!film) {
+            throw new RpcException(new NotFoundException('Фильм не найден'));
+        }
+
+        const newAvgScore = this.decRating(count, film.scoreAVG, value);
+
+        film.scoreAVG = newAvgScore;
+        await film.save();
+
+        return { statusCode: HttpStatus.OK };
+    }
+
+    async updateFilmRating(
+        film_id: number,
+        count: number,
+        old_value: number,
+        new_value: number,
+    ) {
+        const film = await this.filmRepository.findOne({
+            where: { id: film_id },
+        });
+
+        if (!film) {
+            throw new RpcException(new NotFoundException('Фильм не найден'));
+        }
+
+        const newAvgScore = this.updateRating(
+            count,
+            film.scoreAVG,
+            old_value,
+            new_value,
+        );
+
+        film.scoreAVG = newAvgScore;
+        await film.save();
+
+        return { statusCode: HttpStatus.OK };
+    }
+
+    private incRating(count: number, currentRating: number, value: number) {
+        let newScoreAvg = currentRating ? currentRating : 0;
+
+        newScoreAvg *= count;
+        newScoreAvg += value;
+        count++;
+        newScoreAvg /= count;
+
+        return newScoreAvg;
+    }
+
+    private decRating(count: number, currentRating: number, value: number) {
+        let newScoreAvg = currentRating;
+
+        newScoreAvg *= count;
+        newScoreAvg -= value;
+        count--;
+
+        if (count != 0) {
+            newScoreAvg /= count;
+        } else {
+            newScoreAvg = 0;
+        }
+
+        return newScoreAvg;
+    }
+
+    private updateRating(
+        count: number,
+        currentRating: number,
+        oldValue: number,
+        newValue: number,
+    ) {
+        let newScoreAvg = currentRating;
+
+        newScoreAvg *= count;
+        newScoreAvg -= oldValue;
+        newScoreAvg += newValue;
+        newScoreAvg /= count;
+
+        return newScoreAvg;
+    }
 }
