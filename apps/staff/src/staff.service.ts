@@ -3,6 +3,7 @@ import {
     CreateStaffDto,
     CreateStaffTypeDto,
     Staff,
+    StaffPagFilter,
     StaffType,
     UpdateStaffDto,
 } from '@app/models';
@@ -202,7 +203,7 @@ export class StaffService {
     /*
      * Сервис для получения списка участников с пагинацией
      */
-    async getStaffsWithPag(pageOptionsDto: PageOptionsDto) {
+    async getStaffsWithPag(pageOptionsDto: StaffPagFilter) {
         const order: string = pageOptionsDto.order
             ? pageOptionsDto.order
             : Order.ASC;
@@ -210,15 +211,27 @@ export class StaffService {
         const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
         const skip = (page - 1) * take;
 
+        let typeFilter: string[] = pageOptionsDto.type
+            ? [pageOptionsDto.type]
+            : [];
+
         const staffs = await this.staffRepository.findAll({
+            include: [
+                {
+                    model: StaffType,
+                    where: {
+                        name: {
+                            [Op.or]: typeFilter,
+                        },
+                    },
+                },
+                { all: true },
+            ],
             order: [['createdAt', order]],
             offset: skip,
             limit: take,
-            include: { all: true },
         });
 
         return staffs;
     }
-
-    async getActors() {}
 }

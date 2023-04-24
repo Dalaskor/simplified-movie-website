@@ -44,6 +44,7 @@ export * from './dtos/delete-score.dto';
 export * from './dtos/add-role.dto';
 export * from './dtos/page-options.dto';
 export * from './dtos/pag-filter-film.dto';
+export * from './dtos/pag-filter-staff.dto';
 
 export * from './dtos/exception.dto';
 export * from './dtos/google-response.dto';
