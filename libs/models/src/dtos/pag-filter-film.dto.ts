@@ -1,9 +1,27 @@
+import { Order, SORT_PARAMS } from '@app/common';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional } from 'class-validator';
+import { IsArray, IsEnum, IsOptional } from 'class-validator';
 import { PageOptionsDto } from './page-options.dto';
 
 export class FilmPagFilterDto extends PageOptionsDto {
+    @ApiPropertyOptional({
+        enum: SORT_PARAMS,
+        default: SORT_PARAMS.rating,
+        description: 'Фильтр для сортировки',
+    })
+    @IsEnum(SORT_PARAMS)
+    @IsOptional()
+    readonly orderBy?: SORT_PARAMS = SORT_PARAMS.rating;
+
+    @ApiPropertyOptional({
+        example: Order.ASC,
+        description: 'Параметр для сортировки',
+    })
+    @IsEnum(Order)
+    @IsOptional()
+    readonly order?: Order = Order.ASC;
+
     @ApiPropertyOptional({
         default: [],
         example: ['биография', 'комедия'],

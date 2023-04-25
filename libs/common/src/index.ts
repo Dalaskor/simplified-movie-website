@@ -22,6 +22,7 @@ export * from './constants/services';
 export * from './constants/roles';
 export * from './constants/order';
 export * from './constants/staff-types';
+export * from './constants/sorting';
 
 // Paginations
 export * from './pagination/page-options.dto';

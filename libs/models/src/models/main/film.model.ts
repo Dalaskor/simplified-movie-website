@@ -4,6 +4,7 @@ import {
     Column,
     DataType,
     Model,
+    Sequelize,
     Table,
 } from 'sequelize-typescript';
 import { Country } from './country.model';

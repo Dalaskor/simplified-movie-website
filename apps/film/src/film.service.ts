@@ -14,10 +14,11 @@ import {
     Order,
     REVIEW_SERVICE,
     SCORE_SERVICE,
+    SORT_PARAMS,
     STAFF_SERVICE,
     STAFF_TYPES,
 } from '@app/common';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import {
     Country,
     CreateCountryDto,
@@ -28,6 +29,7 @@ import {
     Film,
     FilmPagFilterDto,
     Genre,
+    Score,
     Spectators,
     Staff,
     UpdateFilmDto,
@@ -698,6 +700,9 @@ export class FilmService {
         const order: string = pageOptionsDto.order
             ? pageOptionsDto.order
             : Order.ASC;
+        const orderBy: string = pageOptionsDto.orderBy
+            ? pageOptionsDto.orderBy
+            : SORT_PARAMS.rating;
         const page: number = pageOptionsDto.page ? pageOptionsDto.page : 1;
         const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
         const skip = (page - 1) * take;
@@ -781,7 +786,8 @@ export class FilmService {
                     all: true,
                 },
             ],
-            order: [['createdAt', order]],
+            // order: [['createdAt', order]],
+            order: [[orderBy, order]],
             offset: skip,
             limit: take,
         });
