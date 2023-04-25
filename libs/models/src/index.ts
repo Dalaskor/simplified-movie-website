@@ -18,6 +18,7 @@ export * from './models/main/film-scenarios.model';
 export * from './models/main/film-scores.model';
 export * from './models/main/staff-type.model';
 export * from './models/main/staff-staff-types.model';
+export * from './models/main/review.model';
 
 export * from './models/users/role.model';
 export * from './models/users/user.model';
@@ -33,6 +34,7 @@ export * from './dtos/create-genre.dto';
 export * from './dtos/create-staff.dto';
 export * from './dtos/create-score.dto';
 export * from './dtos/create-staff-type.dto';
+export * from './dtos/create-review.dto';
 
 export * from './dtos/update-country.dto';
 export * from './dtos/update-film.dto';

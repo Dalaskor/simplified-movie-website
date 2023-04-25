@@ -82,4 +82,9 @@ export class FilmController {
             data.new_value,
         );
     }
+
+    @MessagePattern('checkFilmExistById')
+    async CheckFilmExistById(@Payload() id: number) {
+        return await this.filmService.checkFilmExistById(id);
+    }
 }

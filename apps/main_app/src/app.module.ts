@@ -7,6 +7,7 @@ import {
     STAFF_SERVICE,
     GoogleStrategy,
     SCORE_SERVICE,
+    REVIEW_SERVICE,
 } from '@app/common';
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -33,6 +34,7 @@ import { AppService } from './app.service';
         RmqModule.register({ name: STAFF_SERVICE }),
         RmqModule.register({ name: COUNTRY_SERVICE }),
         RmqModule.register({ name: SCORE_SERVICE }),
+        RmqModule.register({ name: REVIEW_SERVICE }),
         forwardRef(() => AuthModule),
     ],
     controllers: [AppController],

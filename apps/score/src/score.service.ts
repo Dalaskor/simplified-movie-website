@@ -21,6 +21,10 @@ export class ScoreService {
     ) {}
 
     async create(dto: CreateScoreDto) {
+        await lastValueFrom(
+            this.filmClient.send('checkFilmExistById', dto.film_id),
+        );
+
         const count = await this.getCount(dto.film_id);
         const candidate = await this.findOne(dto.film_id, dto.user_id);
 

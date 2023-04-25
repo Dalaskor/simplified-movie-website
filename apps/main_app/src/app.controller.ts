@@ -3,7 +3,7 @@ import {
     FILM_SERVICE,
     GENRE_SERVICE,
     JwtAuthGuard,
-    PageOptionsDto,
+    REVIEW_SERVICE,
     ROLES,
     SCORE_SERVICE,
     STAFF_SERVICE,
@@ -16,6 +16,7 @@ import {
     CreateCountryDto,
     CreateFilmDto,
     CreateGenreDto,
+    CreateReviewDto,
     CreateScoreDto,
     CreateStaffDto,
     CreateUserDto,
@@ -68,6 +69,7 @@ export class AppController {
         @Inject(COUNTRY_SERVICE) private countryClient: ClientProxy,
         @Inject(AUTH_SERVICE) private authClient: ClientProxy,
         @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+        @Inject(REVIEW_SERVICE) private reviewClient: ClientProxy,
         private configService: ConfigService,
     ) {}
 
@@ -891,6 +893,135 @@ export class AppController {
     async deleteScore(@Body() dto: DeleteScoreDto) {
         return this.scoreClient
             .send('deleteScore', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    ////
+    // Reviews endpoints
+    ////
+    @ApiTags('Отзывы')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Post('/reviews')
+    @ApiOperation({ summary: 'Создать отзыв к фильму' })
+    @ApiBody({
+        type: CreateReviewDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.CREATED,
+        type: CreateReviewDto,
+    })
+    async createReview(@Body() dto: CreateReviewDto) {
+        return this.reviewClient
+            .send('createReview', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Отзывы')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Put('/reviews')
+    @ApiOperation({ summary: 'Обновить отзыв к фильму' })
+    @ApiBody({
+        type: CreateReviewDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateReviewDto,
+    })
+    async updateReview(@Body() dto: CreateReviewDto) {
+        return this.reviewClient
+            .send('updateReview', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Отзывы')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Delete('/reviews/:film_id/:user_id')
+    @ApiOperation({ summary: 'Удалить отзыв к фильму' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateReviewDto,
+    })
+    async deleteReview(
+        @Param('film_id') film_id: number,
+        @Param('user_id') user_id: number,
+    ) {
+        return this.reviewClient
+            .send('deleteReview', { film_id, user_id })
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Отзывы')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Get('/reviews/film/:film_id')
+    @ApiOperation({ summary: 'Получить все отзывы по фильму' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateReviewDto,
+    })
+    async getAllByFilmReview(@Param('film_id') film_id: number) {
+        return this.reviewClient
+            .send('getAllByFilmReview', film_id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Отзывы')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Get('/reviews/user/:user_id')
+    @ApiOperation({ summary: 'Получить все отзывы пользователя' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateReviewDto,
+    })
+    async getAllByUserReview(@Param('user_id') user_id: number) {
+        return this.reviewClient
+            .send('getAllByUserReview', user_id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Отзывы')
+    @Roles(ROLES.USER)
+    @UseGuards(RolesGuard)
+    @Get('/reviews/:film_id/:user_id')
+    @ApiOperation({ summary: 'Получить один отзыв' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateReviewDto,
+    })
+    async getOneReview(
+        @Param('film_id') film_id: number,
+        @Param('user_id') user_id: number,
+    ) {
+        return this.reviewClient
+            .send('getOneReview', { film_id, user_id })
             .pipe(
                 catchError((error) =>
                     throwError(() => new RpcException(error.response)),

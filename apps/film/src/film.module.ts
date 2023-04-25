@@ -5,6 +5,7 @@ import {
     GENRE_SERVICE,
     STAFF_SERVICE,
     SCORE_SERVICE,
+    REVIEW_SERVICE,
 } from '@app/common';
 import {
     Country,
@@ -68,6 +69,7 @@ import { FilmService } from './film.service';
         RmqModule.register({ name: COUNTRY_SERVICE }),
         RmqModule.register({ name: GENRE_SERVICE }),
         RmqModule.register({ name: SCORE_SERVICE }),
+        RmqModule.register({ name: REVIEW_SERVICE }),
         GenreModule,
         CountryModule,
         StaffModule,

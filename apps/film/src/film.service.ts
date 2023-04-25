@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     HttpStatus,
     Inject,
     Injectable,
@@ -11,6 +12,7 @@ import {
     COUNTRY_SERVICE,
     GENRE_SERVICE,
     Order,
+    REVIEW_SERVICE,
     SCORE_SERVICE,
     STAFF_SERVICE,
     STAFF_TYPES,
@@ -38,6 +40,7 @@ export class FilmService {
         @Inject(COUNTRY_SERVICE) private countryClient: ClientProxy,
         @Inject(GENRE_SERVICE) private genreClient: ClientProxy,
         @Inject(SCORE_SERVICE) private scoreClient: ClientProxy,
+        @Inject(REVIEW_SERVICE) private reviewClient: ClientProxy,
         @InjectModel(Film) private filmRepository: typeof Film,
         @InjectModel(Spectators)
         private spectatorsRepository: typeof Spectators,
@@ -349,6 +352,9 @@ export class FilmService {
         const film = await this.findOne(id);
 
         await lastValueFrom(this.scoreClient.send('deleteAllByFilm', film.id));
+        await lastValueFrom(
+            this.reviewClient.send('deleteAllByFilmReview', film.id),
+        );
 
         await film.destroy();
 
@@ -885,5 +891,17 @@ export class FilmService {
         newScoreAvg /= count;
 
         return newScoreAvg;
+    }
+
+    async checkFilmExistById(id: number) {
+        const film = await this.filmRepository.findByPk(id);
+
+        if (!film) {
+            throw new RpcException(
+                new BadRequestException('Фильма с таким ID не существует'),
+            );
+        }
+
+        return { statusCode: HttpStatus.OK };
     }
 }
