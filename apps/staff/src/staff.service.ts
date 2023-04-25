@@ -1,4 +1,4 @@
-import { Order, PageOptionsDto, STAFF_SERVICE, STAFF_TYPES } from '@app/common';
+import { Order, STAFF_TYPES } from '@app/common';
 import {
     CreateStaffDto,
     CreateStaffTypeDto,
@@ -24,7 +24,12 @@ export class StaffService {
         @InjectModel(StaffType) private staffTypeRepository: typeof StaffType,
     ) {}
 
-    async createMany(createStaffDtoArray: CreateStaffDto[]) {
+    /**
+     * Создать множество участников для заполнения базы данных.
+     * @param {CreateStaffDto[]} createStaffDtoArray - Массив с именами участинков.
+     * @returns Staff[] - Массив с участниками созданных в бд.
+     */
+    async createMany(createStaffDtoArray: CreateStaffDto[]): Promise<Staff[]> {
         const staffs = [];
 
         const types = await this.createStaffTypes();
@@ -59,7 +64,13 @@ export class StaffService {
         return staffs;
     }
 
-    async createStaffTypes() {
+    /**
+     * Создает типы участников при заполнении бд или при создании нового участника,
+     * если они не были созданы.
+     * @private
+     * @returns StaffType[] - Массив типов участинков созданных в бд.
+     */
+    private async createStaffTypes(): Promise<StaffType[]> {
         const dtos: CreateStaffTypeDto[] = [];
 
         dtos.push({ name: STAFF_TYPES.ACTOR });
@@ -78,7 +89,13 @@ export class StaffService {
         return types;
     }
 
-    async create(createStaffDto: CreateStaffDto) {
+    /**
+     * Создает одного нового участника.
+     * @param {CreateStaffDto} createStaffDto - DTO для создания участника.
+     * @returns Staff - Возвращает созданного участника.
+     * @throws BadRequestException
+     */
+    async create(createStaffDto: CreateStaffDto): Promise<Staff> {
         const countTypes = await this.staffTypeRepository.count();
 
         if (!countTypes) {
@@ -123,7 +140,11 @@ export class StaffService {
         return staff;
     }
 
-    async findAll() {
+    /**
+     * Возвращает список всех участников.
+     * @returns Staff[] - Список участников.
+     */
+    async findAll(): Promise<Staff[]> {
         const staffs = await this.staffRepository.findAll({
             include: { all: true },
         });
@@ -131,7 +152,13 @@ export class StaffService {
         return staffs;
     }
 
-    async findOne(id: number) {
+    /**
+     * Возвращает участника, найденного по ID.
+     * @param {number} id - Идентификатор участника в бд.
+     * @returns Staff - Найденный участник из бд.
+     * @throws NotFoundException
+     */
+    async findOne(id: number): Promise<Staff> {
         const staff = await this.staffRepository.findOne({
             where: { id },
             include: { all: true },
@@ -146,7 +173,17 @@ export class StaffService {
         return staff;
     }
 
-    async update(id: number, updateStaffDto: UpdateStaffDto) {
+    /**
+     * Обновляет данные о участнике и возвращает его.
+     * @param {number} id - Идентификатор участника в бд.
+     * @param {UpdateStaffDto} updateStaffDto - DTO для обновления данных участника.
+     * @returns UpdateStaffDto - Новые данные участника.
+     * @throws BadRequestException
+     */
+    async update(
+        id: number,
+        updateStaffDto: UpdateStaffDto,
+    ): Promise<UpdateStaffDto> {
         const staffTypes = await this.staffTypeRepository.findAll({
             where: {
                 name: {
@@ -174,7 +211,12 @@ export class StaffService {
         return updateStaffDto;
     }
 
-    async remove(id: number) {
+    /**
+     * Удаляет участника из базы данных.
+     * @param {number} id - Идентификатор участника в бд.
+     * @returns HttpStatus - OK
+     */
+    async remove(id: number): Promise<any> {
         const staff = await this.findOne(id);
 
         await staff.destroy();
@@ -182,6 +224,12 @@ export class StaffService {
         return { status: HttpStatus.OK };
     }
 
+    /**
+     * Находит участников в бд.
+     * @param {string[]} names - Список имен участников.
+     * @returns Возвращает список участников из базы данных.
+     * @throws NotFoundException
+     */
     async getStaffByNamesArray(names: string[]): Promise<Staff[]> {
         const staffs = await this.staffRepository.findAll({
             where: {
@@ -200,10 +248,12 @@ export class StaffService {
         return staffs;
     }
 
-    /*
-     * Сервис для получения списка участников с пагинацией
+    /**
+     * Получает список участников с учетом фильтрации, сортировки и пагинации.
+     * @param {StaffPagFilter} pageOptionsDto - DTO для фильтрации, сортировки и пагинации.
+     * @returns Staff[] - Список участников с учетом фильтрации, сортировки и пагинации.
      */
-    async getStaffsWithPag(pageOptionsDto: StaffPagFilter) {
+    async getStaffsWithPag(pageOptionsDto: StaffPagFilter): Promise<Staff[]> {
         const order: string = pageOptionsDto.order
             ? pageOptionsDto.order
             : Order.ASC;
