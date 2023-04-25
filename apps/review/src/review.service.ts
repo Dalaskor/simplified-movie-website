@@ -105,6 +105,10 @@ export class ReviewService {
         return await this.reviewRepository.destroy({ where: { film_id } });
     }
 
+    async getCountByFilm(film_id: number): Promise<number> {
+        return await this.reviewRepository.count({ where: { film_id } });
+    }
+
     private async findOne(film_id: number, user_id: number): Promise<Review> {
         const review = await this.reviewRepository.findOne({
             where: {

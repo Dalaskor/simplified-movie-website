@@ -41,4 +41,9 @@ export class ReviewController {
     async deleteAllByFilm(@Payload() film_id: number): Promise<number> {
         return await this.reviewService.deleteAllByFilm(film_id);
     }
+
+    @MessagePattern('getCountByFilm')
+    async getCountByFilm(@Payload() film_id: number): Promise<number> {
+        return await this.reviewService.getCountByFilm(film_id);
+    }
 }

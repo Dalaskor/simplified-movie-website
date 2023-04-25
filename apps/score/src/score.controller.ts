@@ -35,4 +35,9 @@ export class ScoreController {
     async deleteAllByFilm(@Payload() film_id: number) {
         return await this.scoreService.deleteAllByFilm(film_id);
     }
+
+    @MessagePattern('getCountByFilm')
+    async getCountByFilm(@Payload() film_id: number): Promise<number> {
+        return await this.scoreService.getCountByFilm(film_id);
+    }
 }

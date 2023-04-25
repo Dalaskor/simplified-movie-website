@@ -124,6 +124,10 @@ export class ScoreService {
         return score;
     }
 
+    async getCountByFilm(film_id: number): Promise<number> {
+        return await this.scoreRepository.count({ where: { film_id } });
+    }
+
     private async findOne(film_id: number, user_id: number) {
         const score = await this.scoreRepository.findOne({
             where: {

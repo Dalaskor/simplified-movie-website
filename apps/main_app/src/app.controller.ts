@@ -835,6 +835,25 @@ export class AppController {
     }
 
     @ApiTags('Оценки')
+    @Get('/scores/count/:film_id')
+    @ApiOperation({ summary: 'Получить оценку пользователя на фильм' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateScoreDto,
+    })
+    async getCountByFilmScores(
+        @Param('film_id') film_id: number,
+    ) {
+        return this.scoreClient
+            .send('getCountByFilm', film_id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Оценки')
     @Get('/scores/:film_id/:user_id')
     @ApiOperation({ summary: 'Получить оценку пользователя на фильм' })
     @ApiResponse({
@@ -970,8 +989,25 @@ export class AppController {
     }
 
     @ApiTags('Отзывы')
-    @Roles(ROLES.USER)
-    @UseGuards(RolesGuard)
+    @Get('/reviews/count/:film_id')
+    @ApiOperation({ summary: 'Получить количество отзывов к фильму' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: CreateReviewDto,
+    })
+    async getCountByFilmReview(
+        @Param('film_id') film_id: number,
+    ) {
+        return this.reviewClient
+            .send('getCountByFilm', film_id)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Отзывы')
     @Get('/reviews/film/:film_id')
     @ApiOperation({ summary: 'Получить все отзывы по фильму' })
     @ApiResponse({
@@ -989,8 +1025,6 @@ export class AppController {
     }
 
     @ApiTags('Отзывы')
-    @Roles(ROLES.USER)
-    @UseGuards(RolesGuard)
     @Get('/reviews/user/:user_id')
     @ApiOperation({ summary: 'Получить все отзывы пользователя' })
     @ApiResponse({
@@ -1008,8 +1042,6 @@ export class AppController {
     }
 
     @ApiTags('Отзывы')
-    @Roles(ROLES.USER)
-    @UseGuards(RolesGuard)
     @Get('/reviews/:film_id/:user_id')
     @ApiOperation({ summary: 'Получить один отзыв' })
     @ApiResponse({
