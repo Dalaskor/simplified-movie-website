@@ -18,6 +18,12 @@ export class ReviewService {
         @Inject(FILM_SERVICE) private filmClient: ClientProxy,
     ) {}
 
+    /**
+     * Создать отзыв.
+     * @param {CreateReviewDto} dto - DTO для создания отзыва.
+     * @returns Review - Созданный отзыв.
+     * @throws BadRequestException
+     */
     async create(dto: CreateReviewDto): Promise<Review> {
         await lastValueFrom(
             this.filmClient.send('checkFilmExistById', dto.film_id),
@@ -42,6 +48,12 @@ export class ReviewService {
         return review;
     }
 
+    /**
+     * Обновить данные отзыва.
+     * @param {CreateReviewDto} dto - DTO создания для отзыва.
+     * @returns Review - Обновленный отзыв.
+     * @throws NotFoundException
+     */
     async update(dto: CreateReviewDto): Promise<Review> {
         const review = await this.findOne(dto.film_id, dto.user_id);
 
@@ -52,7 +64,6 @@ export class ReviewService {
         console.log('REVIEW: ', review.text);
         console.log('DTO: ', dto.text);
 
-        // review.text = dto.text;
         review.set('text', dto.text);
 
         console.log('REVIEW: ', review.text);
@@ -63,6 +74,14 @@ export class ReviewService {
         return review;
     }
 
+    /**
+     * Удалить отзыв.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} user_id - Идентификатор пользователя,
+     * который написал отзыв.
+     * @returns Результат удаления отзыва.
+     * @throws NotFoundException
+     */
     async delete(film_id: number, user_id: number): Promise<any> {
         const review = await this.findOne(film_id, user_id);
 
@@ -75,6 +94,14 @@ export class ReviewService {
         return { statusCode: HttpStatus.OK, message: 'Отзыв удален' };
     }
 
+    /**
+     * Получить один отзыв.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} user_id - Идентификатор пользователя,
+     * который написал отзыв.
+     * @returns Review - Найденный отзыв.
+     * @throws NotFoundException
+     */
     async getOne(film_id: number, user_id: number): Promise<Review> {
         const review = await this.findOne(film_id, user_id);
 
@@ -85,6 +112,11 @@ export class ReviewService {
         return review;
     }
 
+    /**
+     * Получить все отзывы на фильм.
+     * @param {number} film_id - Идентификатор фильма.
+     * @returns Review[] - Список найденных отзывов.
+     */
     async getAllByFilm(film_id: number): Promise<Review[]> {
         const reviews = await this.reviewRepository.findAll({
             where: { film_id },
@@ -93,6 +125,11 @@ export class ReviewService {
         return reviews;
     }
 
+    /**
+     * Получить все отзывы пользователя.
+     * @param {number} user_id - Идентификатор пользователя.
+     * @returns Review[] - Список найденных отзывов.
+     */
     async getAllByUser(user_id: number): Promise<Review[]> {
         const reviews = await this.reviewRepository.findAll({
             where: { user_id },
@@ -101,14 +138,30 @@ export class ReviewService {
         return reviews;
     }
 
+    /**
+     * Удалить все отзывы к фильму.
+     * @param {number} film_id - Идентификатор фильма.
+     * @returns number - Количество удаленных отзывов.
+     */
     async deleteAllByFilm(film_id: number): Promise<number> {
         return await this.reviewRepository.destroy({ where: { film_id } });
     }
 
+    /**
+     * Получить количество отзывов к фильму.
+     * @param {number} film_id - Идентификатор фильма.
+     * @returns number - Количество отзывов к фильму.
+     */
     async getCountByFilm(film_id: number): Promise<number> {
         return await this.reviewRepository.count({ where: { film_id } });
     }
 
+    /**
+     * Получить один отзыв.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} user_id - Идентификатор пользователя,
+     * @returns Review - Найденный отзыв.
+     */
     private async findOne(film_id: number, user_id: number): Promise<Review> {
         const review = await this.reviewRepository.findOne({
             where: {

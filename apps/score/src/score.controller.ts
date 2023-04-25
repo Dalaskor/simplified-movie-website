@@ -4,6 +4,11 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ScoreService } from './score.service';
 
+interface ScoreData {
+    film_id: number;
+    user_id: number;
+}
+
 @Controller()
 export class ScoreController {
     constructor(private readonly scoreService: ScoreService) {}
@@ -20,11 +25,12 @@ export class ScoreController {
 
     /**
      * Получить оценку пользователя на фильм.
-     * @param {any} data - Объект хранящий в себе film_id и user_id.
+     * @param {ScoreData} data - Объект хронящий в себе
+     * {number} film_id и {number} user_id.
      * @returns Score - Оценка пользователя на фильм.
      */
     @MessagePattern('getScoreByUser')
-    async getScoreByUser(@Payload() data: any): Promise<Score> {
+    async getScoreByUser(@Payload() data: ScoreData): Promise<Score> {
         return await this.scoreService.getScoreByUser(
             data.film_id,
             data.user_id,

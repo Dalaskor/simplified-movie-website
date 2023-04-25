@@ -23,6 +23,7 @@ export class ScoreService {
      * Создание новой оценки.
      * @param {CreateStaffDto} dto - DTO для создания оценки.
      * @returns Score - Созданная оценка.
+     * @throws BadRequestException
      */
     async create(dto: CreateScoreDto): Promise<Score> {
         await lastValueFrom(
@@ -61,6 +62,7 @@ export class ScoreService {
      * Обновить оценку пользователя на фильм.
      * @param {UpdateStaffDto} dto - DTO для обновления оценки.
      * @returns UpdateScoreDto - Обновленные данные об оценке фильма.
+     * @throws NotFoundException
      */
     async update(dto: UpdateScoreDto) {
         const count = await this.getCountByFilm(dto.film_id);
@@ -89,6 +91,7 @@ export class ScoreService {
      * Удалить оценку пользователя.
      * @param {DeleteScoreDto} dto - DTO для удаления оценки.
      * @returns Результат удаления оценки.
+     * @throws NotFoundException
      */
     async delete(dto: DeleteScoreDto) {
         const count = await this.getCountByFilm(dto.film_id);
@@ -133,6 +136,7 @@ export class ScoreService {
      * @param {number} film_id - Идентификатор фильма.
      * @param {number} user_id - Идентификатор пользователя.
      * @returns Score - Оценка пользователя на фильм.
+     * @throws NotFoundException
      */
     async getScoreByUser(film_id: number, user_id: number) {
         const score = await this.scoreRepository.findOne({
