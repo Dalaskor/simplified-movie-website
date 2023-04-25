@@ -1,9 +1,8 @@
 import { FILM_SERVICE } from '@app/common';
-import { CreateScoreDto, DeleteScoreDto, Film, Score } from '@app/models';
+import { CreateScoreDto, DeleteScoreDto, Score } from '@app/models';
 import { UpdateScoreDto } from '@app/models/dtos/update-score.dto';
 import {
     BadRequestException,
-    HttpCode,
     HttpStatus,
     Inject,
     Injectable,
@@ -20,12 +19,17 @@ export class ScoreService {
         @Inject(FILM_SERVICE) private filmClient: ClientProxy,
     ) {}
 
-    async create(dto: CreateScoreDto) {
+    /**
+     * Создание новой оценки.
+     * @param {CreateStaffDto} dto - DTO для создания оценки.
+     * @returns Score - Созданная оценка.
+     */
+    async create(dto: CreateScoreDto): Promise<Score> {
         await lastValueFrom(
             this.filmClient.send('checkFilmExistById', dto.film_id),
         );
 
-        const count = await this.getCount(dto.film_id);
+        const count = await this.getCountByFilm(dto.film_id);
         const candidate = await this.findOne(dto.film_id, dto.user_id);
 
         if (candidate) {
@@ -53,8 +57,13 @@ export class ScoreService {
         return score;
     }
 
+    /**
+     * Обновить оценку пользователя на фильм.
+     * @param {UpdateStaffDto} dto - DTO для обновления оценки.
+     * @returns UpdateScoreDto - Обновленные данные об оценке фильма.
+     */
     async update(dto: UpdateScoreDto) {
-        const count = await this.getCount(dto.film_id);
+        const count = await this.getCountByFilm(dto.film_id);
         const score = await this.findOne(dto.film_id, dto.user_id);
 
         if (!score) {
@@ -76,8 +85,13 @@ export class ScoreService {
         return score;
     }
 
+    /**
+     * Удалить оценку пользователя.
+     * @param {DeleteScoreDto} dto - DTO для удаления оценки.
+     * @returns Результат удаления оценки.
+     */
     async delete(dto: DeleteScoreDto) {
-        const count = await this.getCount(dto.film_id);
+        const count = await this.getCountByFilm(dto.film_id);
         const score = await this.findOne(dto.film_id, dto.user_id);
 
         if (!score) {
@@ -97,6 +111,11 @@ export class ScoreService {
         return { message: 'Оценка удалена' };
     }
 
+    /**
+     * Удалить все оценки связанные с определенным фильмом.
+     * @param {number} film_id - Идентификтор фильма.
+     * @returns Результат удаления оценок.
+     */
     async deleteAllByFilm(film_id: number) {
         const count = await this.scoreRepository.destroy({
             where: { film_id },
@@ -109,6 +128,12 @@ export class ScoreService {
         };
     }
 
+    /**
+     * Получить оценку пользователя на фильм.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} user_id - Идентификатор пользователя.
+     * @returns Score - Оценка пользователя на фильм.
+     */
     async getScoreByUser(film_id: number, user_id: number) {
         const score = await this.scoreRepository.findOne({
             where: {
@@ -124,10 +149,21 @@ export class ScoreService {
         return score;
     }
 
+    /**
+     * Получить количество оценок на фильм.
+     * @param(number) film_id - Идентификтор фильма.
+     * @returns number - Количество оценок на фильм.
+     */
     async getCountByFilm(film_id: number): Promise<number> {
         return await this.scoreRepository.count({ where: { film_id } });
     }
 
+    /**
+     * Получить одну оценку.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} user_id - Идентификатор пользователя.
+     * @returns Score - Оценка пользователя на фильм.
+     */
     private async findOne(film_id: number, user_id: number) {
         const score = await this.scoreRepository.findOne({
             where: {
@@ -137,13 +173,5 @@ export class ScoreService {
         });
 
         return score;
-    }
-
-    private async getCount(film_id: number) {
-        let count = await this.scoreRepository.count({
-            where: { film_id },
-        });
-
-        return count;
     }
 }
