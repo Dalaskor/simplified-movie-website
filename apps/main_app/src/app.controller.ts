@@ -836,7 +836,7 @@ export class AppController {
 
     @ApiTags('Оценки')
     @Get('/scores/count/:film_id')
-    @ApiOperation({ summary: 'Получить оценку пользователя на фильм' })
+    @ApiOperation({ summary: 'Получить количество оценок фильма' })
     @ApiResponse({
         status: HttpStatus.OK,
         type: CreateScoreDto,
