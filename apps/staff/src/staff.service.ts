@@ -28,6 +28,7 @@ export class StaffService {
      * Создать множество участников для заполнения базы данных.
      * @param {CreateStaffDto[]} createStaffDtoArray - Массив с именами участинков.
      * @returns Staff[] - Массив с участниками созданных в бд.
+     * @throws BadRequestException
      */
     async createMany(createStaffDtoArray: CreateStaffDto[]): Promise<Staff[]> {
         const staffs = [];
@@ -36,6 +37,12 @@ export class StaffService {
 
         for (const dto of createStaffDtoArray) {
             const staff = await this.staffRepository.create({ name: dto.name });
+
+            if (!staff) {
+                throw new RpcException(
+                    new BadRequestException('Ошибка создания участника.'),
+                );
+            }
 
             const typesIds = [];
             const typesArray = [];
@@ -130,6 +137,12 @@ export class StaffService {
 
         const staff = await this.staffRepository.create(createStaffDto);
 
+        if (!staff) {
+            throw new RpcException(
+                new BadRequestException('Ошибка создания участника.'),
+            );
+        }
+
         const staffTypeIds = staffTypes.map((item) => item.id);
 
         await staff.$set('types', staffTypeIds);
@@ -178,7 +191,7 @@ export class StaffService {
      * @param {number} id - Идентификатор участника в бд.
      * @param {UpdateStaffDto} updateStaffDto - DTO для обновления данных участника.
      * @returns UpdateStaffDto - Новые данные участника.
-     * @throws BadRequestException
+     * @throws BadRequestException, NotFoundException
      */
     async update(
         id: number,
@@ -199,6 +212,7 @@ export class StaffService {
         }
 
         const staff = await this.findOne(id);
+
         const typeIds = staffTypes.map((item) => item.id);
 
         await staff.$set('types', typeIds);
