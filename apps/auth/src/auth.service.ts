@@ -108,8 +108,8 @@ export class AuthService {
         };
     }
 
-    async handleValidateUser(data: any) {
-        return this.jwtService.verify(data.token);
+    async handleValidateUser(data: any): Promise<Boolean> {
+        return await this.jwtService.verify(data.token);
     }
 
     async handleValidateUserWithRoles(data: any) {

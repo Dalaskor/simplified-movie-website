@@ -11,7 +11,12 @@ export class UsersService {
         private roleService: RolesService,
     ) {}
 
-    async createUser(dto: CreateUserDto) {
+    /**
+     * Создать пользователя.
+     * @param {CreateRoleDto} dto - DTO для создания пользователя.
+     * @returns User - Созданный пользователь.
+     */
+    async createUser(dto: CreateUserDto): Promise<User> {
         const user = await this.usersRepository.create(dto);
         let role = await this.roleService.getRoleByValue(ROLES.USER);
 
@@ -25,7 +30,12 @@ export class UsersService {
         return user;
     }
 
-    async createAdmin(dto: CreateUserDto) {
+    /**
+     * Создать пользователя с правами администратора.
+     * @param {CreateRoleDto} dto - DTO для создания пользователя.
+     * @returns User - Созданный пользователь.
+     */
+    async createAdmin(dto: CreateUserDto): Promise<User> {
         const user = await this.createUser(dto);
         let role = await this.roleService.getRoleByValue(ROLES.ADMIN);
 
@@ -39,7 +49,11 @@ export class UsersService {
         return user;
     }
 
-    async getAllUsers() {
+    /**
+     * Получить список всех пользователей.
+     * @returns User[] - Список найденных пользователей.
+     */
+    async getAllUsers(): Promise<User[]> {
         const users = await this.usersRepository.findAll({
             include: { all: true },
         });
@@ -47,14 +61,24 @@ export class UsersService {
         return users;
     }
 
-    async getUser(id: number) {
+    /**
+     * Получить пользователя.
+     * @param {number} id - Идентификатор пользователя.
+     * @returns User - Найденный пользователь.
+     */
+    async getUser(id: number): Promise<User> {
         return await this.usersRepository.findOne({
             where: { id },
             include: { all: true },
         });
     }
 
-    async getUserByEmail(email: string) {
+    /**
+     * Получить пользователя по Email.
+     * @param {string} email - Email пользователя.
+     * @returns User - Найденный пользователь.
+     */
+    async getUserByEmail(email: string): Promise<User> {
         const user = await this.usersRepository.findOne({
             where: { email },
             include: { all: true },
@@ -63,7 +87,12 @@ export class UsersService {
         return user;
     }
 
-    async addROle(dto: AddRoleDto) {
+    /**
+     * Добавить роль пользователю.
+     * @param {AddRoleDto} dto - DTO для добавления роли.
+     * @returns AddRoleDto - Данные роли.
+     */
+    async addROle(dto: AddRoleDto): Promise<AddRoleDto> {
         const user = await this.getUser(dto.userId);
         const role = await this.roleService.getRoleByValue(dto.value);
 
@@ -79,7 +108,12 @@ export class UsersService {
         );
     }
 
-    async removeRole(dto: AddRoleDto) {
+    /**
+     * Удалить роль пользователю.
+     * @param {AddRoleDto} dto - DTO для добавления роли.
+     * @returns AddRoleDto - Данные роли.
+     */
+    async removeRole(dto: AddRoleDto): Promise<AddRoleDto> {
         const user = await this.getUser(dto.userId);
         const role = await this.roleService.getRoleByValue(dto.value);
 
