@@ -12,7 +12,13 @@ import * as bcrypt from 'bcryptjs';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
-import { AddRoleDto, CreateUserDto, Role, User } from '@app/models';
+import {
+    AddRoleDto,
+    CreateUserDto,
+    Role,
+    TokenResponseDto,
+    User,
+} from '@app/models';
 import { RolesService } from './roles/roles.service';
 
 @Injectable()
@@ -24,7 +30,12 @@ export class AuthService {
         private readonly httpService: HttpService,
     ) {}
 
-    async createSuperUser(dto: CreateUserDto) {
+    /**
+     * Создание пользователя с правами администратора.
+     * @param {CreateUserDto} dto - DTO для создания пользователя.
+     * @returns TokenResponseDto - JWT токен.
+     */
+    async createSuperUser(dto: CreateUserDto): Promise<TokenResponseDto> {
         const candidate = await this.userService.getUserByEmail(dto.email);
 
         if (candidate) {
@@ -44,12 +55,22 @@ export class AuthService {
         return await this.generateToken(user);
     }
 
-    async login(dto: CreateUserDto) {
+    /**
+     * Авторизация пользователя.
+     * @param {CreateRoleDto} dto - DTO для создания пользователя.
+     * @returns TokenResponseDto - JWT токен.
+     */
+    async login(dto: CreateUserDto): Promise<TokenResponseDto> {
         const user = await this.validateUser(dto);
         return await this.generateToken(user);
     }
 
-    async registration(dto: CreateUserDto) {
+    /**
+     * Регистрация нового пользователя.
+     * @param {CreateRoleDto} dto - DTO для создания пользователя.
+     * @returns TokenResponseDto - JWT токен.
+     */
+    async registration(dto: CreateUserDto): Promise<TokenResponseDto> {
         const candidate = await this.userService.getUserByEmail(dto.email);
 
         if (candidate) {
@@ -69,7 +90,12 @@ export class AuthService {
         return await this.generateToken(user);
     }
 
-    private async validateUser(dto: CreateUserDto) {
+    /**
+     * Валидация пользователя.
+     * @param {CreateUserDto} dto - DTO для создания пользователя.
+     * @returns User - Проверенный пользователь.
+     */
+    private async validateUser(dto: CreateUserDto): Promise<User> {
         const user = await this.userService.getUserByEmail(dto.email);
 
         if (!user) {
@@ -96,7 +122,11 @@ export class AuthService {
         );
     }
 
-    private async generateToken(user: User) {
+    /**
+     * Генерация JWT токена.
+     * @param {User} user - Пользователь.
+     */
+    private async generateToken(user: User): Promise<TokenResponseDto> {
         const payload = {
             id: user.id,
             email: user.email,
@@ -108,10 +138,16 @@ export class AuthService {
         };
     }
 
+    /**
+     * Обработчик верификации токена.
+     */
     async handleValidateUser(data: any): Promise<Boolean> {
         return await this.jwtService.verify(data.token);
     }
 
+    /**
+     * Обработчик верификации токена.
+     */
     async handleValidateUserWithRoles(data: any) {
         const checkToken = this.jwtService.verify(data.token);
 
@@ -126,6 +162,11 @@ export class AuthService {
         throw new RpcException(new ForbiddenException('Нет доступа'));
     }
 
+    /**
+     * Получить пользователя.
+     * @param {number} id - Идентификатор пользователя.
+     * @returns User - Найденный пользователь.
+     */
     async getUser(id: number) {
         const user = await this.userService.getUser(id);
 
@@ -138,6 +179,9 @@ export class AuthService {
         return user;
     }
 
+    /**
+     * OAuth через Google
+     */
     async googleLogin(user: any) {
         if (!user) {
             return 'No user from Google';
@@ -155,6 +199,10 @@ export class AuthService {
         return await this.registration({ email: userEmail, password });
     }
 
+    /**
+     * Генерация пароля.
+     * @param {number} len - Размер пароля.
+     */
     gen_password(len: number) {
         let password = '';
         const symbols =
@@ -169,6 +217,9 @@ export class AuthService {
         return password;
     }
 
+    /**
+     * OAuth через vk
+     */
     async vkLogin(query: any) {
         if (query.access_token && query.user_id) {
             const checkToken = await this.validateVkToken(query.access_token);
@@ -202,6 +253,10 @@ export class AuthService {
         );
     }
 
+    /**
+     * Валидация токена.
+     * @param {string} token - JWT токен.
+     */
     async validateVkToken(token: string) {
         const url = `https://api.vk.com/method/users.get?access_token=${token}&v=5.131`;
         const req = await lastValueFrom(this.httpService.get(url));
@@ -215,6 +270,10 @@ export class AuthService {
         return false;
     }
 
+    /**
+     * Проверка электронной почты.
+     * @param {string} email - Электронная почта.
+     */
     async checkUserEmail(email: string) {
         const user = await this.userService.getUserByEmail(email);
 
@@ -230,14 +289,26 @@ export class AuthService {
         };
     }
 
+    /**
+     * Добавить роль пользователю.
+     * @param {AddRoleDto} dto - DTO для добавления роли пользоветилю.
+     */
     async userAddRole(dto: AddRoleDto): Promise<AddRoleDto> {
         return await this.userService.addROle(dto);
     }
 
+    /**
+     * Удалить роль пользователю.
+     * @param {AddRoleDto} dto - DTO для добавления роли пользоветилю.
+     */
     async userRemoveRole(dto: AddRoleDto): Promise<AddRoleDto> {
         return await this.userService.removeRole(dto);
     }
 
+    /**
+     * Получить список всех ролей.
+     * @returns Role[] - Список найденных ролей.
+     */
     async getAllRoles(): Promise<Role[]> {
         return await this.roleService.getAllRoles();
     }
