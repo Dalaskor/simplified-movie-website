@@ -53,6 +53,12 @@ export class FilmService {
      * @returns Результат выполнения функции.
      */
     async createMany(createFilmDtoArray: CreateFilmDto[]): Promise<any> {
+        if (!createFilmDtoArray) {
+            throw new RpcException(
+                new BadRequestException('Ошибка заполнения'),
+            );
+        }
+
         let staffArray: CreateStaffDto[] =
             this.getStaffArray(createFilmDtoArray);
         let countryArray: CreateCountryDto[] =
@@ -393,6 +399,12 @@ export class FilmService {
      */
     getStaffArray(createFilmDtoArray: CreateFilmDto[]): CreateStaffDto[] {
         let staffArray: CreateStaffDto[] = [];
+
+        if (!createFilmDtoArray) {
+            throw new RpcException(
+                new BadRequestException('Ошибка заполнения'),
+            );
+        }
 
         createFilmDtoArray.forEach((value) => {
             value.director.forEach((name) => {

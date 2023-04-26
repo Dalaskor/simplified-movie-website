@@ -12,8 +12,15 @@ import {
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { AppController } from './app.controller';
+import { AppAuthController } from './app.auth.controller';
+import { AppCountryController } from './app.country.controller';
+import { AppFillDbController } from './app.fill-db.controller';
+import { AppFilmController } from './app.film.controller';
+import { AppGenreController } from './app.genre.controller';
+import { AppReviewController } from './app.review.controller';
+import { AppScoresController } from './app.scores.controller';
 import { AppService } from './app.service';
+import { AppStaffController } from './app.staff.controller';
 
 @Module({
     imports: [
@@ -37,7 +44,16 @@ import { AppService } from './app.service';
         RmqModule.register({ name: REVIEW_SERVICE }),
         forwardRef(() => AuthModule),
     ],
-    controllers: [AppController],
+    controllers: [
+        AppFillDbController,
+        AppAuthController,
+        AppFilmController,
+        AppGenreController,
+        AppStaffController,
+        AppCountryController,
+        AppScoresController,
+        AppReviewController,
+    ],
     providers: [AppService, GoogleStrategy],
 })
 export class AppModule {}
