@@ -12,12 +12,14 @@ import * as bcrypt from 'bcryptjs';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
-import { CreateUserDto, User } from '@app/models';
+import { AddRoleDto, CreateUserDto, Role, User } from '@app/models';
+import { RolesService } from './roles/roles.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UsersService,
+        private readonly roleService: RolesService,
         private readonly jwtService: JwtService,
         private readonly httpService: HttpService,
     ) {}
@@ -226,5 +228,17 @@ export class AuthService {
             statusCode: HttpStatus.OK,
             message: 'Электронная почта свободна',
         };
+    }
+
+    async userAddRole(dto: AddRoleDto): Promise<AddRoleDto> {
+        return await this.userService.addROle(dto);
+    }
+
+    async userRemoveRole(dto: AddRoleDto): Promise<AddRoleDto> {
+        return await this.userService.removeRole(dto);
+    }
+
+    async getAllRoles(): Promise<Role[]> {
+        return await this.roleService.getAllRoles();
     }
 }

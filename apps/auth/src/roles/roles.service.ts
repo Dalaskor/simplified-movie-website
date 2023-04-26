@@ -13,7 +13,7 @@ export class RolesService {
     }
 
     async getAllRoles() {
-        const roles = this.roleRepository.findAll({ include: { all: true } });
+        const roles = this.roleRepository.findAll();
 
         return roles;
     }

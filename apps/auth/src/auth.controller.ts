@@ -7,7 +7,7 @@ import {
     RmqContext,
 } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '@app/models';
+import { AddRoleDto, CreateUserDto, Role } from '@app/models';
 
 @Controller()
 export class AuthController {
@@ -64,5 +64,20 @@ export class AuthController {
     @MessagePattern('checkUserEmail')
     async checkUserEmail(@Payload() email: string) {
         return await this.authService.checkUserEmail(email);
+    }
+
+    @MessagePattern('userAddRole')
+    async userAddRole(@Payload() dto: AddRoleDto): Promise<AddRoleDto> {
+        return await this.authService.userAddRole(dto);
+    }
+
+    @MessagePattern('userRemoveRole')
+    async userRemoveRole(@Payload() dto: AddRoleDto): Promise<AddRoleDto> {
+        return await this.authService.userRemoveRole(dto);
+    }
+
+    @MessagePattern('getAllRoles')
+    async getAllRoles(): Promise<Role[]> {
+        return await this.authService.getAllRoles();
     }
 }

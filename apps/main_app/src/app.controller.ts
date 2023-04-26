@@ -13,6 +13,7 @@ import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { AUTH_SERVICE } from '@app/common/auth/service';
 import {
+    AddRoleDto,
     CreateCountryDto,
     CreateFilmDto,
     CreateGenreDto,
@@ -327,6 +328,75 @@ export class AppController {
             statusCode: HttpStatus.OK,
             message: 'У пользователя есть права администратора.',
         };
+    }
+
+    @ApiTags('Авторизация')
+    @Post('/add-role')
+    @ApiOperation({
+        summary: 'Добавить роль пользователю',
+    })
+    @ApiBody({
+        type: AddRoleDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Операция прошла успешно.',
+    })
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
+    async userAddRole(@Body() dto: AddRoleDto) {
+        return this.authClient
+            .send('userAddRole', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Авторизация')
+    @Post('/remove-role')
+    @ApiOperation({
+        summary: 'Удалить роль у пользователя',
+    })
+    @ApiBody({
+        type: AddRoleDto,
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Операция прошла успешно.',
+    })
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
+    async userRemoveRole(@Body() dto: AddRoleDto) {
+        return this.authClient
+            .send('userRemoveRole', dto)
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
+    }
+
+    @ApiTags('Авторизация')
+    @Post('/get-all-roles')
+    @ApiOperation({
+        summary: 'Получить список ролей',
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Операция прошла успешно.',
+    })
+    /* @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard) */
+    async getAllRoles() {
+        return this.authClient
+            .send('getAllRoles', {})
+            .pipe(
+                catchError((error) =>
+                    throwError(() => new RpcException(error.response)),
+                ),
+            );
     }
 
     // Film endpoints
