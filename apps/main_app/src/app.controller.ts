@@ -306,6 +306,29 @@ export class AppController {
             );
     }
 
+    @ApiTags('Авторизация')
+    @Get('/check-admin')
+    @ApiOperation({
+        summary:
+            'Проверка на наличие прав администратора. (Необходим JWT токен)',
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'У пользователя есть права администратора.',
+    })
+    @ApiResponse({
+        status: HttpStatus.FORBIDDEN,
+        description: 'У пользователя нет прав администратора.',
+    })
+    @Roles(ROLES.ADMIN)
+    @UseGuards(RolesGuard)
+    checkAdmin() {
+        return {
+            statusCode: HttpStatus.OK,
+            message: 'У пользователя есть права администратора.',
+        };
+    }
+
     // Film endpoints
     @ApiTags('Фильмы')
     @ApiOperation({ summary: 'Создать фильм' })
@@ -841,9 +864,7 @@ export class AppController {
         status: HttpStatus.OK,
         type: CreateScoreDto,
     })
-    async getCountByFilmScores(
-        @Param('film_id') film_id: number,
-    ) {
+    async getCountByFilmScores(@Param('film_id') film_id: number) {
         return this.scoreClient
             .send('getCountByFilm', film_id)
             .pipe(
@@ -995,9 +1016,7 @@ export class AppController {
         status: HttpStatus.OK,
         type: CreateReviewDto,
     })
-    async getCountByFilmReview(
-        @Param('film_id') film_id: number,
-    ) {
+    async getCountByFilmReview(@Param('film_id') film_id: number) {
         return this.reviewClient
             .send('getCountByFilm', film_id)
             .pipe(
