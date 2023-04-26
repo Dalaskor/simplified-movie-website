@@ -1,10 +1,8 @@
 import {
-    BelongsTo,
     BelongsToMany,
     Column,
     DataType,
     Model,
-    Sequelize,
     Table,
 } from 'sequelize-typescript';
 import { Country } from './country.model';
@@ -17,10 +15,8 @@ import { FilmGenres } from './film-genres.model';
 import { FilmMontages } from './film-montages.model';
 import { FilmOperators } from './film-operators.model';
 import { FilmScenario } from './film-scenarios.model';
-import { FilmScores } from './film-scores.model';
 import { FilmSpectators } from './film-spectators.model';
 import { Genre } from './genre.model';
-import { Score } from './score.model';
 import { Spectators } from './spectators.model';
 import { Staff } from './staff.model';
 

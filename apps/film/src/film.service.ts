@@ -18,7 +18,7 @@ import {
     STAFF_SERVICE,
     STAFF_TYPES,
 } from '@app/common';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import {
     Country,
     CreateCountryDto,
@@ -29,7 +29,6 @@ import {
     Film,
     FilmPagFilterDto,
     Genre,
-    Score,
     Spectators,
     Staff,
     UpdateFilmDto,
@@ -48,10 +47,12 @@ export class FilmService {
         private spectatorsRepository: typeof Spectators,
     ) {}
 
-    /*
-     * Сервис для заполнения бд из файла json
+    /**
+     * Создать массив фильмов при заполнении бд.
+     * @param {CreateFilmDto[]} createFilmDtoArray - DTO для создания массива фльмов.
+     * @returns Результат выполнения функции.
      */
-    async createMany(createFilmDtoArray: CreateFilmDto[]) {
+    async createMany(createFilmDtoArray: CreateFilmDto[]): Promise<any> {
         let staffArray: CreateStaffDto[] =
             this.getStaffArray(createFilmDtoArray);
         let countryArray: CreateCountryDto[] =
@@ -150,7 +151,13 @@ export class FilmService {
         return { status: 'Created' };
     }
 
-    getIdsFromModelArr(names: string[], fromArr: any[]) {
+    /**
+     * Получить массив ID из массива моделей.
+     * @param {string[]} names - Список названий.
+     * @param {any[]} fromArr - Массив моделей.
+     * @returns number[] - Массив ID.
+     */
+    getIdsFromModelArr(names: string[], fromArr: any[]): number[] {
         return fromArr.map((item) => {
             if (names.includes(item.name)) {
                 return item.id;
@@ -158,8 +165,11 @@ export class FilmService {
         });
     }
 
-    /*
-     * Сервис для создание зрителя
+    /**
+     * Создать модель зрителей фильма.
+     * @param {CreateSpectatorDto} spectator - DTO для создания зрителей.
+     * @returns Spectators - Созданая модель зрителей.
+     * @throws NotFoundException
      */
     async createSpectator(spectator: CreateSpectatorDto): Promise<Spectators> {
         const country = await this.getCountryByName(spectator.country);
@@ -177,8 +187,10 @@ export class FilmService {
         return newSpectator;
     }
 
-    /*
-     * Сервис для получения страны по названию
+    /**
+     * Отправить запрос на микросервис для получения страны по названию.
+     * @param {string} name - Название страны.
+     * @returns Country - Найденная страна.
      */
     async getCountryByName(name: string): Promise<Country> {
         return lastValueFrom(
@@ -189,8 +201,10 @@ export class FilmService {
         );
     }
 
-    /*
-     * Сервис для для создания одного фильма
+    /**
+     * Создать один новый фильм.
+     * @param {CreateFilmDto} dto - DTO для создания фильма.
+     * @returns Film - Созданный фильм.
      */
     async create(dto: CreateFilmDto): Promise<Film> {
         const film = await this.filmRepository.create({
@@ -244,8 +258,9 @@ export class FilmService {
         return film;
     }
 
-    /*
-     * Получить все фильмы из бд
+    /**
+     * Получить список всех фильмов.
+     * @returns Film[] - Список найденных фильмов.
      */
     async findAll(): Promise<Film[]> {
         const films = await this.filmRepository.findAll({
@@ -255,8 +270,11 @@ export class FilmService {
         return films;
     }
 
-    /*
-     * Получить фильм по id из бд
+    /**
+     * Получить один фильм по ID.
+     * @param {number} id - Идентификатор фильма.
+     * @returns Film - Найденный фильм.
+     * @throws NotFoundException
      */
     async findOne(id: number): Promise<Film> {
         const film = await this.filmRepository.findOne({
@@ -271,8 +289,11 @@ export class FilmService {
         return film;
     }
 
-    /*
-     * Обновить данные о фильме
+    /**
+     * Обновить данные о фильме.
+     * @param {number} id - Идентификатор фильма.
+     * @param {UpdateFilmDto} dto - DTO для обновления данных о фильме.
+     * @throws NotFoundException
      */
     async update(id: number, dto: UpdateFilmDto): Promise<Film> {
         const film = await this.filmRepository.findOne({ where: { id } });
@@ -347,10 +368,12 @@ export class FilmService {
         return film;
     }
 
-    /*
-     * Удалить фильм из бд
+    /**
+     * Удалить фильм.
+     * @param {number} id - Идентификатор фильма.
+     * @returns Результат выполнения функции.
      */
-    async remove(id: number) {
+    async remove(id: number): Promise<any> {
         const film = await this.findOne(id);
 
         await lastValueFrom(this.scoreClient.send('deleteAllByFilm', film.id));
@@ -363,6 +386,11 @@ export class FilmService {
         return { statusCode: HttpStatus.OK, value: 'Фильм удален' };
     }
 
+    /**
+     * Получить массив участников из масива DTO фильма.
+     * @param {CreateFilmDto[]} createFilmDtoArray - Массив DTO для создания фильма.
+     * @returns CreateStaffDto[] - Массив DTO для создания участников.
+     */
     getStaffArray(createFilmDtoArray: CreateFilmDto[]): CreateStaffDto[] {
         let staffArray: CreateStaffDto[] = [];
 
@@ -484,6 +512,11 @@ export class FilmService {
         return staffArray;
     }
 
+    /**
+     * Получить массив стран из масива DTO фильма.
+     * @param {CreateFilmDto[]} createFilmDtoArray - Массив DTO для создания фильма.
+     * @returns CreateCountryDto[] - Массив DTO для создания стран.
+     */
     getCountryArray(createFilmDtoArray: CreateFilmDto[]): CreateCountryDto[] {
         let countryArray: CreateCountryDto[] = [];
 
@@ -501,6 +534,11 @@ export class FilmService {
         return countryArray;
     }
 
+    /**
+     * Получить массив жанров из масива DTO фильма.
+     * @param {CreateFilmDto[]} createFilmDtoArray - Массив DTO для создания фильма.
+     * @returns CreateCountryDto[] - Массив DTO для создания жанров.
+     */
     getGenreArray(createFilmDtoArray: CreateFilmDto[]): CreateGenreDto[] {
         let genreArray: CreateGenreDto[] = [];
 
@@ -514,7 +552,12 @@ export class FilmService {
         return genreArray;
     }
 
-    validateDtos(dtoArray: CreateFilmDto[]) {
+    /**
+     * Валидация DTO для создания фильма.
+     * @param {CreateFilmDto[]} dtoArray - Массив DTO для создания фильма.
+     * @returns CreateFilmDto[]
+     */
+    validateDtos(dtoArray: CreateFilmDto[]): any[] {
         const filmDtos = [];
 
         for (const dto of dtoArray) {
@@ -591,8 +634,10 @@ export class FilmService {
         return filmDtos;
     }
 
-    /*
-     * Сервис для получения массива жанров по массиву названий
+    /**
+     * Получить массив жанров по массиву названий.
+     * @param {string[]} names - Список названий.
+     * @returns Genre[] - Массив найденных жанров.
      */
     async getGenresByNames(names: string[]): Promise<Genre[]> {
         return await lastValueFrom(
@@ -600,8 +645,10 @@ export class FilmService {
         );
     }
 
-    /*
-     * Сервис для получения массива стран по массиву названий
+    /**
+     * Получить массив стран по массиву названий.
+     * @param {string[]} names - Список названий.
+     * @returns Country[] - Массив найденных стран.
      */
     async getCountriesByNames(names: string[]): Promise<Country[]> {
         return await lastValueFrom(
@@ -612,8 +659,10 @@ export class FilmService {
         );
     }
 
-    /*
-     * Сервис для получения массива участников фильма по массиву названий
+    /**
+     * Получить массив участников по массиву названий.
+     * @param {string[]} names - Список названий.
+     * @returns Country[] - Массив найденных участников.
      */
     async getStaffsByNames(names: string[]): Promise<Staff[]> {
         return await lastValueFrom(
@@ -621,82 +670,102 @@ export class FilmService {
         );
     }
 
-    /*
-     * Сервис для присвоения жанров фильму
+    /**
+     * Присвоить жанры фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Genre[]} genres - Массив жанров.
      */
-    async filmApplyGenres(film: Film, genres: Genre[]) {
+    async filmApplyGenres(film: Film, genres: Genre[]): Promise<any> {
         const ids = genres.map((item) => item.id);
         await film.$set('genres', ids);
     }
 
-    /*
-     * Сервис для присвоения стран фильму
+    /**
+     * Присвоить страны фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Country[]} countries - Массив стран.
      */
-    async filmApplyCountries(film: Film, countries: Country[]) {
+    async filmApplyCountries(film: Film, countries: Country[]): Promise<any> {
         const ids = countries.map((item) => item.id);
         await film.$set('countries', ids);
     }
 
-    /*
-     * Сервис для присвоения сценаристов фильму
+    /**
+     * Присвоить сценаристов фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Staff[]} scenarios - Массив сценаристов.
      */
-    async filmApplyScenarios(film: Film, scenarios: Staff[]) {
+    async filmApplyScenarios(film: Film, scenarios: Staff[]): Promise<any> {
         const ids = scenarios.map((item) => item.id);
         await film.$set('scenario', ids);
     }
 
-    /*
-     * Сервис для присвоения композиторов фильму
+    /**
+     * Присвоить композиторов фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Staff[]} compositors - Массив композиторов.
      */
-    async filmApplyCompositors(film: Film, compositors: Staff[]) {
+    async filmApplyCompositors(film: Film, compositors: Staff[]): Promise<any> {
         const ids = compositors.map((item) => item.id);
         await film.$set('compositors', ids);
     }
 
-    /*
-     * Сервис для присвоения актеров фильму
+    /**
+     * Присвоить актеров фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Staff[]} actors - Массив актеров.
      */
-    async filmApplyActors(film: Film, actors: Staff[]) {
+    async filmApplyActors(film: Film, actors: Staff[]): Promise<any> {
         const ids = actors.map((item) => item.id);
         await film.$set('actors', ids);
     }
 
-    /*
-     * Сервис для присвоения художников фильму
+    /**
+     * Присвоить художников фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Staff[]} artists - Массив художников.
      */
-    async filmApplyArtists(film: Film, artists: Staff[]) {
+    async filmApplyArtists(film: Film, artists: Staff[]): Promise<any> {
         const ids = artists.map((item) => item.id);
         await film.$set('artists', ids);
     }
 
-    /*
-     * Сервис для присвоения директоров фильму
+    /**
+     * Присвоить режисеров фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Staff[]} directors - Массив режисеров.
      */
-    async filmApplyDirectors(film: Film, directors: Staff[]) {
+    async filmApplyDirectors(film: Film, directors: Staff[]): Promise<any> {
         const ids = directors.map((item) => item.id);
         await film.$set('directors', ids);
     }
 
-    /*
-     * Сервис для присвоения монтажа фильму
+    /**
+     * Присвоить монтаж фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Staff[]} montages - Массив монтажа.
      */
-    async filmApplyMontages(film: Film, montages: Staff[]) {
+    async filmApplyMontages(film: Film, montages: Staff[]): Promise<any> {
         const ids = montages.map((item) => item.id);
         await film.$set('montages', ids);
     }
 
-    /*
-     * Сервис для присвоения операторов фильму
+    /**
+     * Присвоить операторов фильму.
+     * @param {Film} film - Фильм к которму нужно присвоить.
+     * @param {Staff[]} operators - Массив операторов.
      */
-    async filmApplyOperators(film: Film, operators: Staff[]) {
+    async filmApplyOperators(film: Film, operators: Staff[]): Promise<any> {
         const ids = operators.map((item) => item.id);
         await film.$set('operators', ids);
     }
 
-    /*
-     * Сервис для получения списка фильмов с пагинацией
+    /**
+     * Получить список фильмов с учетом фильтрации, сортировки и пагинации.
+     * @param {FilmPagFilterDto} pageOptionsDto - DTO для фильтрации, сортировки и пагинации фильмов.
+     * @returns Film[] - Список найденных фильмов.
      */
-    async getFilmWithPag(pageOptionsDto: FilmPagFilterDto) {
+    async getFilmWithPag(pageOptionsDto: FilmPagFilterDto): Promise<Film[]> {
         const order: string = pageOptionsDto.order
             ? pageOptionsDto.order
             : Order.ASC;
@@ -795,7 +864,18 @@ export class FilmService {
         return films;
     }
 
-    async incFilmRating(film_id: number, count: number, value: number) {
+    /**
+     * Увеличить рейтинг фильма.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} count - количество оценок до создания новой.
+     * @param {number} value - Значение новой оценки.
+     * @returns Результат выполнения функции.
+     */
+    async incFilmRating(
+        film_id: number,
+        count: number,
+        value: number,
+    ): Promise<any> {
         const film = await this.filmRepository.findOne({
             where: { id: film_id },
         });
@@ -812,7 +892,18 @@ export class FilmService {
         return { statusCode: HttpStatus.OK };
     }
 
-    async decFilmRating(film_id: number, count: number, value: number) {
+    /**
+     * Уменьшить рейтинг фильма.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} count - количество оценок до создания новой.
+     * @param {number} value - Значение новой оценки.
+     * @returns Результат выполнения функции.
+     */
+    async decFilmRating(
+        film_id: number,
+        count: number,
+        value: number,
+    ): Promise<any> {
         const film = await this.filmRepository.findOne({
             where: { id: film_id },
         });
@@ -829,12 +920,20 @@ export class FilmService {
         return { statusCode: HttpStatus.OK };
     }
 
+    /**
+     * Обновить рейтинг фильма.
+     * @param {number} film_id - Идентификатор фильма.
+     * @param {number} count - количество оценок до создания новой.
+     * @param {number} old_value - Старое значение новой оценки.
+     * @param {number} new_value - Новое значение новой оценки.
+     * @returns Результат выполнения функции.
+     */
     async updateFilmRating(
         film_id: number,
         count: number,
         old_value: number,
         new_value: number,
-    ) {
+    ): Promise<any> {
         const film = await this.filmRepository.findOne({
             where: { id: film_id },
         });
@@ -856,7 +955,17 @@ export class FilmService {
         return { statusCode: HttpStatus.OK };
     }
 
-    private incRating(count: number, currentRating: number, value: number) {
+    /**
+     * Увеличить рейтинг.
+     * @param {number} count - Количество оценок.
+     * @param {number} currentRating - Текущий рейтинг фильма.
+     * @param {number} value - Занчение новой оценки.
+     */
+    private incRating(
+        count: number,
+        currentRating: number,
+        value: number,
+    ): number {
         let newScoreAvg = currentRating ? currentRating : 0;
 
         newScoreAvg *= count;
@@ -867,7 +976,17 @@ export class FilmService {
         return newScoreAvg;
     }
 
-    private decRating(count: number, currentRating: number, value: number) {
+    /**
+     * Понизить рейтинг.
+     * @param {number} count - Количество оценок.
+     * @param {number} currentRating - Текущий рейтинг фильма.
+     * @param {number} value - Занчение новой оценки.
+     */
+    private decRating(
+        count: number,
+        currentRating: number,
+        value: number,
+    ): number {
         let newScoreAvg = currentRating;
 
         newScoreAvg *= count;
@@ -883,12 +1002,19 @@ export class FilmService {
         return newScoreAvg;
     }
 
+    /**
+     * Обновить рейтинг.
+     * @param {number} count - Количество оценок.
+     * @param {number} currentRating - Текущий рейтинг фильма.
+     * @param {number} oldValue - Занчение старой оценки.
+     * @param {number} newValue - Занчение новой оценки.
+     */
     private updateRating(
         count: number,
         currentRating: number,
         oldValue: number,
         newValue: number,
-    ) {
+    ): number {
         let newScoreAvg = currentRating;
 
         newScoreAvg *= count;
@@ -899,7 +1025,13 @@ export class FilmService {
         return newScoreAvg;
     }
 
-    async checkFilmExistById(id: number) {
+    /**
+     * Проверка существования фильма по ID.
+     * @param {number} id - Идентификатор фильма.
+     * @returns Результат выполнения функции.
+     * @throws BadRequestException
+     */
+    async checkFilmExistById(id: number): Promise<any> {
         const film = await this.filmRepository.findByPk(id);
 
         if (!film) {

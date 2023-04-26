@@ -20,7 +20,9 @@ export class CountryService {
      * @param {CreateCountryDto[]} createCountryDtoArray DTO для создания стран из массива.
      * @returns Country[] - Массив созданных стран
      */
-    async createMany(createCountryDtoArray: CreateCountryDto[]) {
+    async createMany(
+        createCountryDtoArray: CreateCountryDto[],
+    ): Promise<Country[]> {
         const countries = await this.countryRepository.bulkCreate(
             createCountryDtoArray,
             { ignoreDuplicates: true },
@@ -35,7 +37,7 @@ export class CountryService {
      * @returns Country - Созданная страна
      * @throws BadRequestException
      */
-    async create(createCountryDto: CreateCountryDto) {
+    async create(createCountryDto: CreateCountryDto): Promise<Country> {
         const candidate = await this.countryRepository.findOne({
             where: { name: createCountryDto.name },
         });
@@ -67,7 +69,7 @@ export class CountryService {
      * @returns Country - Найденная страна.
      * @throws NotFoundException
      */
-    async findOne(id: number) {
+    async findOne(id: number): Promise<Country> {
         const country = await this.countryRepository.findOne({ where: { id } });
 
         if (!country) {
@@ -100,7 +102,10 @@ export class CountryService {
      * @param {UpdateCountryDto} updateCountryDto - DTO для обновления данных о стране.
      * @returns Country - Обновленная страна.
      */
-    async update(id: number, updateCountryDto: UpdateCountryDto) {
+    async update(
+        id: number,
+        updateCountryDto: UpdateCountryDto,
+    ): Promise<Country> {
         const country = await this.findOne(id);
 
         country.name = updateCountryDto.name;
@@ -115,7 +120,7 @@ export class CountryService {
      * @param {number} id - Идентификатор страны.
      * @returns Результат выполнения функции.
      */
-    async remove(id: number) {
+    async remove(id: number): Promise<any> {
         const country = await this.findOne(id);
 
         await country.destroy();
