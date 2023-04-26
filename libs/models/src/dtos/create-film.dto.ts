@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsInt, IsString, ValidateNested } from 'class-validator';
 
 export class CreateFilmDto {
     @ApiProperty({
@@ -28,7 +28,7 @@ export class CreateFilmDto {
         example: '2023',
         description: 'Год выпуска',
     })
-    @IsNumber({}, { message: 'Должно быть целым числом' })
+    @IsInt({ message: 'Должно быть целым числом' })
     year: number;
 
     @ApiProperty({

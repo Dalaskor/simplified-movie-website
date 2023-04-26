@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 import { CreateGenreDto } from './create-genre.dto';
 
 export class UpdateGenreDto extends PartialType(CreateGenreDto) {
@@ -8,7 +8,7 @@ export class UpdateGenreDto extends PartialType(CreateGenreDto) {
         example: '1',
         description: 'Идентификатор жанра в базе данных',
     })
-    @IsNumber({}, { message: 'Должно быть целым числом' })
+    @IsInt({ message: 'Должно быть целым числом' })
     id: number;
 
     @ApiProperty({

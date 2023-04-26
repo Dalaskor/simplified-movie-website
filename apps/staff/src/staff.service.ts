@@ -36,13 +36,21 @@ export class StaffService {
         const types = await this.createStaffTypes();
 
         for (const dto of createStaffDtoArray) {
+            const candidate = await this.staffRepository.findOne({
+                where: { name: dto.name },
+            });
+
+            if(candidate) {
+                continue;
+            }
+
             const staff = await this.staffRepository.create({ name: dto.name });
 
-            if (!staff) {
+            /* if (!staff) {
                 throw new RpcException(
                     new BadRequestException('Ошибка создания участника.'),
                 );
-            }
+            } */
 
             const typesIds = [];
             const typesArray = [];

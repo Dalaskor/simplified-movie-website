@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsInt, IsNumber, IsString } from 'class-validator';
 import { CreateFilmDto } from './create-film.dto';
 
 export class UpdateFilmDto extends PartialType(CreateFilmDto) {
@@ -8,7 +8,7 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
         example: 1,
         description: 'Идентификатор фильма в базе данных',
     })
-    @IsNumber({}, { message: 'Должно быть целым числом' })
+    @IsInt({ message: 'Должно быть целым числом' })
     id: number;
 
     @ApiProperty({
@@ -36,7 +36,7 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
         example: '2023',
         description: 'Год выпуска',
     })
-    @IsNumber({}, { message: 'Должно быть целым числом' })
+    @IsInt({ message: 'Должно быть целым числом' })
     year: number;
 
     @ApiProperty({

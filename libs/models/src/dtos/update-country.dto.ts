@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 import { CreateCountryDto } from './create-country.dto';
 
 export class UpdateCountryDto extends PartialType(CreateCountryDto) {
@@ -8,7 +8,7 @@ export class UpdateCountryDto extends PartialType(CreateCountryDto) {
         example: 1,
         description: 'Идентификатор страны в базе данных',
     })
-    @IsString({ message: 'Должно быть строкой' })
+    @IsInt({ message: 'Должно быть целым числом' })
     id: number;
 
     @ApiProperty({
