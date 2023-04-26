@@ -47,15 +47,41 @@ export class FilmService {
         private spectatorsRepository: typeof Spectators,
     ) {}
 
+    async createMany(createFilmDtoArray: CreateFilmDto[]): Promise<any> {
+        if (!createFilmDtoArray) {
+            throw new RpcException(
+                new BadRequestException('Ошибка заполнения'),
+            );
+        }
+
+        const step = 50;
+        let i = 0;
+
+        while (i < createFilmDtoArray.length) {
+            await this.createManyFilms(createFilmDtoArray.slice(i, i + step));
+            i += step;
+        }
+
+        return { status: 'Created' };
+    }
+
     /**
      * Создать массив фильмов при заполнении бд.
      * @param {CreateFilmDto[]} createFilmDtoArray - DTO для создания массива фльмов.
      * @returns Результат выполнения функции.
      */
-    async createMany(createFilmDtoArray: CreateFilmDto[]): Promise<any> {
+    async createManyFilms(createFilmDtoArray: CreateFilmDto[]): Promise<any> {
         if (!createFilmDtoArray) {
             throw new RpcException(
                 new BadRequestException('Ошибка заполнения'),
+            );
+        }
+
+        if (createFilmDtoArray.length > 50) {
+            throw new RpcException(
+                new BadRequestException(
+                    'Превышает лимит размера массива (Лимит равен 50)',
+                ),
             );
         }
 
