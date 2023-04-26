@@ -28,7 +28,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
         description: 'Фильтр по списку жанров',
     })
     @Type(() => Array<string>)
-    @IsArray()
+    // @IsArray()
     @IsOptional()
     readonly genres?: string[] = [];
 
@@ -38,7 +38,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
         description: 'Фильтр по списку жанров на английском',
     })
     @Type(() => Array<string>)
-    @IsArray()
+    // @IsArray()
     @IsOptional()
     readonly genres_en?: string[] = [];
 
@@ -48,7 +48,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
         description: 'Фильтр по списку стран',
     })
     @Type(() => Array<string>)
-    @IsArray()
+    // @IsArray()
     @IsOptional()
     readonly countries?: string[] = [];
 
@@ -58,7 +58,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
         description: 'Фильтр по списку актеров',
     })
     @Type(() => Array<string>)
-    @IsArray()
+    // @IsArray()
     @IsOptional()
     readonly actors?: string[] = [];
 
@@ -68,7 +68,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
         description: 'Фильтр по списку режисеров',
     })
     @Type(() => Array<string>)
-    @IsArray()
+    // @IsArray()
     @IsOptional()
     readonly directors?: string[] = [];
 }
