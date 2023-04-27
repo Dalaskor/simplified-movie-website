@@ -132,9 +132,9 @@ describe('CountryController', () => {
 
     it('should get the countries by names array', async () => {
         const names: string[] = ['Test 1', 'Test 2'];
-        await controller.getStaffByNamesHandle(names);
+        await controller.getCountriesByNamesHandle(names);
         expect(service.getCountriesByNamesArray).toHaveBeenCalled();
-        expect(controller.getStaffByNamesHandle(names)).resolves.toEqual([
+        expect(controller.getCountriesByNamesHandle(names)).resolves.toEqual([
             {
                 id: 1,
                 name: names[0],

@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsString } from 'class-validator';
+import { IsInt, IsString, ValidateIf } from 'class-validator';
 import { CreateGenreDto } from './create-genre.dto';
 
 export class UpdateGenreDto extends PartialType(CreateGenreDto) {
@@ -17,4 +17,12 @@ export class UpdateGenreDto extends PartialType(CreateGenreDto) {
     })
     @IsString({ message: 'Должно быть строкой' })
     name: string;
+
+    @ApiProperty({
+        example: 'action',
+        description: 'Название жанра на английском',
+    })
+    @IsString({ message: 'Должно быть строкой' })
+    @ValidateIf((object, value) => value !== null)
+    name_en?: string;
 }

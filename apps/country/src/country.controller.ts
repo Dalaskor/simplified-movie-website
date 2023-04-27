@@ -91,7 +91,7 @@ export class CountryController {
      * @returns Country[] - Массив найденных стран.
      */
     @MessagePattern({ cmd: 'getCountriesByNames' })
-    async getStaffByNamesHandle(
+    async getCountriesByNamesHandle(
         @Payload() names: string[],
     ): Promise<Country[]> {
         return await this.countryService.getCountriesByNamesArray(names);

@@ -9,6 +9,10 @@ export class CreateGenreDto {
     @IsString({ message: 'Должно быть строкой' })
     name: string;
 
+    @ApiProperty({
+        example: 'action',
+        description: 'Название жанра на английском',
+    })
     @IsString({ message: 'Должно быть строкой' })
     @ValidateIf((object, value) => value !== null)
     name_en?: string | null;
