@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
-import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ReviewService {

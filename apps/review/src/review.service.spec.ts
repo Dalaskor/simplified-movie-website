@@ -1,5 +1,6 @@
 import { FILM_SERVICE } from '@app/common';
 import { CreateReviewDto, Review } from '@app/models';
+import { HttpStatus } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { getModelToken } from '@nestjs/sequelize';
 import { Test } from '@nestjs/testing';
@@ -52,5 +53,47 @@ describe('ReviewService', () => {
 
     it('should create the review', async () => {
         expect(await service.create(testCreateReviewDto)).toEqual(testReview);
+    });
+
+    it('should delete the review', async () => {
+        const destroyStub = jest.fn();
+        const findSpy = jest
+            .spyOn(model, 'findOne')
+            .mockReturnValue({ destroy: destroyStub } as any);
+        const retVal = await service.delete(1, 1);
+
+        expect(findSpy).toBeCalledWith({ where: { film_id: 1, user_id: 1 } });
+        expect(destroyStub).toBeCalledTimes(1);
+        expect(retVal).toMatchObject({
+            statusCode: HttpStatus.OK,
+            message: 'Отзыв удален',
+        });
+    });
+
+    it('should find the review', async () => {
+        const saveStub = jest.fn();
+        const findspy = jest.spyOn(model, 'findOne').mockReturnValue({
+            save: saveStub,
+        } as any);
+        expect(await service.getOne(1, 1));
+        expect(findspy).toBeCalledWith({ where: { film_id: 1, user_id: 1 } });
+    });
+
+    it('should find all reviews for film', async () => {
+        const saveStub = jest.fn();
+        const findspy = jest.spyOn(model, 'findAll').mockReturnValue({
+            save: saveStub,
+        } as any);
+        expect(await service.getAllByFilm(1));
+        expect(findspy).toBeCalledWith({ where: { film_id: 1 } });
+    });
+
+    it('should find all reviews for user', async () => {
+        const saveStub = jest.fn();
+        const findspy = jest.spyOn(model, 'findAll').mockReturnValue({
+            save: saveStub,
+        } as any);
+        expect(await service.getAllByUser(1));
+        expect(findspy).toBeCalledWith({ where: { user_id: 1 } });
     });
 });
