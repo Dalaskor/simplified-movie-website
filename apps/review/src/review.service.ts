@@ -25,9 +25,10 @@ export class ReviewService {
      * @throws BadRequestException
      */
     async create(dto: CreateReviewDto): Promise<Review> {
-        await lastValueFrom(
+        /* await lastValueFrom(
             this.filmClient.send('checkFilmExistById', dto.film_id),
-        );
+        ); */
+        await this.checkFilm(dto.film_id);
 
         const candidate = await this.findOne(dto.film_id, dto.user_id);
 
@@ -46,6 +47,10 @@ export class ReviewService {
         }
 
         return review;
+    }
+
+    async checkFilm(film_id: number) {
+        return this.filmClient.send('checkFilmExistById', film_id);
     }
 
     /**

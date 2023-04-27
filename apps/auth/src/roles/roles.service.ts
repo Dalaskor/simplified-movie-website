@@ -47,14 +47,9 @@ export class RolesService {
      * Получить роль по названию.
      * @param {string} value - Название роли.
      * @returns Role - Найденная роль.
-     * @throws NotFoundException
      */
     async getRoleByValue(value: string): Promise<Role> {
         const role = await this.roleRepository.findOne({ where: { value } });
-
-        if (!role) {
-            throw new RpcException(new NotFoundException('Роль не найдена'));
-        }
 
         return role;
     }
