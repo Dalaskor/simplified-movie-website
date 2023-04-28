@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
-import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ScoreService {
@@ -26,9 +25,7 @@ export class ScoreService {
      * @throws BadRequestException
      */
     async create(dto: CreateScoreDto): Promise<Score> {
-        await lastValueFrom(
-            this.filmClient.send('checkFilmExistById', dto.film_id),
-        );
+        await this.checkFilm(dto.user_id);
 
         const count = await this.getCountByFilm(dto.film_id);
         const candidate = await this.findOne(dto.film_id, dto.user_id);
@@ -47,15 +44,13 @@ export class ScoreService {
             );
         }
 
-        await lastValueFrom(
-            this.filmClient.send('incFilmRating', {
-                film_id: score.film_id,
-                count: count,
-                value: score.value,
-            }),
-        );
+        await this.incFilmRating(score.film_id, count, score.value);
 
         return score;
+    }
+
+    async checkFilm(film_id: number): Promise<any> {
+        return this.filmClient.send('checkFilmExistById', film_id);
     }
 
     /**
@@ -72,13 +67,11 @@ export class ScoreService {
             throw new RpcException(new NotFoundException('Оценка не найдена'));
         }
 
-        await lastValueFrom(
-            this.filmClient.send('updateFilmRating', {
-                film_id: score.film_id,
-                count: count,
-                old_value: score.value,
-                new_value: dto.value,
-            }),
+        await this.updateFilmRating(
+            score.film_id,
+            count,
+            score.value,
+            dto.value,
         );
 
         score.value = dto.value;
@@ -101,17 +94,49 @@ export class ScoreService {
             throw new RpcException(new NotFoundException('Оценка не найдена'));
         }
 
-        await lastValueFrom(
-            this.filmClient.send('decFilmRating', {
-                film_id: score.film_id,
-                count: count,
-                value: score.value,
-            }),
-        );
+        await this.decFilmRating(score.film_id, count, score.value);
 
         await score.destroy();
 
         return { message: 'Оценка удалена' };
+    }
+
+    private async incFilmRating(
+        film_id: number,
+        count: number,
+        value: number,
+    ): Promise<any> {
+        return this.filmClient.send('incFilmRating', {
+            film_id,
+            count,
+            value,
+        });
+    }
+
+    private async updateFilmRating(
+        film_id: number,
+        count: number,
+        old_value: number,
+        new_value: number,
+    ): Promise<any> {
+        return this.filmClient.send('updateFilmRating', {
+            film_id,
+            count,
+            old_value,
+            new_value,
+        });
+    }
+
+    private async decFilmRating(
+        film_id: number,
+        count: number,
+        value: number,
+    ): Promise<any> {
+        return this.filmClient.send('decFilmRating', {
+            film_id,
+            count,
+            value,
+        });
     }
 
     /**
