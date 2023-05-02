@@ -52,7 +52,7 @@ export class AppFilmController {
             );
     }
 
-    @ApiTags('Фильмы')
+    /* @ApiTags('Фильмы')
     @ApiOperation({ summary: 'Получить всех список фильмов' })
     @Get('/all-films')
     @ApiResponse({
@@ -69,7 +69,7 @@ export class AppFilmController {
                     throwError(() => new RpcException(error.response)),
                 ),
             );
-    }
+    } */
 
     @ApiTags('Фильмы')
     @ApiOperation({

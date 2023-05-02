@@ -42,7 +42,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: 'Россия',
         description: 'Страна произведения',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     country: string[];
@@ -50,7 +49,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["музыка", "биография", "драма"]',
         description: 'Жанр произведения',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     genre: string[];
@@ -65,7 +63,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Рустам Мосафир"]',
         description: 'Директора',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     director: string[];
@@ -73,7 +70,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Дмитрий Лемешев", "Рустам Мосафир", "Александр Бузин"]',
         description: 'Сценаристы',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     scenario: string[];
@@ -81,7 +77,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Дмитрий Нелидов", "Александра Ремизова", "Ольга Филипук"]',
         description: 'Продюсеры',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     producer: string[];
@@ -89,7 +84,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Степан Бешкуров"]',
         description: 'Операторы',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     operator: string[];
@@ -97,7 +91,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Алексей Горшенев"]',
         description: 'Композиторы',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     compositor: string[];
@@ -105,7 +98,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Григорий Пушкин", "Оксана Кручина", "Макр Ли"]',
         description: 'Художники',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     artist: string[];
@@ -113,7 +105,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Андрей Назаров"]',
         description: 'Монтаж',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     montage: string[];
@@ -121,7 +112,6 @@ export class UpdateFilmDto extends PartialType(CreateFilmDto) {
     @ApiProperty({
         example: '["Константин Плотников", "Влад Коноплёв"]',
         description: 'Актеры',
-        isArray: true,
     })
     @IsString({ message: 'Должно быть строкой', each: true })
     actors: string[];

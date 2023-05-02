@@ -52,7 +52,7 @@ export class AppStaffController {
             );
     }
 
-    @ApiTags('Участники')
+    /* @ApiTags('Участники')
     @ApiOperation({ summary: 'Получить список всех участников' })
     @Get('/all-staffs')
     @ApiResponse({
@@ -69,7 +69,7 @@ export class AppStaffController {
                     throwError(() => new RpcException(error.response)),
                 ),
             );
-    }
+    } */
 
     @ApiTags('Участники')
     @ApiOperation({ summary: 'Получить список участников с пагинацией' })

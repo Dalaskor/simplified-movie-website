@@ -397,6 +397,8 @@ export class FilmService {
             await this.filmApplyOperators(film, operators);
         }
 
+        await film.save();
+
         return film;
     }
 
