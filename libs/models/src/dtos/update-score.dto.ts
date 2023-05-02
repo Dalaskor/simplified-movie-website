@@ -6,20 +6,20 @@ export class UpdateScoreDto {
         example: '1',
         description: 'Идентификатор фильма',
     })
-    @IsInt({ message: 'Должно быть целым числом' })
+    @IsInt({ message: 'film_id Должно быть целым числом' })
     film_id: number;
 
     @ApiProperty({
         example: '1',
         description: 'Идентификатор пользователя',
     })
-    @IsInt({ message: 'Должно быть целым числом' })
+    @IsInt({ message: 'user_id Должно быть целым числом' })
     user_id: number;
 
     @ApiProperty({
         example: '7.5',
         description: 'Оценка фильма',
     })
-    @IsNumber({}, { message: 'Должно быть числом' })
+    @IsNumber({}, { message: 'value Должно быть числом' })
     value: number;
 }

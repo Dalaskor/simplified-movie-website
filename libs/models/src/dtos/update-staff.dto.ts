@@ -8,14 +8,14 @@ export class UpdateStaffDto extends PartialType(CreateStaffDto) {
         example: 1,
         description: 'Идентификатор участника в базе данных',
     })
-    @IsInt({ message: 'Должно быть целым числом' })
+    @IsInt({ message: 'id Должно быть целым числом' })
     id: number;
 
     @ApiProperty({
         example: 'Иван Иванов',
         description: 'Имя участника',
     })
-    @IsString({ message: 'Должно быть строкой' })
+    @IsString({ message: 'name Должно быть строкой' })
     name: string;
 
     @ApiPropertyOptional({
@@ -24,6 +24,6 @@ export class UpdateStaffDto extends PartialType(CreateStaffDto) {
         isArray: true,
     })
     @IsOptional()
-    @IsString({ each: true, message: 'Должно быть строкой' })
+    @IsString({ each: true, message: 'элемент массива types Должно быть строкой' })
     types: string[] = [];
 }

@@ -6,6 +6,6 @@ export class CreateCountryDto {
         example: 'Россия',
         description: 'Название страны',
     })
-    @IsString({ message: 'Должно быть строкой' })
+    @IsString({ message: 'name Должно быть строкой' })
     name: string;
 }
