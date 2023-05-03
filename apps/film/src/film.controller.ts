@@ -109,6 +109,14 @@ export class FilmController {
     }
 
     /**
+     * Получить количество фильмов.
+     */
+    @MessagePattern('getCountFilms')
+    async getCountFilms(): Promise<number> {
+        return await this.filmService.getCountFilms();
+    }
+
+    /**
      * Увеличить рейтинг фильма.
      * @param {FilmRatingData} data - Объект с данными для рейтинга.
      * @returns Результат выполнения функции.

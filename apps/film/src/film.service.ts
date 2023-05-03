@@ -1082,4 +1082,12 @@ export class FilmService {
 
         return { statusCode: HttpStatus.OK };
     }
+
+    /**
+     * Получить количество фильмов
+     */
+     async getCountFilms(): Promise<number> {
+         const count = await this.filmRepository.count();
+         return count;
+     }
 }

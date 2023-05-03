@@ -13,6 +13,7 @@ import {
     Post,
     Put,
     Query,
+    Res,
     UseGuards,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
@@ -23,7 +24,7 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { catchError, throwError } from 'rxjs';
+import { catchError, lastValueFrom, Observable, throwError } from 'rxjs';
 
 @Controller()
 export class AppFilmController {
@@ -81,14 +82,28 @@ export class AppFilmController {
         status: HttpStatus.OK,
         isArray: true,
     })
-    async getFilmWithPag(@Query() pageOptionsDto: FilmPagFilterDto) {
-        return this.filmClient
-            .send('getFilmsWithPag', pageOptionsDto)
-            .pipe(
-                catchError((error) =>
-                    throwError(() => new RpcException(error.response)),
+    async getFilmWithPag(
+        @Query() pageOptionsDto: FilmPagFilterDto,
+        @Res() res: any,
+    ) {
+        const countHeader = await lastValueFrom(
+            this.filmClient.send<number>('getCountFilms', {}),
+        );
+        const films = await this.getPagFilms(pageOptionsDto);
+        await res.header('x-total-count', countHeader);
+        await res.send(films);
+    }
+
+    async getPagFilms(pageOptionsDto: FilmPagFilterDto) {
+        return await lastValueFrom(
+            this.filmClient
+                .send('getFilmsWithPag', pageOptionsDto)
+                .pipe(
+                    catchError((error) =>
+                        throwError(() => new RpcException(error.response)),
+                    ),
                 ),
-            );
+        );
     }
 
     @ApiTags('Фильмы')
