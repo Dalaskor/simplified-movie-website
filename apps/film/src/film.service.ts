@@ -801,91 +801,62 @@ export class FilmService {
       directorFilter = [directorFilter];
     }
 
+    const includes = [];
+    if (genreFilter.length > 0) {
+      includes.push({
+        model: Genre,
+        where: {
+          name: {
+            [Op.or]: genreFilter,
+          },
+          name_en: {
+            [Op.or]: genreEnFilter,
+          },
+        },
+      });
+    }
+    if (genreFilter.length > 0) {
+      includes.push({
+        model: Country,
+        where: {
+          name: {
+            [Op.or]: countryFilter,
+          },
+        },
+      });
+    }
+    if (actorFilter.length > 0) {
+      includes.push({
+        model: Staff,
+        as: 'actors',
+        where: {
+          name: {
+            [Op.or]: actorFilter,
+          },
+        },
+      });
+    }
+    if (directorFilter.length > 0) {
+      includes.push({
+        model: Staff,
+        as: 'directors',
+        where: {
+          name: {
+            [Op.or]: directorFilter,
+          },
+        },
+      });
+    }
+
     const films = await this.filmRepository.findAll({
-      include: [
-        {
-          model: Genre,
-          where: {
-            name: {
-              [Op.or]: genreFilter,
-            },
-            name_en: {
-              [Op.or]: genreEnFilter,
-            },
-          },
-        },
-        {
-          model: Country,
-          where: {
-            name: {
-              [Op.or]: countryFilter,
-            },
-          },
-        },
-        {
-          model: Staff,
-          as: 'actors',
-          where: {
-            name: {
-              [Op.or]: actorFilter,
-            },
-          },
-        },
-        {
-          model: Staff,
-          as: 'directors',
-          where: {
-            name: {
-              [Op.or]: directorFilter,
-            },
-          },
-        },
-      ],
+      include: includes,
       order: [[orderBy, order]],
       offset: skip,
       limit: take,
     });
 
     const count = await this.filmRepository.count({
-      include: [
-        {
-          model: Genre,
-          where: {
-            name: {
-              [Op.or]: genreFilter,
-            },
-            name_en: {
-              [Op.or]: genreEnFilter,
-            },
-          },
-        },
-        {
-          model: Country,
-          where: {
-            name: {
-              [Op.or]: countryFilter,
-            },
-          },
-        },
-        {
-          model: Staff,
-          as: 'actors',
-          where: {
-            name: {
-              [Op.or]: actorFilter,
-            },
-          },
-        },
-        {
-          model: Staff,
-          as: 'directors',
-          where: {
-            name: {
-              [Op.or]: directorFilter,
-            },
-          },
-        },
-      ],
+      include: includes,
       distinct: true,
       col: 'id',
     });
