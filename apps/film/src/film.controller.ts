@@ -6,7 +6,7 @@ import {
     Payload,
     RmqContext,
 } from '@nestjs/microservices';
-import { RmqService } from '@app/common';
+import { FilmPagResult, RmqService } from '@app/common';
 import {
     CreateFilmDto,
     Film,
@@ -104,7 +104,7 @@ export class FilmController {
     @MessagePattern('getFilmsWithPag')
     async getFilmsWithPag(
         @Payload() pageOptionsDto: FilmPagFilterDto,
-    ): Promise<Film[]> {
+    ): Promise<FilmPagResult> {
         return await this.filmService.getFilmWithPag(pageOptionsDto);
     }
 

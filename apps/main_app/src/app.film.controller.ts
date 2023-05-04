@@ -1,4 +1,4 @@
-import { FILM_SERVICE, ROLES } from '@app/common';
+import { FilmPagResult, FILM_SERVICE, ROLES } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { CreateFilmDto, FilmPagFilterDto, UpdateFilmDto } from '@app/models';
@@ -86,24 +86,11 @@ export class AppFilmController {
         @Query() pageOptionsDto: FilmPagFilterDto,
         @Res() res: any,
     ) {
-        const countHeader = await lastValueFrom(
-            this.filmClient.send<number>('getCountFilms', {}),
+        const filmPagResult: FilmPagResult = await lastValueFrom(
+            this.filmClient.send<FilmPagResult>('getFilmsWithPag', pageOptionsDto),
         );
-        const films = await this.getPagFilms(pageOptionsDto);
-        await res.header('x-total-count', countHeader);
-        await res.send(films);
-    }
-
-    async getPagFilms(pageOptionsDto: FilmPagFilterDto) {
-        return await lastValueFrom(
-            this.filmClient
-                .send('getFilmsWithPag', pageOptionsDto)
-                .pipe(
-                    catchError((error) =>
-                        throwError(() => new RpcException(error.response)),
-                    ),
-                ),
-        );
+        await res.header('x-total-count', filmPagResult.count);
+        await res.send(filmPagResult.films);
     }
 
     @ApiTags('Фильмы')
