@@ -58,6 +58,7 @@ export class ReviewService {
       film_id: review.film_id,
       parent: review.parent,
       user_email: commentUser.email,
+      createdAt: review.createdAt,
     };
   }
 
@@ -133,6 +134,7 @@ export class ReviewService {
       film_id: review.film_id,
       parent: review.parent,
       user_email: commentUser.email,
+      createdAt: review.createdAt,
     };
   }
 
@@ -163,6 +165,7 @@ export class ReviewService {
         film_id: review.film_id,
         parent: review.parent,
         user_email: commentUser.email,
+        createdAt: review.createdAt,
       });
     }
 
@@ -198,22 +201,5 @@ export class ReviewService {
    */
   async getCountByFilm(film_id: number): Promise<number> {
     return await this.reviewRepository.count({ where: { film_id } });
-  }
-
-  /**
-   * Получить один отзыв.
-   * @param {number} film_id - Идентификатор фильма.
-   * @param {number} user_id - Идентификатор пользователя,
-   * @returns Review - Найденный отзыв.
-   */
-  private async findOne(film_id: number, user_id: number): Promise<Review> {
-    const review = await this.reviewRepository.findOne({
-      where: {
-        user_id,
-        film_id,
-      },
-    });
-
-    return review;
   }
 }

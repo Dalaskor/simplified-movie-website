@@ -45,4 +45,6 @@ export class OutputReviewDto {
   @IsOptional()
   @IsString({ message: 'user_email Должно быть строкой' })
   user_email?: string;
+
+  createdAt?: string;
 }
