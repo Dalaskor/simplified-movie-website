@@ -22,4 +22,7 @@ export class Review extends Model<Review, ReviewCreationsAttrs> {
 
     @Column({ type: DataType.INTEGER, allowNull: false })
     film_id: number;
+
+    @Column({ type: DataType.INTEGER, allowNull: true })
+    parent: number;
 }

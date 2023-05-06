@@ -1,7 +1,7 @@
 import { REVIEW_SERVICE, ROLES } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
-import { CreateReviewDto } from '@app/models';
+import { CreateReviewDto, OutputReviewDto, UpdateReviewDto } from '@app/models';
 import {
     Body,
     Controller,
@@ -32,7 +32,7 @@ export class AppReviewController {
     })
     @ApiResponse({
         status: HttpStatus.CREATED,
-        type: CreateReviewDto,
+        type: OutputReviewDto,
     })
     async createReview(@Body() dto: CreateReviewDto) {
         return this.reviewClient
@@ -50,13 +50,13 @@ export class AppReviewController {
     @Put('/reviews')
     @ApiOperation({ summary: 'Обновить отзыв к фильму' })
     @ApiBody({
-        type: CreateReviewDto,
+        type: UpdateReviewDto,
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        type: CreateReviewDto,
+        type: OutputReviewDto,
     })
-    async updateReview(@Body() dto: CreateReviewDto) {
+    async updateReview(@Body() dto: UpdateReviewDto) {
         return this.reviewClient
             .send('updateReview', dto)
             .pipe(
@@ -76,11 +76,10 @@ export class AppReviewController {
         type: CreateReviewDto,
     })
     async deleteReview(
-        @Param('film_id') film_id: number,
-        @Param('user_id') user_id: number,
+        @Param('id') id: number,
     ) {
         return this.reviewClient
-            .send('deleteReview', { film_id, user_id })
+            .send('deleteReview', id)
             .pipe(
                 catchError((error) =>
                     throwError(() => new RpcException(error.response)),
@@ -140,18 +139,17 @@ export class AppReviewController {
     }
 
     @ApiTags('Отзывы')
-    @Get('/reviews/:film_id/:user_id')
+    @Get('/reviews/:id')
     @ApiOperation({ summary: 'Получить один отзыв' })
     @ApiResponse({
         status: HttpStatus.OK,
         type: CreateReviewDto,
     })
     async getOneReview(
-        @Param('film_id') film_id: number,
-        @Param('user_id') user_id: number,
+        @Param('id') id: number,
     ) {
         return this.reviewClient
-            .send('getOneReview', { film_id, user_id })
+            .send('getOneReview', id)
             .pipe(
                 catchError((error) =>
                     throwError(() => new RpcException(error.response)),

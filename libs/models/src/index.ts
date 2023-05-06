@@ -40,8 +40,11 @@ export * from './dtos/update-country.dto';
 export * from './dtos/update-film.dto';
 export * from './dtos/update-genre.dto';
 export * from './dtos/update-staff.dto';
+export * from './dtos/update-review.dto';
 
 export * from './dtos/delete-score.dto';
+
+export * from './dtos/output-review.dto';
 
 export * from './dtos/add-role.dto';
 export * from './dtos/page-options.dto';

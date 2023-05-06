@@ -1,179 +1,219 @@
-import { FILM_SERVICE } from '@app/common';
-import { CreateReviewDto, Review } from '@app/models';
+import { AUTH_SERVICE, FILM_SERVICE } from '@app/common';
 import {
-    BadRequestException,
-    HttpStatus,
-    Inject,
-    Injectable,
-    NotFoundException,
+  CreateReviewDto,
+  OutputReviewDto,
+  Review,
+  UpdateReviewDto,
+  User,
+} from '@app/models';
+import {
+  BadRequestException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ReviewService {
-    constructor(
-        @InjectModel(Review) private reviewRepository: typeof Review,
-        @Inject(FILM_SERVICE) private filmClient: ClientProxy,
-    ) {}
+  constructor(
+    @InjectModel(Review) private reviewRepository: typeof Review,
+    @Inject(FILM_SERVICE) private filmClient: ClientProxy,
+    @Inject(AUTH_SERVICE) private authClient: ClientProxy,
+  ) {}
 
-    /**
-     * Создать отзыв.
-     * @param {CreateReviewDto} dto - DTO для создания отзыва.
-     * @returns Review - Созданный отзыв.
-     * @throws BadRequestException
-     */
-    async create(dto: CreateReviewDto): Promise<Review> {
-        /* await lastValueFrom(
+  /**
+   * Создать отзыв.
+   * @param {CreateReviewDto} dto - DTO для создания отзыва.
+   * @returns Review - Созданный отзыв.
+   * @throws BadRequestException
+   */
+  async create(dto: CreateReviewDto): Promise<OutputReviewDto> {
+    /* await lastValueFrom(
             this.filmClient.send('checkFilmExistById', dto.film_id),
         ); */
-        await this.checkFilm(dto.film_id);
+    await this.checkFilm(dto.film_id);
 
-        const candidate = await this.findOne(dto.film_id, dto.user_id);
+    const commentUser: User = await lastValueFrom(
+      this.authClient.send('getUser', dto.user_id),
+    );
 
-        if (candidate) {
-            throw new RpcException(
-                new BadRequestException('Отзыв уже существует'),
-            );
-        }
-
-        const review = await this.reviewRepository.create(dto);
-
-        if (!review) {
-            throw new RpcException(
-                new BadRequestException('Ошибка создания отзыва'),
-            );
-        }
-
-        return review;
+    if (!commentUser) {
+      throw new RpcException(new NotFoundException('Пользователь не найден'));
     }
 
-    async checkFilm(film_id: number) {
-        return this.filmClient.send('checkFilmExistById', film_id);
+    const review = await this.reviewRepository.create(dto);
+
+    if (!review) {
+      throw new RpcException(new BadRequestException('Ошибка создания отзыва'));
     }
 
-    /**
-     * Обновить данные отзыва.
-     * @param {CreateReviewDto} dto - DTO создания для отзыва.
-     * @returns Review - Обновленный отзыв.
-     * @throws NotFoundException
-     */
-    async update(dto: CreateReviewDto): Promise<Review> {
-        const review = await this.findOne(dto.film_id, dto.user_id);
+    return {
+      id: review.id,
+      text: review.text,
+      user_id: review.user_id,
+      film_id: review.film_id,
+      parent: review.parent,
+      user_email: commentUser.email,
+    };
+  }
 
-        if (!review) {
-            throw new RpcException(new NotFoundException('Отзыв не найден'));
-        }
+  async checkFilm(film_id: number) {
+    return this.filmClient.send('checkFilmExistById', film_id);
+  }
 
-        console.log('REVIEW: ', review.text);
-        console.log('DTO: ', dto.text);
+  /**
+   * Обновить данные отзыва.
+   * @param {CreateReviewDto} dto - DTO создания для отзыва.
+   * @returns Review - Обновленный отзыв.
+   * @throws NotFoundException
+   */
+  async update(dto: UpdateReviewDto): Promise<Review> {
+    const review = await this.reviewRepository.findByPk(dto.id);
 
-        review.set('text', dto.text);
-
-        console.log('REVIEW: ', review.text);
-        console.log('DTO: ', dto.text);
-
-        await review.save();
-
-        return review;
+    if (!review) {
+      throw new RpcException(new NotFoundException('Отзыв не найден'));
     }
 
-    /**
-     * Удалить отзыв.
-     * @param {number} film_id - Идентификатор фильма.
-     * @param {number} user_id - Идентификатор пользователя,
-     * который написал отзыв.
-     * @returns Результат удаления отзыва.
-     * @throws NotFoundException
-     */
-    async delete(film_id: number, user_id: number): Promise<any> {
-        const review = await this.findOne(film_id, user_id);
+    review.set('text', dto.text);
 
-        if (!review) {
-            throw new RpcException(new NotFoundException('Отзыв не найден'));
-        }
+    await review.save();
 
-        await review.destroy();
+    return review;
+  }
 
-        return { statusCode: HttpStatus.OK, message: 'Отзыв удален' };
+  /**
+   * Удалить отзыв.
+   * @param {number} id - Идентификатор коментария.
+   * который написал отзыв.
+   * @returns Результат удаления отзыва.
+   * @throws NotFoundException
+   */
+  async delete(id: number): Promise<any> {
+    const review = await this.reviewRepository.findByPk(id);
+
+    if (!review) {
+      throw new RpcException(new NotFoundException('Отзыв не найден'));
     }
 
-    /**
-     * Получить один отзыв.
-     * @param {number} film_id - Идентификатор фильма.
-     * @param {number} user_id - Идентификатор пользователя,
-     * который написал отзыв.
-     * @returns Review - Найденный отзыв.
-     * @throws NotFoundException
-     */
-    async getOne(film_id: number, user_id: number): Promise<Review> {
-        const review = await this.findOne(film_id, user_id);
+    await review.destroy();
 
-        if (!review) {
-            throw new RpcException(new NotFoundException('Отзыв не найден'));
-        }
+    return { statusCode: HttpStatus.OK, message: 'Отзыв удален' };
+  }
 
-        return review;
+  /**
+   * Получить один отзыв.
+   * @param {number} id - Идентификатор отзыва.
+   * который написал отзыв.
+   * @returns Review - Найденный отзыв.
+   * @throws NotFoundException
+   */
+  async getOne(id: number): Promise<OutputReviewDto> {
+    const review = await this.reviewRepository.findByPk(id);
+
+    if (!review) {
+      throw new RpcException(new NotFoundException('Отзыв не найден'));
     }
 
-    /**
-     * Получить все отзывы на фильм.
-     * @param {number} film_id - Идентификатор фильма.
-     * @returns Review[] - Список найденных отзывов.
-     */
-    async getAllByFilm(film_id: number): Promise<Review[]> {
-        const reviews = await this.reviewRepository.findAll({
-            where: { film_id },
-        });
+    const commentUser: User = await lastValueFrom(
+      this.authClient.send('getUser', review.user_id),
+    );
 
-        return reviews;
+    if (!commentUser) {
+      throw new RpcException(new NotFoundException('Пользователь не найден'));
     }
 
-    /**
-     * Получить все отзывы пользователя.
-     * @param {number} user_id - Идентификатор пользователя.
-     * @returns Review[] - Список найденных отзывов.
-     */
-    async getAllByUser(user_id: number): Promise<Review[]> {
-        const reviews = await this.reviewRepository.findAll({
-            where: { user_id },
-        });
+    return {
+      id: review.id,
+      text: review.text,
+      user_id: review.user_id,
+      film_id: review.film_id,
+      parent: review.parent,
+      user_email: commentUser.email,
+    };
+  }
 
-        return reviews;
+  /**
+   * Получить все отзывы на фильм.
+   * @param {number} film_id - Идентификатор фильма.
+   * @returns Review[] - Список найденных отзывов.
+   */
+  async getAllByFilm(film_id: number): Promise<OutputReviewDto[]> {
+    const reviews = await this.reviewRepository.findAll({
+      where: { film_id },
+    });
+
+    const outputs: OutputReviewDto[] = [];
+    for (const review of reviews) {
+      const commentUser: User = await lastValueFrom(
+        this.authClient.send('getUser', review.user_id),
+      );
+
+      if (!commentUser) {
+        throw new RpcException(new NotFoundException('Пользователь не найден'));
+      }
+
+      outputs.push({
+        id: review.id,
+        text: review.text,
+        user_id: review.user_id,
+        film_id: review.film_id,
+        parent: review.parent,
+        user_email: commentUser.email,
+      });
     }
 
-    /**
-     * Удалить все отзывы к фильму.
-     * @param {number} film_id - Идентификатор фильма.
-     * @returns number - Количество удаленных отзывов.
-     */
-    async deleteAllByFilm(film_id: number): Promise<number> {
-        return await this.reviewRepository.destroy({ where: { film_id } });
-    }
+    return outputs;
+  }
 
-    /**
-     * Получить количество отзывов к фильму.
-     * @param {number} film_id - Идентификатор фильма.
-     * @returns number - Количество отзывов к фильму.
-     */
-    async getCountByFilm(film_id: number): Promise<number> {
-        return await this.reviewRepository.count({ where: { film_id } });
-    }
+  /**
+   * Получить все отзывы пользователя.
+   * @param {number} user_id - Идентификатор пользователя.
+   * @returns Review[] - Список найденных отзывов.
+   */
+  async getAllByUser(user_id: number): Promise<Review[]> {
+    const reviews = await this.reviewRepository.findAll({
+      where: { user_id },
+    });
 
-    /**
-     * Получить один отзыв.
-     * @param {number} film_id - Идентификатор фильма.
-     * @param {number} user_id - Идентификатор пользователя,
-     * @returns Review - Найденный отзыв.
-     */
-    private async findOne(film_id: number, user_id: number): Promise<Review> {
-        const review = await this.reviewRepository.findOne({
-            where: {
-                user_id,
-                film_id,
-            },
-        });
+    return reviews;
+  }
 
-        return review;
-    }
+  /**
+   * Удалить все отзывы к фильму.
+   * @param {number} film_id - Идентификатор фильма.
+   * @returns number - Количество удаленных отзывов.
+   */
+  async deleteAllByFilm(film_id: number): Promise<number> {
+    return await this.reviewRepository.destroy({ where: { film_id } });
+  }
+
+  /**
+   * Получить количество отзывов к фильму.
+   * @param {number} film_id - Идентификатор фильма.
+   * @returns number - Количество отзывов к фильму.
+   */
+  async getCountByFilm(film_id: number): Promise<number> {
+    return await this.reviewRepository.count({ where: { film_id } });
+  }
+
+  /**
+   * Получить один отзыв.
+   * @param {number} film_id - Идентификатор фильма.
+   * @param {number} user_id - Идентификатор пользователя,
+   * @returns Review - Найденный отзыв.
+   */
+  private async findOne(film_id: number, user_id: number): Promise<Review> {
+    const review = await this.reviewRepository.findOne({
+      where: {
+        user_id,
+        film_id,
+      },
+    });
+
+    return review;
+  }
 }

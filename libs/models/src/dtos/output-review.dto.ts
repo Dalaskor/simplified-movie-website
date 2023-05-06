@@ -1,7 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 
-export class CreateReviewDto {
+export class OutputReviewDto {
+  @ApiProperty({
+    example: 1,
+    description: 'ID коментария',
+  })
+  @IsInt({ message: 'id Должно быть целым числом' })
+  id: number;
+
   @ApiProperty({
     example: 'Lorem ipsum',
     description: 'Текст отзыва',
@@ -30,4 +37,12 @@ export class CreateReviewDto {
   @IsOptional()
   @IsInt({ message: 'parent_id Должно быть целым числом' })
   parent?: number;
+
+  @ApiProperty({
+    example: 'test@test.com',
+    description: 'email пользователя',
+  })
+  @IsOptional()
+  @IsString({ message: 'user_email Должно быть строкой' })
+  user_email?: string;
 }

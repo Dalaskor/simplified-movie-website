@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ReviewController } from './review.controller';
 import { ReviewService } from './review.service';
 import * as Joi from 'joi';
-import { DatabaseModule, FILM_SERVICE, RmqModule } from '@app/common';
+import { AUTH_SERVICE, DatabaseModule, FILM_SERVICE, RmqModule } from '@app/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Review } from '@app/models';
 
@@ -22,6 +22,7 @@ import { Review } from '@app/models';
         SequelizeModule.forFeature([Review]),
         RmqModule,
         RmqModule.register({ name: FILM_SERVICE }),
+        RmqModule.register({ name: AUTH_SERVICE }),
     ],
     controllers: [ReviewController],
     providers: [ReviewService],
