@@ -69,7 +69,7 @@ export class AppReviewController {
     @ApiTags('Отзывы')
     @Roles(ROLES.USER)
     @UseGuards(RolesGuard)
-    @Delete('/reviews/:film_id/:user_id')
+    @Delete('/reviews/:id')
     @ApiOperation({ summary: 'Удалить отзыв к фильму' })
     @ApiResponse({
         status: HttpStatus.OK,
