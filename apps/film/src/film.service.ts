@@ -114,37 +114,78 @@ export class FilmService {
       }
 
       const genresId = this.getIdsFromModelArr(dto.genres, genresModelArr);
+      const genres = this.getFilmModelsFromModelArr(dto.genres, genresModelArr);
       await curFilm.$set('genres', genresId);
+      curFilm.genres = genres;
 
       const countriesId = this.getIdsFromModelArr(
         dto.countries,
         countriesModelArr,
       );
+      const countries = this.getFilmModelsFromModelArr(
+        dto.countries,
+        genresModelArr,
+      );
       await curFilm.$set('countries', countriesId);
+      curFilm.countries = countries;
 
       const scenariosId = this.getIdsFromModelArr(dto.scenario, staffModelArr);
+      const scenarios = this.getFilmModelsFromModelArr(
+        dto.scenario,
+        staffModelArr,
+      );
       await curFilm.$set('scenario', scenariosId);
+      curFilm.scenario = scenarios;
 
       const compositorId = this.getIdsFromModelArr(
         dto.compositors,
         staffModelArr,
       );
+      const compositors = this.getFilmModelsFromModelArr(
+        dto.compositors,
+        staffModelArr,
+      );
       await curFilm.$set('compositors', compositorId);
+      curFilm.compositors = compositors;
 
       const actorsId = this.getIdsFromModelArr(dto.actors, staffModelArr);
+      const actors = this.getFilmModelsFromModelArr(dto.actors, staffModelArr);
       await curFilm.$set('actors', actorsId);
+      curFilm.actors = actors;
 
       const artistsId = this.getIdsFromModelArr(dto.artists, staffModelArr);
+      const artists = this.getFilmModelsFromModelArr(
+        dto.artists,
+        staffModelArr,
+      );
       await curFilm.$set('artists', artistsId);
+      curFilm.artists = artists;
 
       const directorsId = this.getIdsFromModelArr(dto.directors, staffModelArr);
+      const directors = this.getFilmModelsFromModelArr(
+        dto.directors,
+        staffModelArr,
+      );
       await curFilm.$set('directors', directorsId);
+      curFilm.directors = directors;
 
       const montageId = this.getIdsFromModelArr(dto.montages, staffModelArr);
+      const montages = this.getFilmModelsFromModelArr(
+        dto.montages,
+        staffModelArr,
+      );
       await curFilm.$set('montages', montageId);
+      curFilm.montages = montages;
 
       const operarotsId = this.getIdsFromModelArr(dto.operators, staffModelArr);
+      const operators = this.getFilmModelsFromModelArr(
+        dto.operators,
+        staffModelArr,
+      );
       await curFilm.$set('operators', operarotsId);
+      curFilm.operators = operators;
+
+      await curFilm.save();
 
       /* const spectatorIds = [];
             for (const spectator of dto.spectators) {
@@ -170,6 +211,20 @@ export class FilmService {
     return fromArr.map((item) => {
       if (names.includes(item.name)) {
         return item.id;
+      }
+    });
+  }
+
+  /**
+   * Получить массив моеделий относящихся к фильму из общего массива моделей.
+   * @param {string[]} names - Список названий.
+   * @param {any[]} fromArr - Массив моделей.
+   * @returns number[] - Массив ID.
+   */
+  getFilmModelsFromModelArr(names: string[], fromArr: any[]): any[] {
+    return fromArr.map((item) => {
+      if (names.includes(item.name)) {
+        return item;
       }
     });
   }
@@ -665,6 +720,8 @@ export class FilmService {
   async filmApplyGenres(film: Film, genres: Genre[]): Promise<any> {
     const ids = genres.map((item) => item.id);
     await film.$set('genres', ids);
+    film.genres = genres;
+    await film.save();
   }
 
   /**
@@ -675,6 +732,8 @@ export class FilmService {
   async filmApplyCountries(film: Film, countries: Country[]): Promise<any> {
     const ids = countries.map((item) => item.id);
     await film.$set('countries', ids);
+    film.countries = countries;
+    await film.save();
   }
 
   /**
@@ -685,6 +744,8 @@ export class FilmService {
   async filmApplyScenarios(film: Film, scenarios: Staff[]): Promise<any> {
     const ids = scenarios.map((item) => item.id);
     await film.$set('scenario', ids);
+    film.scenario = scenarios;
+    await film.save();
   }
 
   /**
@@ -695,6 +756,8 @@ export class FilmService {
   async filmApplyCompositors(film: Film, compositors: Staff[]): Promise<any> {
     const ids = compositors.map((item) => item.id);
     await film.$set('compositors', ids);
+    film.compositors = compositors;
+    film.save();
   }
 
   /**
@@ -705,6 +768,8 @@ export class FilmService {
   async filmApplyActors(film: Film, actors: Staff[]): Promise<any> {
     const ids = actors.map((item) => item.id);
     await film.$set('actors', ids);
+    film.actors = actors;
+    film.save();
   }
 
   /**
@@ -715,6 +780,8 @@ export class FilmService {
   async filmApplyArtists(film: Film, artists: Staff[]): Promise<any> {
     const ids = artists.map((item) => item.id);
     await film.$set('artists', ids);
+    film.artists = artists;
+    film.save();
   }
 
   /**
@@ -725,6 +792,8 @@ export class FilmService {
   async filmApplyDirectors(film: Film, directors: Staff[]): Promise<any> {
     const ids = directors.map((item) => item.id);
     await film.$set('directors', ids);
+    film.directors = directors;
+    await film.save();
   }
 
   /**
@@ -735,6 +804,8 @@ export class FilmService {
   async filmApplyMontages(film: Film, montages: Staff[]): Promise<any> {
     const ids = montages.map((item) => item.id);
     await film.$set('montages', ids);
+    film.montages = montages;
+    await film.save();
   }
 
   /**
@@ -745,6 +816,8 @@ export class FilmService {
   async filmApplyOperators(film: Film, operators: Staff[]): Promise<any> {
     const ids = operators.map((item) => item.id);
     await film.$set('operators', ids);
+    film.operators = operators;
+    await film.save();
   }
 
   /**
@@ -802,9 +875,11 @@ export class FilmService {
     }
 
     const includes = [];
+
     if (genreFilter.length > 0) {
       includes.push({
         model: Genre,
+        as: 'genres',
         where: {
           name: {
             [Op.or]: genreFilter,
@@ -813,6 +888,10 @@ export class FilmService {
             [Op.or]: genreEnFilter,
           },
         },
+      });
+    } else {
+      includes.push({
+        model: Genre,
       });
     }
     if (genreFilter.length > 0) {
@@ -823,6 +902,10 @@ export class FilmService {
             [Op.or]: countryFilter,
           },
         },
+      });
+    } else {
+      includes.push({
+        model: Country,
       });
     }
     if (actorFilter.length > 0) {
