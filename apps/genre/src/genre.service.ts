@@ -83,13 +83,14 @@ export class GenreService {
     /**
      * Обновить данные о жанре.
      * @param {number} id - Идентификатор жанра.
-     * @param {UpdateStaffDto} updateGenreDto - DTO для обновления жанра.
+     * @param {UpdateStaffDto} dto - DTO для обновления жанра.
      * @returns Genre - Обновленный жанр.
      */
-    async update(id: number, updateGenreDto: UpdateGenreDto): Promise<Genre> {
+    async update(id: number, dto: UpdateGenreDto): Promise<Genre> {
         const genre = await this.findOne(id);
-
-        genre.name = updateGenreDto.name;
+        
+        dto.name ? genre.name = dto.name : '';
+        dto.name_en ? genre.name_en = dto.name_en : '';
 
         await genre.save();
 
