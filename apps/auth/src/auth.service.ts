@@ -1,10 +1,10 @@
 import {
-    BadRequestException,
-    ForbiddenException,
-    HttpStatus,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
+  BadRequestException,
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users/users.service';
@@ -13,303 +13,358 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
 import {
-    AddRoleDto,
-    CreateUserDto,
-    Role,
-    TokenResponseDto,
-    User,
+  AddRoleDto,
+  CreateUserDto,
+  OutputJwtTokens,
+  Role,
+  TokenResponseDto,
+  User,
 } from '@app/models';
 import { RolesService } from './roles/roles.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private readonly userService: UsersService,
-        private readonly roleService: RolesService,
-        private readonly jwtService: JwtService,
-        private readonly httpService: HttpService,
-    ) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly roleService: RolesService,
+    private readonly jwtService: JwtService,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
 
-    /**
-     * Создание пользователя с правами администратора.
-     * @param {CreateUserDto} dto - DTO для создания пользователя.
-     * @returns TokenResponseDto - JWT токен.
-     */
-    async createSuperUser(dto: CreateUserDto): Promise<TokenResponseDto> {
-        const candidate = await this.userService.getUserByEmail(dto.email);
+  /**
+   * Создание пользователя с правами администратора.
+   * @param {CreateUserDto} dto - DTO для создания пользователя.
+   * @returns TokenResponseDto - JWT токен.
+   */
+  async createSuperUser(dto: CreateUserDto): Promise<OutputJwtTokens> {
+    const candidate = await this.userService.getUserByEmail(dto.email);
 
-        if (candidate) {
-            throw new RpcException(
-                new BadRequestException(
-                    'Пользователь с такой электронной почтой уже существует',
-                ),
-            );
-        }
-
-        const hashPassword = await bcrypt.hash(dto.password, 5);
-        const user = await this.userService.createAdmin({
-            email: dto.email,
-            password: hashPassword,
-        });
-
-        return await this.generateToken(user);
+    if (candidate) {
+      throw new RpcException(
+        new BadRequestException(
+          'Пользователь с такой электронной почтой уже существует',
+        ),
+      );
     }
 
-    /**
-     * Авторизация пользователя.
-     * @param {CreateRoleDto} dto - DTO для создания пользователя.
-     * @returns TokenResponseDto - JWT токен.
-     */
-    async login(dto: CreateUserDto): Promise<TokenResponseDto> {
-        const user = await this.validateUser(dto);
-        return await this.generateToken(user);
+    const hashPassword = await bcrypt.hash(dto.password, 5);
+    const user = await this.userService.createAdmin({
+      email: dto.email,
+      password: hashPassword,
+    });
+    const tokens = await this.generateTokens(user);
+    const hashRefreshToken = await bcrypt.hash(tokens.refreshToken, 5);
+    await this.userService.updateRefreshToken(user.id, hashRefreshToken);
+
+    return tokens;
+    // return await this.generateToken(user);
+  }
+
+  /**
+   * Авторизация пользователя.
+   * @param {CreateRoleDto} dto - DTO для создания пользователя.
+   * @returns TokenResponseDto - JWT токен.
+   */
+  async login(dto: CreateUserDto): Promise<OutputJwtTokens> {
+    const user = await this.validateUser(dto);
+    const tokens = await this.generateTokens(user);
+    const hashRefreshToken = await bcrypt.hash(tokens.refreshToken, 5);
+    await this.userService.updateRefreshToken(user.id, hashRefreshToken);
+    return tokens;
+  }
+
+  /**
+   * Регистрация нового пользователя.
+   * @param {CreateRoleDto} dto - DTO для создания пользователя.
+   * @returns TokenResponseDto - JWT токен.
+   */
+  async registration(dto: CreateUserDto): Promise<OutputJwtTokens> {
+    const candidate = await this.userService.getUserByEmail(dto.email);
+
+    if (candidate) {
+      throw new RpcException(
+        new BadRequestException(
+          'Пользователь с такой электронной почтой уже существует',
+        ),
+      );
     }
 
-    /**
-     * Регистрация нового пользователя.
-     * @param {CreateRoleDto} dto - DTO для создания пользователя.
-     * @returns TokenResponseDto - JWT токен.
-     */
-    async registration(dto: CreateUserDto): Promise<TokenResponseDto> {
-        const candidate = await this.userService.getUserByEmail(dto.email);
+    const hashPassword = await bcrypt.hash(dto.password, 5);
+    const user = await this.userService.createUser({
+      email: dto.email,
+      password: hashPassword,
+    });
+    const tokens = await this.generateTokens(user);
+    const hashRefreshToken = await bcrypt.hash(tokens.refreshToken, 5);
+    await this.userService.updateRefreshToken(user.id, hashRefreshToken);
 
-        if (candidate) {
-            throw new RpcException(
-                new BadRequestException(
-                    'Пользователь с такой электронной почтой уже существует',
-                ),
-            );
-        }
+    return tokens;
+    // return await this.generateToken(user);
+  }
 
-        const hashPassword = await bcrypt.hash(dto.password, 5);
-        const user = await this.userService.createUser({
-            email: dto.email,
-            password: hashPassword,
-        });
+  /**
+   * Валидация пользователя.
+   * @param {CreateUserDto} dto - DTO для создания пользователя.
+   * @returns User - Проверенный пользователь.
+   */
+  private async validateUser(dto: CreateUserDto): Promise<User> {
+    const user = await this.userService.getUserByEmail(dto.email);
 
-        return await this.generateToken(user);
+    if (!user) {
+      throw new RpcException(
+        new BadRequestException('Неккоректные электронная почта или пароль'),
+      );
     }
 
-    /**
-     * Валидация пользователя.
-     * @param {CreateUserDto} dto - DTO для создания пользователя.
-     * @returns User - Проверенный пользователь.
-     */
-    private async validateUser(dto: CreateUserDto): Promise<User> {
-        const user = await this.userService.getUserByEmail(dto.email);
+    const passwordEquals = await bcrypt.compare(dto.password, user.password);
 
-        if (!user) {
-            throw new RpcException(
-                new UnauthorizedException(
-                    'Неккоректные электронная почта или пароль',
-                ),
-            );
-        }
-
-        const passwordEquals = await bcrypt.compare(
-            dto.password,
-            user.password,
-        );
-
-        if (user && passwordEquals) {
-            return user;
-        }
-
-        throw new RpcException(
-            new UnauthorizedException(
-                'Неккоректные электронная почта или пароль',
-            ),
-        );
+    if (user && passwordEquals) {
+      return user;
     }
 
-    /**
-     * Генерация JWT токена.
-     * @param {User} user - Пользователь.
-     */
-    private async generateToken(user: User): Promise<TokenResponseDto> {
-        const payload = {
-            id: user.id,
-            email: user.email,
-            roles: user.roles,
-        };
+    throw new RpcException(
+      new BadRequestException('Неккоректные электронная почта или пароль'),
+    );
+  }
 
-        return {
-            token: this.jwtService.sign(payload),
-        };
+  /**
+   * Генерация JWT токена.
+   * @param {User} user - Пользователь.
+   */
+  private async generateToken(user: User): Promise<TokenResponseDto> {
+    const payload = {
+      id: user.id,
+      email: user.email,
+      roles: user.roles,
+    };
+
+    return {
+      token: this.jwtService.sign(payload),
+    };
+  }
+
+  /**
+   * Генерация JWT токенов.
+   * @param {User} user - Пользователь.
+   */
+  private async generateTokens(user: User): Promise<OutputJwtTokens> {
+    const payload = {
+      id: user.id,
+      email: user.email,
+      roles: user.roles,
+    };
+    const accessSettings = {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: '1h',
+    };
+    const refreshSettings = {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: '7d',
+    };
+    const token = await this.jwtService.signAsync(payload, accessSettings);
+    const refreshToken = await this.jwtService.signAsync(
+      payload,
+      refreshSettings,
+    );
+    return {
+      token,
+      refreshToken,
+    };
+  }
+
+  async updateTokens(
+    user_id: number,
+    refreshToken: string,
+  ): Promise<OutputJwtTokens> {
+    const user = await this.getUser(user_id);
+    const userRefreshToken: string = user.refreshToken;
+
+    if (!user || !userRefreshToken) {
+      throw new RpcException(new ForbiddenException('Доступ запрещен'));
     }
 
-    /**
-     * Обработчик верификации токена.
-     */
-    async handleValidateUser(data: any): Promise<Boolean> {
-        return await this.jwtService.verify(data.token);
+    const refreshTokenEquals = await bcrypt.compare(refreshToken, userRefreshToken);
+
+    if (!refreshTokenEquals) {
+      throw new RpcException(new ForbiddenException('Доступ запрещен'));
     }
 
-    /**
-     * Обработчик верификации токена.
-     */
-    async handleValidateUserWithRoles(data: any) {
-        const checkToken = this.jwtService.verify(data.token);
+    const tokens = await this.generateTokens(user);
+    const hashRefreshToken = await bcrypt.hash(tokens.refreshToken, 5);
+    await this.userService.updateRefreshToken(user.id, hashRefreshToken);
+    return tokens;
+  }
 
-        const checkRoles = checkToken.roles.some((role: any) =>
-            data.requiredRoles.includes(role.value),
-        );
+  /**
+   * Обработчик верификации токена.
+   */
+  async handleValidateUser(data: any): Promise<Boolean> {
+    return await this.jwtService.verify(data.token);
+  }
 
-        if (checkToken && checkRoles) {
-            return checkToken;
-        }
+  async handleValidateRefreshToken(data: any): Promise<Boolean> {
+    return await this.jwtService.verify(data.token, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+  }
 
-        throw new RpcException(new ForbiddenException('Нет доступа'));
+  /**
+   * Обработчик верификации токена.
+   */
+  async handleValidateUserWithRoles(data: any): Promise<Boolean> {
+    const checkToken = await this.jwtService.verifyAsync(data.token);
+    const checkRoles = await checkToken.roles.some((role: any) =>
+      data.requiredRoles.includes(role.value),
+    );
+
+    if (checkToken && checkRoles) {
+      return checkToken;
     }
 
-    /**
-     * Получить пользователя.
-     * @param {number} id - Идентификатор пользователя.
-     * @returns User - Найденный пользователь.
-     */
-    async getUser(id: number) {
-        const user = await this.userService.getUser(id);
+    throw new RpcException(new ForbiddenException('Нет доступа'));
+  }
 
-        if (!user) {
-            throw new RpcException(
-                new NotFoundException('Пользователь не найден'),
-            );
-        }
+  /**
+   * Получить пользователя.
+   * @param {number} id - Идентификатор пользователя.
+   * @returns User - Найденный пользователь.
+   */
+  async getUser(id: number) {
+    const user = await this.userService.getUser(id);
 
-        return user;
+    if (!user) {
+      throw new RpcException(new NotFoundException('Пользователь не найден'));
     }
 
-    /**
-     * OAuth через Google
-     */
-    async googleLogin(user: any) {
-        if (!user) {
-            return 'No user from Google';
-        }
+    return user;
+  }
 
-        const userEmail = user.email;
-        const candidate = await this.userService.getUserByEmail(userEmail);
-
-        if (candidate) {
-            return this.generateToken(candidate);
-        }
-
-        const password = this.gen_password(15);
-
-        return await this.registration({ email: userEmail, password });
+  /**
+   * OAuth через Google
+   */
+  async googleLogin(user: any) {
+    if (!user) {
+      return 'No user from Google';
     }
 
-    /**
-     * Генерация пароля.
-     * @param {number} len - Размер пароля.
-     */
-    gen_password(len: number) {
-        let password = '';
-        const symbols =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!№;%:?*()_+=';
+    const userEmail = user.email;
+    const candidate = await this.userService.getUserByEmail(userEmail);
 
-        for (var i = 0; i < len; i++) {
-            password += symbols.charAt(
-                Math.floor(Math.random() * symbols.length),
-            );
-        }
-
-        return password;
+    if (candidate) {
+      return this.generateToken(candidate);
     }
 
-    /**
-     * OAuth через vk
-     */
-    async vkLogin(query: any) {
-        if (query.access_token && query.user_id) {
-            const checkToken = await this.validateVkToken(query.access_token);
+    const password = this.gen_password(15);
 
-            if (checkToken === false) {
-                throw new RpcException(
-                    new UnauthorizedException('Токен не валидный'),
-                );
-            }
+    return await this.registration({ email: userEmail, password });
+  }
 
-            const password = this.gen_password(15);
-            const userDto: CreateUserDto = {
-                email: `${query.user_id}@vk.com`,
-                password,
-            };
+  /**
+   * Генерация пароля.
+   * @param {number} len - Размер пароля.
+   */
+  gen_password(len: number) {
+    let password = '';
+    const symbols =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!№;%:?*()_+=';
 
-            const candidate = await this.userService.getUserByEmail(
-                userDto.email,
-            );
-
-            if (candidate) {
-                console.log('GENERATE TOKEN');
-                return await this.generateToken(candidate);
-            }
-
-            return await this.registration(userDto);
-        }
-
-        throw new RpcException(
-            new UnauthorizedException('Пользователь не авторизован'),
-        );
+    for (var i = 0; i < len; i++) {
+      password += symbols.charAt(Math.floor(Math.random() * symbols.length));
     }
 
-    /**
-     * Валидация токена.
-     * @param {string} token - JWT токен.
-     */
-    async validateVkToken(token: string) {
-        const url = `https://api.vk.com/method/users.get?access_token=${token}&v=5.131`;
-        const req = await lastValueFrom(this.httpService.get(url));
-        const tokenData = req.data.response[0];
-        console.log(tokenData.id);
+    return password;
+  }
 
-        if (tokenData.id) {
-            return true;
-        }
+  /**
+   * OAuth через vk
+   */
+  async vkLogin(query: any) {
+    if (query.access_token && query.user_id) {
+      const checkToken = await this.validateVkToken(query.access_token);
 
-        return false;
+      if (checkToken === false) {
+        throw new RpcException(new UnauthorizedException('Токен не валидный'));
+      }
+
+      const password = this.gen_password(15);
+      const userDto: CreateUserDto = {
+        email: `${query.user_id}@vk.com`,
+        password,
+      };
+
+      const candidate = await this.userService.getUserByEmail(userDto.email);
+
+      if (candidate) {
+        console.log('GENERATE TOKEN');
+        return await this.generateToken(candidate);
+      }
+
+      return await this.registration(userDto);
     }
 
-    /**
-     * Проверка электронной почты.
-     * @param {string} email - Электронная почта.
-     */
-    async checkUserEmail(email: string) {
-        const user = await this.userService.getUserByEmail(email);
+    throw new RpcException(
+      new UnauthorizedException('Пользователь не авторизован'),
+    );
+  }
 
-        if (user) {
-            throw new RpcException(
-                new BadRequestException('Электронная почта уже занята'),
-            );
-        }
+  /**
+   * Валидация токена.
+   * @param {string} token - JWT токен.
+   */
+  async validateVkToken(token: string) {
+    const url = `https://api.vk.com/method/users.get?access_token=${token}&v=5.131`;
+    const req = await lastValueFrom(this.httpService.get(url));
+    const tokenData = req.data.response[0];
 
-        return {
-            statusCode: HttpStatus.OK,
-            message: 'Электронная почта свободна',
-        };
+    if (tokenData.id) {
+      return true;
     }
 
-    /**
-     * Добавить роль пользователю.
-     * @param {AddRoleDto} dto - DTO для добавления роли пользоветилю.
-     */
-    async userAddRole(dto: AddRoleDto): Promise<AddRoleDto> {
-        return await this.userService.addROle(dto);
+    return false;
+  }
+
+  /**
+   * Проверка электронной почты.
+   * @param {string} email - Электронная почта.
+   */
+  async checkUserEmail(email: string) {
+    const user = await this.userService.getUserByEmail(email);
+
+    if (user) {
+      throw new RpcException(
+        new BadRequestException('Электронная почта уже занята'),
+      );
     }
 
-    /**
-     * Удалить роль пользователю.
-     * @param {AddRoleDto} dto - DTO для добавления роли пользоветилю.
-     */
-    async userRemoveRole(dto: AddRoleDto): Promise<AddRoleDto> {
-        return await this.userService.removeRole(dto);
-    }
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Электронная почта свободна',
+    };
+  }
 
-    /**
-     * Получить список всех ролей.
-     * @returns Role[] - Список найденных ролей.
-     */
-    async getAllRoles(): Promise<Role[]> {
-        return await this.roleService.getAllRoles();
-    }
+  /**
+   * Добавить роль пользователю.
+   * @param {AddRoleDto} dto - DTO для добавления роли пользоветилю.
+   */
+  async userAddRole(dto: AddRoleDto): Promise<AddRoleDto> {
+    return await this.userService.addROle(dto);
+  }
+
+  /**
+   * Удалить роль пользователю.
+   * @param {AddRoleDto} dto - DTO для добавления роли пользоветилю.
+   */
+  async userRemoveRole(dto: AddRoleDto): Promise<AddRoleDto> {
+    return await this.userService.removeRole(dto);
+  }
+
+  /**
+   * Получить список всех ролей.
+   * @returns Role[] - Список найденных ролей.
+   */
+  async getAllRoles(): Promise<Role[]> {
+    return await this.roleService.getAllRoles();
+  }
 }

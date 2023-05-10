@@ -45,6 +45,7 @@ export * from './dtos/update-review.dto';
 export * from './dtos/delete-score.dto';
 
 export * from './dtos/output-review.dto';
+export * from './dtos/output-jwt-tokens.dto';
 
 export * from './dtos/add-role.dto';
 export * from './dtos/page-options.dto';
@@ -55,3 +56,5 @@ export * from './dtos/exception.dto';
 export * from './dtos/google-response.dto';
 export * from './dtos/token.dto';
 export * from './dtos/vk-login.dto';
+
+export * from './dtos/refresh-tokens.dto';

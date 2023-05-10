@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import {
     AddRoleDto,
     CreateUserDto,
+    OutputJwtTokens,
+    RefreshTokensDto,
     Role,
     TokenResponseDto,
     User,
@@ -21,7 +23,7 @@ export class AuthController {
     @MessagePattern('registration')
     async registration(
         @Payload() dto: CreateUserDto,
-    ): Promise<TokenResponseDto> {
+    ): Promise<OutputJwtTokens> {
         return await this.authService.registration(dto);
     }
 
@@ -31,8 +33,17 @@ export class AuthController {
      * @returns TokenResponseDto - JWT токен.
      */
     @MessagePattern('login')
-    async login(@Payload() dto: CreateUserDto): Promise<TokenResponseDto> {
+    async login(@Payload() dto: CreateUserDto): Promise<OutputJwtTokens> {
         return await this.authService.login(dto);
+    }
+
+    /**
+     * Обновление JWT токенов.
+     * @param {any} data - Объект содержащий token
+     */
+    @MessagePattern('refreshTokens')
+    async handleUpdateTokens(@Payload() data: RefreshTokensDto): Promise<OutputJwtTokens> {
+        return await this.authService.updateTokens(data.user_id, data.refreshToken);
     }
 
     /**
@@ -42,6 +53,15 @@ export class AuthController {
     @MessagePattern('validate_user')
     async handleValidateUser(@Payload() data: any): Promise<Boolean> {
         return await this.authService.handleValidateUser(data);
+    }
+
+    /**
+     * Проверка валидации JWT refresh токена.
+     * @param {any} data - Объект содержащий token
+     */
+    @MessagePattern('validate_refresh_token')
+    async handleValidateRefreshToken(@Payload() data: any): Promise<Boolean> {
+        return await this.authService.handleValidateRefreshToken(data);
     }
 
     /**

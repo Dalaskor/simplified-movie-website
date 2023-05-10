@@ -15,6 +15,7 @@ import { HttpModule } from '@nestjs/axios';
             isGlobal: true,
             validationSchema: Joi.object({
                 JWT_SECRET: Joi.string().required(),
+                JWT_REFRESH_SECRET: Joi.string().required(),
                 JWT_EXPIRATION: Joi.string().required(),
                 RABBIT_MQ_URI: Joi.string().required(),
                 RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),

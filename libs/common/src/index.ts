@@ -11,6 +11,7 @@ export * from './rmq/rmq.module';
 // AUTH
 export * from './auth/auth.module';
 export * from './auth/jwt-auth.guard';
+export * from './auth/jwt-refresh.guard';
 export * from './auth/google.strategy';
 export * from './auth/google-auth.decorator';
 export * from './auth/roles-auth.decorator';

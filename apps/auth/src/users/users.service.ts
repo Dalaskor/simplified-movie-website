@@ -6,126 +6,132 @@ import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class UsersService {
-    constructor(
-        @InjectModel(User) private readonly usersRepository: typeof User,
-        private roleService: RolesService,
-    ) {}
+  constructor(
+    @InjectModel(User) private readonly usersRepository: typeof User,
+    private roleService: RolesService,
+  ) {}
 
-    /**
-     * Создать пользователя.
-     * @param {CreateRoleDto} dto - DTO для создания пользователя.
-     * @returns User - Созданный пользователь.
-     */
-    async createUser(dto: CreateUserDto): Promise<User> {
-        const user = await this.usersRepository.create(dto);
-        let role = await this.roleService.getRoleByValue(ROLES.USER);
+  /**
+   * Создать пользователя.
+   * @param {CreateRoleDto} dto - DTO для создания пользователя.
+   * @returns User - Созданный пользователь.
+   */
+  async createUser(dto: CreateUserDto): Promise<User> {
+    const user = await this.usersRepository.create(dto);
+    let role = await this.roleService.getRoleByValue(ROLES.USER);
 
-        if (!role) {
-            role = await this.roleService.create({ value: ROLES.USER });
-        }
-
-        await user.$set('roles', [role.id]);
-        user.roles = [role];
-
-        return user;
+    if (!role) {
+      role = await this.roleService.create({ value: ROLES.USER });
     }
 
-    /**
-     * Создать пользователя с правами администратора.
-     * @param {CreateRoleDto} dto - DTO для создания пользователя.
-     * @returns User - Созданный пользователь.
-     */
-    async createAdmin(dto: CreateUserDto): Promise<User> {
-        const user = await this.createUser(dto);
-        let role = await this.roleService.getRoleByValue(ROLES.ADMIN);
+    await user.$set('roles', [role.id]);
+    user.roles = [role];
 
-        if (!role) {
-            role = await this.roleService.create({ value: ROLES.ADMIN });
-        }
+    return user;
+  }
 
-        await user.$add('roles', [role.id]);
-        user.roles.push(role);
+  /**
+   * Создать пользователя с правами администратора.
+   * @param {CreateRoleDto} dto - DTO для создания пользователя.
+   * @returns User - Созданный пользователь.
+   */
+  async createAdmin(dto: CreateUserDto): Promise<User> {
+    const user = await this.createUser(dto);
+    let role = await this.roleService.getRoleByValue(ROLES.ADMIN);
 
-        return user;
+    if (!role) {
+      role = await this.roleService.create({ value: ROLES.ADMIN });
     }
 
-    /**
-     * Получить список всех пользователей.
-     * @returns User[] - Список найденных пользователей.
-     */
-    async getAllUsers(): Promise<User[]> {
-        const users = await this.usersRepository.findAll({
-            include: { all: true },
-        });
+    await user.$add('roles', [role.id]);
+    user.roles.push(role);
 
-        return users;
+    return user;
+  }
+
+  /**
+   * Получить список всех пользователей.
+   * @returns User[] - Список найденных пользователей.
+   */
+  async getAllUsers(): Promise<User[]> {
+    const users = await this.usersRepository.findAll({
+      include: { all: true },
+    });
+
+    return users;
+  }
+
+  /**
+   * Получить пользователя.
+   * @param {number} id - Идентификатор пользователя.
+   * @returns User - Найденный пользователь.
+   */
+  async getUser(id: number): Promise<User> {
+    return await this.usersRepository.findOne({
+      where: { id },
+      include: { all: true },
+    });
+  }
+
+  /**
+   * Получить пользователя по Email.
+   * @param {string} email - Email пользователя.
+   * @returns User - Найденный пользователь.
+   */
+  async getUserByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      include: { all: true },
+    });
+
+    return user;
+  }
+
+  /**
+   * Добавить роль пользователю.
+   * @param {AddRoleDto} dto - DTO для добавления роли.
+   * @returns AddRoleDto - Данные роли.
+   */
+  async addROle(dto: AddRoleDto): Promise<AddRoleDto> {
+    const user = await this.getUser(dto.userId);
+    const role = await this.roleService.getRoleByValue(dto.value);
+
+    if (role && user) {
+      await user.$add('role', role.id);
+
+      return dto;
     }
 
-    /**
-     * Получить пользователя.
-     * @param {number} id - Идентификатор пользователя.
-     * @returns User - Найденный пользователь.
-     */
-    async getUser(id: number): Promise<User> {
-        return await this.usersRepository.findOne({
-            where: { id },
-            include: { all: true },
-        });
+    throw new HttpException(
+      'Пользователь или роль не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  /**
+   * Удалить роль пользователю.
+   * @param {AddRoleDto} dto - DTO для добавления роли.
+   * @returns AddRoleDto - Данные роли.
+   */
+  async removeRole(dto: AddRoleDto): Promise<AddRoleDto> {
+    const user = await this.getUser(dto.userId);
+    const role = await this.roleService.getRoleByValue(dto.value);
+
+    if (role && user) {
+      await user.$remove('role', role.id);
+
+      return dto;
     }
 
-    /**
-     * Получить пользователя по Email.
-     * @param {string} email - Email пользователя.
-     * @returns User - Найденный пользователь.
-     */
-    async getUserByEmail(email: string): Promise<User> {
-        const user = await this.usersRepository.findOne({
-            where: { email },
-            include: { all: true },
-        });
+    throw new HttpException(
+      'Пользователь или роль не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
 
-        return user;
-    }
-
-    /**
-     * Добавить роль пользователю.
-     * @param {AddRoleDto} dto - DTO для добавления роли.
-     * @returns AddRoleDto - Данные роли.
-     */
-    async addROle(dto: AddRoleDto): Promise<AddRoleDto> {
-        const user = await this.getUser(dto.userId);
-        const role = await this.roleService.getRoleByValue(dto.value);
-
-        if (role && user) {
-            await user.$add('role', role.id);
-
-            return dto;
-        }
-
-        throw new HttpException(
-            'Пользователь или роль не найдены',
-            HttpStatus.NOT_FOUND,
-        );
-    }
-
-    /**
-     * Удалить роль пользователю.
-     * @param {AddRoleDto} dto - DTO для добавления роли.
-     * @returns AddRoleDto - Данные роли.
-     */
-    async removeRole(dto: AddRoleDto): Promise<AddRoleDto> {
-        const user = await this.getUser(dto.userId);
-        const role = await this.roleService.getRoleByValue(dto.value);
-
-        if (role && user) {
-            await user.$remove('role', role.id);
-
-            return dto;
-        }
-
-        throw new HttpException(
-            'Пользователь или роль не найдены',
-            HttpStatus.NOT_FOUND,
-        );
-    }
+  async updateRefreshToken(user_id: number, hashToken: string): Promise<any> {
+    const user = await this.usersRepository.findByPk(user_id);
+    user.refreshToken = hashToken;
+    await user.save();
+  }
 }
