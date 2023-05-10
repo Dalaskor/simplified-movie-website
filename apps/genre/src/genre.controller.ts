@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreateGenreDto, Genre, UpdateGenreDto } from '@app/models';
+import { CreateGenreDto, Genre, GenrePag, UpdateGenreDto } from '@app/models';
 
 @Controller()
 export class GenreController {
@@ -34,8 +34,8 @@ export class GenreController {
      * @returns Genre[] - Список найденных жанров.
      */
     @MessagePattern('findAllGenre')
-    async findAll(): Promise<Genre[]> {
-        return await this.genreService.findAll();
+    async findAll(dto: GenrePag): Promise<Genre[]> {
+        return await this.genreService.findAll(dto);
     }
 
     /**
