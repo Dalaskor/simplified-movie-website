@@ -1,7 +1,7 @@
 import { Order, SORT_PARAMS } from '@app/common';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { PageOptionsDto } from './page-options.dto';
 
 export class FilmPagFilterDto extends PageOptionsDto {

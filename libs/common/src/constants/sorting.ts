@@ -1,6 +1,6 @@
 export enum SORT_PARAMS {
     // scoreCount = 'scoreCount',
     rating = 'scoreAVG',
-    date = 'premiere',
+    date = 'year',
     alphabet = 'name',
 }
