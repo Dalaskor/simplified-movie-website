@@ -9,8 +9,6 @@ import {
   ExceptionDto,
   GoogleResponseDto,
   OutputJwtTokens,
-  RefreshTokensDto,
-  TokenResponseDto,
   VkLoginDto,
 } from '@app/models';
 import {
@@ -57,7 +55,6 @@ export class AppAuthController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Пользователь с такой электронной почтой уже существует',
-    type: ExceptionDto,
   })
   @ApiBody({ type: CreateUserDto })
   async registration(@Body() dto: CreateUserDto) {
@@ -82,11 +79,84 @@ export class AppAuthController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Неккоректные электронная почта или пароль',
-    type: ExceptionDto,
   })
   async login(@Body() dto: CreateUserDto) {
     return this.authClient
       .send('login', dto)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Авторизация')
+  @ApiOperation({ summary: 'Разлогинить пользователя (Удалить refreshToken у пользователя)' })
+  @Get('/logout/:user_id')
+  @ApiParam({
+    name: 'user_id',
+    example: 1,
+    required: true,
+    description: 'Идентификатор пользователя в базе данных',
+    type: Number,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Пользователь успешно разлогинен',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Пользователь не найден',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен',
+  })
+  @UseGuards(JwtAuthGuard)
+  async logout(@Param('user_id') user_id: number) {
+    return this.authClient
+      .send('logout', user_id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Авторизация')
+  @Post('/refresh-tokens/:user_id')
+  @ApiOperation({
+    summary:
+      'Обновить токены для пользователя (требуется refreshToken в заголовке)',
+  })
+  @ApiParam({
+    name: 'user_id',
+    example: 1,
+    required: true,
+    description: 'Идентификатор пользователя в базе данных',
+    type: Number,
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Операция прошла успешно.',
+    type: OutputJwtTokens,
+  })
+  @UseGuards(JwtRefreshGuard)
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен',
+  })
+  async refreshTokens(@Param('user_id') user_id: number, @Req() req: any) {
+    return this.authClient
+      .send('refreshTokens', { user_id, refreshToken: req.refreshToken })
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
@@ -138,6 +208,14 @@ export class AppAuthController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Пользователь не найден',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен',
   })
   async getUser(@Param('id') id: number) {
     return this.authClient
@@ -269,6 +347,14 @@ export class AppAuthController {
   })
   @Roles(ROLES.ADMIN)
   @UseGuards(RolesGuard)
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или роль пользователя',
+  })
   checkAdmin() {
     return {
       statusCode: HttpStatus.OK,
@@ -290,6 +376,14 @@ export class AppAuthController {
   })
   @Roles(ROLES.ADMIN)
   @UseGuards(RolesGuard)
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или роль пользователя',
+  })
   async userAddRole(@Body() dto: AddRoleDto) {
     return this.authClient
       .send('userAddRole', dto)
@@ -314,6 +408,14 @@ export class AppAuthController {
   })
   @Roles(ROLES.ADMIN)
   @UseGuards(RolesGuard)
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или роль пользователя',
+  })
   async userRemoveRole(@Body() dto: AddRoleDto) {
     return this.authClient
       .send('userRemoveRole', dto)
@@ -336,42 +438,6 @@ export class AppAuthController {
   async getAllRoles() {
     return this.authClient
       .send('getAllRoles', {})
-      .pipe(
-        catchError((error) =>
-          throwError(() => new RpcException(error.response)),
-        ),
-      );
-  }
-
-  @ApiTags('Авторизация')
-  @Post('/refresh-tokens/:user_id')
-  @ApiOperation({
-    summary:
-      'Обновить токены для пользователя (требуется refreshToken в заголовке)',
-  })
-  @ApiBody({
-    type: RefreshTokensDto,
-    description: `
-    user_id - id пользователя, которому требуется обновить JWT токены\n
-    refreshToken - текущий refreshToken пользователя полученный при логине/регистрации
-    `,
-  })
-  @ApiParam({
-    name: 'id',
-    example: 1,
-    required: true,
-    description: 'Идентификатор пользователя в базе данных',
-    type: Number,
-  })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Операция прошла успешно.',
-    type: OutputJwtTokens,
-  })
-  @UseGuards(JwtRefreshGuard)
-  async refreshTokens(@Param('user_id') user_id: number, @Req() req: any) {
-    return this.authClient
-      .send('refreshTokens', {user_id, refreshToken: req.refreshToken})
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

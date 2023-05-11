@@ -10,6 +10,7 @@ import {
     TokenResponseDto,
     User,
 } from '@app/models';
+import { HttpStatusCode } from 'axios';
 
 @Controller()
 export class AuthController {
@@ -35,6 +36,16 @@ export class AuthController {
     @MessagePattern('login')
     async login(@Payload() dto: CreateUserDto): Promise<OutputJwtTokens> {
         return await this.authService.login(dto);
+    }
+
+    /**
+     * Разлогинить пользователя.
+     * @param {number} user_id - Идентификатор пользователя.
+     */
+    @MessagePattern('logout')
+    async logout(user_id: number): Promise<any> {
+        await this.authService.logout(user_id);
+        return { message: "Операция прошла успешно", statusCode: HttpStatusCode.Ok }
     }
 
     /**

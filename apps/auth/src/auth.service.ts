@@ -185,7 +185,10 @@ export class AuthService {
       throw new RpcException(new ForbiddenException('Доступ запрещен'));
     }
 
-    const refreshTokenEquals = await bcrypt.compare(refreshToken, userRefreshToken);
+    const refreshTokenEquals = await bcrypt.compare(
+      refreshToken,
+      userRefreshToken,
+    );
 
     if (!refreshTokenEquals) {
       throw new RpcException(new ForbiddenException('Доступ запрещен'));
@@ -366,5 +369,13 @@ export class AuthService {
    */
   async getAllRoles(): Promise<Role[]> {
     return await this.roleService.getAllRoles();
+  }
+
+  /**
+   * Разлогинить пользователя.
+   * @param {number} user_id - Идентификатор пользователя.
+   */
+  async logout(user_id: number): Promise<any> {
+      return await this.userService.removeRefreshToken(user_id);
   }
 }

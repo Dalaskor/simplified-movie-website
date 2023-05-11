@@ -1,6 +1,12 @@
 import { ROLES } from '@app/common';
 import { AddRoleDto, CreateUserDto, User } from '@app/models';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
 import { RolesService } from '../roles/roles.service';
 
@@ -102,9 +108,8 @@ export class UsersService {
       return dto;
     }
 
-    throw new HttpException(
-      'Пользователь или роль не найдены',
-      HttpStatus.NOT_FOUND,
+    throw new RpcException(
+      new NotFoundException('Пользователь или роль не найдены'),
     );
   }
 
@@ -123,15 +128,41 @@ export class UsersService {
       return dto;
     }
 
-    throw new HttpException(
-      'Пользователь или роль не найдены',
-      HttpStatus.NOT_FOUND,
+    throw new RpcException(
+      new NotFoundException('Пользователь или роль не найдены'),
     );
   }
 
+  /**
+   * Обновить refreshToken у пользователя.
+   * @param {number} user_id - Идентификатор пользователя.
+   * @param {string} hashToken - Захешированный новый refreshToken
+   * @throws RpcException(NotFoundException)
+   */
   async updateRefreshToken(user_id: number, hashToken: string): Promise<any> {
     const user = await this.usersRepository.findByPk(user_id);
+
+    if (!user) {
+      throw new RpcException(new NotFoundException('Пользователь не найден'));
+    }
+
     user.refreshToken = hashToken;
+    await user.save();
+  }
+
+  /**
+   * Удалить refreshToken у пользователя.
+   * @param {number} user_id - Идентификатор пользователя.
+   * @throws RpcException(NotFoundException)
+   */
+  async removeRefreshToken(user_id: number): Promise<any> {
+    const user = await this.usersRepository.findByPk(user_id);
+
+    if (!user) {
+      throw new RpcException(new NotFoundException('Пользователь не найден'));
+    }
+
+    user.refreshToken = null;
     await user.save();
   }
 }
