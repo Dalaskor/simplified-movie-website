@@ -376,6 +376,6 @@ export class AuthService {
    * @param {number} user_id - Идентификатор пользователя.
    */
   async logout(user_id: number): Promise<any> {
-      return await this.userService.removeRefreshToken(user_id);
+    return await this.userService.removeRefreshToken(user_id);
   }
 }

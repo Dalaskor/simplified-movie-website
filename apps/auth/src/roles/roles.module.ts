@@ -6,12 +6,12 @@ import { Role, User, UserRoles } from '@app/models';
 import { DatabaseModule } from '@app/common';
 
 @Module({
-    imports: [
-        DatabaseModule,
-        SequelizeModule.forFeature([Role, User, UserRoles]),
-    ],
-    providers: [RolesService],
-    controllers: [RolesController],
-    exports: [RolesService],
+  imports: [
+    DatabaseModule,
+    SequelizeModule.forFeature([Role, User, UserRoles]),
+  ],
+  providers: [RolesService],
+  controllers: [RolesController],
+  exports: [RolesService],
 })
 export class RolesModule {}

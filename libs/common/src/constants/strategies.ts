@@ -1,4 +1,4 @@
 export const STRATEGIES = {
-    GOOGLE: 'google',
-    JWT: 'jwt'
-}
+  GOOGLE: 'google',
+  JWT: 'jwt',
+};

@@ -5,13 +5,13 @@ import { RmqOptions } from '@nestjs/microservices';
 import { AuthModule } from './auth.module';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AuthModule);
-    const rmqService = app.get<RmqService>(RmqService);
+  const app = await NestFactory.create(AuthModule);
+  const rmqService = app.get<RmqService>(RmqService);
 
-    app.enableCors();
-    app.connectMicroservice<RmqOptions>(rmqService.getOptions('AUTH', false));
-    app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
+  app.connectMicroservice<RmqOptions>(rmqService.getOptions('AUTH', false));
+  app.useGlobalPipes(new ValidationPipe());
 
-    await app.startAllMicroservices();
+  await app.startAllMicroservices();
 }
 bootstrap();

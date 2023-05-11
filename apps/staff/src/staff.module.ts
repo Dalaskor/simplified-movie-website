@@ -9,21 +9,21 @@ import { StaffController } from './staff.controller';
 import { StaffService } from './staff.service';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-            validationSchema: Joi.object({
-                RABBIT_MQ_URI: Joi.string().required(),
-                RABBIT_MQ_STAFF_QUEUE: Joi.string().required(),
-                POSTGRES_URI: Joi.string().required(),
-            }),
-            envFilePath: './apps/staff/.env',
-        }),
-        DatabaseModule,
-        SequelizeModule.forFeature([Staff, StaffType, StaffStaffTypes]),
-        RmqModule,
-    ],
-    controllers: [StaffController],
-    providers: [StaffService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        RABBIT_MQ_URI: Joi.string().required(),
+        RABBIT_MQ_STAFF_QUEUE: Joi.string().required(),
+        POSTGRES_URI: Joi.string().required(),
+      }),
+      envFilePath: './apps/staff/.env',
+    }),
+    DatabaseModule,
+    SequelizeModule.forFeature([Staff, StaffType, StaffStaffTypes]),
+    RmqModule,
+  ],
+  controllers: [StaffController],
+  providers: [StaffService],
 })
 export class StaffModule {}

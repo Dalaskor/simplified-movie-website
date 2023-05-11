@@ -1,6 +1,6 @@
-import { Film } from "@app/models"
+import { Film } from '@app/models';
 
 export interface FilmPagResult {
-    films: Film[],
-    count: number
+  films: Film[];
+  count: number;
 }

@@ -932,7 +932,10 @@ export class FilmService {
     }
 
     const films = await this.filmRepository.findAll({
-      order: [[orderBy, order], ['name', 'ASC']],
+      order: [
+        [orderBy, order],
+        ['name', 'ASC'],
+      ],
       include: includes,
       offset: skip,
       limit: take,

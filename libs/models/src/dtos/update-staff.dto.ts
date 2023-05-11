@@ -26,7 +26,7 @@ export class UpdateStaffDto extends PartialType(CreateStaffDto) {
   @IsString({ message: 'biography - должно быть строкой' })
   @ValidateIf((object, value) => value !== null)
   biography?: string;
-  
+
   @ApiPropertyOptional({
     example: ['actor'],
     description: 'Тип участника (Может быть несколько)',

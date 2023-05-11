@@ -18,18 +18,10 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/common": [
-        "libs/common/src"
-      ],
-      "@app/common/*": [
-        "libs/common/src/*"
-      ],
-      "@app/models": [
-        "libs/models/src"
-      ],
-      "@app/models/*": [
-        "libs/models/src/*"
-      ]
+      "@app/common": ["libs/common/src"],
+      "@app/common/*": ["libs/common/src/*"],
+      "@app/models": ["libs/models/src"],
+      "@app/models/*": ["libs/models/src/*"]
     }
   }
 }

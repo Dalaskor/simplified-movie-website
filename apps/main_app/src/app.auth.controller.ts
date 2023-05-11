@@ -91,7 +91,9 @@ export class AppAuthController {
   }
 
   @ApiTags('Авторизация')
-  @ApiOperation({ summary: 'Разлогинить пользователя (Удалить refreshToken у пользователя)' })
+  @ApiOperation({
+    summary: 'Разлогинить пользователя (Удалить refreshToken у пользователя)',
+  })
   @Get('/logout/:user_id')
   @ApiParam({
     name: 'user_id',

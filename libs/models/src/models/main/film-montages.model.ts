@@ -1,28 +1,28 @@
 import {
-    Column,
-    DataType,
-    ForeignKey,
-    Model,
-    Table,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
 } from 'sequelize-typescript';
 import { Film } from './film.model';
 import { Staff } from './staff.model';
 
 @Table({ tableName: 'film_montages', createdAt: false, updatedAt: false })
 export class FilmMontages extends Model<FilmMontages> {
-    @Column({
-        type: DataType.INTEGER,
-        unique: true,
-        autoIncrement: true,
-        primaryKey: true,
-    })
-    id: number;
+  @Column({
+    type: DataType.INTEGER,
+    unique: true,
+    autoIncrement: true,
+    primaryKey: true,
+  })
+  id: number;
 
-    @ForeignKey(() => Film)
-    @Column({ type: DataType.INTEGER })
-    filmId: number;
+  @ForeignKey(() => Film)
+  @Column({ type: DataType.INTEGER })
+  filmId: number;
 
-    @ForeignKey(() => Staff)
-    @Column({ type: DataType.INTEGER })
-    staffId: number;
+  @ForeignKey(() => Staff)
+  @Column({ type: DataType.INTEGER })
+  staffId: number;
 }
