@@ -42,6 +42,14 @@ export class AppGenreController {
     status: HttpStatus.CREATED,
     type: CreateGenreDto,
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или нет роли админа',
+  })
   async createGenre(@Body() dto: CreateGenreDto) {
     return this.genreClient
       .send('createGenre', dto)
@@ -108,6 +116,14 @@ export class AppGenreController {
     type: CreateGenreDto,
     status: HttpStatus.OK,
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или нет роли админа',
+  })
   async updateGenre(@Body() dto: UpdateGenreDto) {
     return this.genreClient
       .send('updateGenre', dto)
@@ -133,6 +149,14 @@ export class AppGenreController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Успешно удалено',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteGenre(@Param('id') id: number) {
     return this.genreClient

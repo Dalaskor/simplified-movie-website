@@ -19,7 +19,6 @@ import { AppFilmController } from './app.film.controller';
 import { AppGenreController } from './app.genre.controller';
 import { AppReviewController } from './app.review.controller';
 import { AppScoresController } from './app.scores.controller';
-import { AppService } from './app.service';
 import { AppStaffController } from './app.staff.controller';
 
 @Module({
@@ -54,6 +53,6 @@ import { AppStaffController } from './app.staff.controller';
         AppScoresController,
         AppReviewController,
     ],
-    providers: [AppService, GoogleStrategy],
+    providers: [GoogleStrategy],
 })
 export class AppModule {}
