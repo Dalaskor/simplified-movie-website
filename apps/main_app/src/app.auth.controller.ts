@@ -335,6 +335,15 @@ export class AppAuthController {
     type: VkLoginDto,
   })
   async vkAuthResult(@Body() vkLoginDto: VkLoginDto) {
+    if(!Number(vkLoginDto.user_id)) {
+        throw new BadRequestException('Ошибка ввода user_id');
+    }
+    if(!Number(vkLoginDto.expires_in)) {
+        throw new BadRequestException('Ошибка ввода expires_in');
+    }
+    if(!vkLoginDto.access_token) {
+        throw new BadRequestException('Ошибка ввода expires_in');
+    }
     return this.authClient
       .send('loginByVk', vkLoginDto)
       .pipe(
