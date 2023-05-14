@@ -19,6 +19,7 @@ import {
   Role,
   TokenResponseDto,
   User,
+  VkLoginDto,
 } from '@app/models';
 import { RolesService } from './roles/roles.service';
 import { ConfigService } from '@nestjs/config';
@@ -283,13 +284,12 @@ export class AuthService {
   /**
    * OAuth через vk
    */
-  async vkLogin(query: any) {
+  async vkLogin(query: VkLoginDto) {
     if (query.access_token && query.user_id) {
-      const checkToken = await this.validateVkToken(query.access_token);
-
-      if (checkToken === false) {
-        throw new RpcException(new UnauthorizedException('Токен не валидный'));
-      }
+      // const checkToken = await this.validateVkToken(query.access_token);
+      // if (checkToken === false) {
+        // throw new RpcException(new UnauthorizedException('Токен не валидный'));
+      // }
 
       const password = this.gen_password(15);
       const userDto: CreateUserDto = {
@@ -319,6 +319,10 @@ export class AuthService {
   async validateVkToken(token: string) {
     const url = `https://api.vk.com/method/users.get?access_token=${token}&v=5.131`;
     const req = await lastValueFrom(this.httpService.get(url));
+    if (req.data.error) {
+        // throw new RpcException(new BadRequestException(`${JSON.stringify(req.data.error)}`))
+        throw new RpcException(new BadRequestException(req.data.error.error_msg))
+    }
     const tokenData = req.data.response[0];
 
     if (tokenData.id) {

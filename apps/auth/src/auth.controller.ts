@@ -9,6 +9,7 @@ import {
   Role,
   TokenResponseDto,
   User,
+  VkLoginDto,
 } from '@app/models';
 import { HttpStatusCode } from 'axios';
 
@@ -121,7 +122,7 @@ export class AuthController {
    * OAuth через vk
    */
   @MessagePattern('loginByVk')
-  async vkLogin(@Payload() query: any) {
+  async vkLogin(@Payload() query: VkLoginDto) {
     return await this.authService.vkLogin(query);
   }
 
