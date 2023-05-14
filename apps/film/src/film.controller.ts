@@ -168,4 +168,14 @@ export class FilmController {
   async CheckFilmExistById(@Payload() id: number): Promise<any> {
     return await this.filmService.checkFilmExistById(id);
   }
+
+  /**
+   * Поиск фильма по строке.
+   * @param {string} finder - Строка для поиска.
+   * @returns Результат выполнения функции.
+   */
+  @MessagePattern('searchFilmsByStr')
+  async SearchFilmsByStr(@Payload() finder: string): Promise<Film[]> {
+    return await this.filmService.searchFilmByStr(finder);
+  }
 }

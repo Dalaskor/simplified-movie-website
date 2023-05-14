@@ -169,4 +169,35 @@ export class AppFilmController {
         ),
       );
   }
+
+  @ApiTags('Фильмы')
+  @ApiOperation({
+    summary: 'Поиск фильмов по строке',
+    description: 'Поиск проходит в полях name и name_en',
+  })
+  @Get('/films/search/:str')
+  @ApiParam({
+    name: 'str',
+    example: 'lorem',
+    required: true,
+    description: 'Строка для поиска фильма',
+    type: String,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "Список фильмов",
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Пустая строка',
+  })
+  async searchFilmByStr(@Param('str') finder: string) {
+    return this.filmClient
+      .send('searchFilmsByStr', finder)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 }

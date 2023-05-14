@@ -1153,4 +1153,28 @@ export class FilmService {
     const count = await this.filmRepository.count();
     return count;
   }
+
+  /**
+   * Поиск фильма по строке
+   */
+  async searchFilmByStr(finder: string): Promise<Film[]> {
+    if (!finder) {
+      throw new RpcException(new BadRequestException('Строка пустая'));
+    }
+    finder = `%${finder}%`;
+    const films = await this.filmRepository.findAll({
+      where: {
+        [Op.or]: {
+          name: {
+            [Op.iLike]: finder,
+          },
+          name_en: {
+            [Op.iLike]: finder,
+          },
+        },
+      },
+      limit: 10,
+    });
+    return films;
+  }
 }
