@@ -304,4 +304,32 @@ export class StaffService {
 
     return staffs;
   }
+
+  /**
+   * Поиск участников по строке
+   */
+  async searchStaffsByStr(finder: string): Promise<Staff[]> {
+    if (!finder) {
+      throw new RpcException(new BadRequestException('Строка пустая'));
+    }
+    finder = `%${finder}%`;
+    const staffs = await this.staffRepository.findAll({
+      include: {
+        model: StaffType,
+        where: {
+          name: {
+            [Op.or]: ['actor', 'director'],
+          },
+        },
+      },
+      where: {
+        name: {
+          [Op.iLike]: finder,
+        },
+
+      },
+      limit: 10,
+    });
+    return staffs;
+  }
 }

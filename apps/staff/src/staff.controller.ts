@@ -93,4 +93,15 @@ export class StaffController {
   ): Promise<Staff[]> {
     return await this.staffService.getStaffsWithPag(pageOptionsDto);
   }
+
+
+  /**
+   * Поиск актеров и режисеров по строке.
+   * @param {string} finder - Строка для поиска.
+   * @returns Результат выполнения функции.
+   */
+  @MessagePattern('searchActorsDirectorsByStr')
+  async SearchFilmsByStr(@Payload() finder: string): Promise<Staff[]> {
+    return await this.staffService.searchStaffsByStr(finder);
+  }
 }

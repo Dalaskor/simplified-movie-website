@@ -437,6 +437,10 @@ export class FilmService {
    * @returns Результат выполнения функции.
    */
   async remove(id: number): Promise<any> {
+    if(!id) {
+        throw new RpcException(new BadRequestException('Ошибка ввода'));
+    }
+
     const film = await this.findOne(id);
 
     await lastValueFrom(this.scoreClient.send('deleteAllByFilm', film.id));
@@ -1135,6 +1139,10 @@ export class FilmService {
    * @throws BadRequestException
    */
   async checkFilmExistById(id: number): Promise<any> {
+    if(!id) {
+        throw new RpcException(new BadRequestException('Ошибка ввода'));
+    }
+
     const film = await this.filmRepository.findByPk(id);
 
     if (!film) {
@@ -1155,12 +1163,13 @@ export class FilmService {
   }
 
   /**
-   * Поиск фильма по строке
+   * Поиск фильмов по строке
    */
-  async searchFilmByStr(finder: string): Promise<Film[]> {
+  async searchFilmsByStr(finder: string): Promise<Film[]> {
     if (!finder) {
       throw new RpcException(new BadRequestException('Строка пустая'));
     }
+
     finder = `%${finder}%`;
     const films = await this.filmRepository.findAll({
       where: {

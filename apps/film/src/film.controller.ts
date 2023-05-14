@@ -176,6 +176,6 @@ export class FilmController {
    */
   @MessagePattern('searchFilmsByStr')
   async SearchFilmsByStr(@Payload() finder: string): Promise<Film[]> {
-    return await this.filmService.searchFilmByStr(finder);
+    return await this.filmService.searchFilmsByStr(finder);
   }
 }

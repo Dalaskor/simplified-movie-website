@@ -3,6 +3,7 @@ import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { CreateFilmDto, FilmPagFilterDto, UpdateFilmDto } from '@app/models';
 import {
+    BadRequestException,
   Body,
   Controller,
   Delete,
@@ -83,6 +84,37 @@ export class AppFilmController {
   }
 
   @ApiTags('Фильмы')
+  @ApiOperation({
+    summary: 'Поиск фильмов по строке',
+    description: 'Поиск проходит в полях name и name_en',
+  })
+  @Get('/films/search/:str')
+  @ApiParam({
+    name: 'str',
+    example: 'lorem',
+    required: true,
+    description: 'Строка для поиска фильма',
+    type: String,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "Список фильмов",
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Пустая строка',
+  })
+  async searchFilmByStr(@Param('str') finder: string) {
+    return this.filmClient
+      .send('searchFilmsByStr', finder)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Фильмы')
   @ApiOperation({ summary: 'Получить данные о фильме по ID' })
   @Get('/films/:id')
   @ApiParam({
@@ -97,38 +129,11 @@ export class AppFilmController {
     status: HttpStatus.OK,
   })
   async getFilmById(@Param('id') id: number) {
+    if(typeof id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.filmClient
       .send('findOneFilm', id)
-      .pipe(
-        catchError((error) =>
-          throwError(() => new RpcException(error.response)),
-        ),
-      );
-  }
-
-  @ApiTags('Фильмы')
-  @ApiOperation({ summary: 'Обновить данные о фильме' })
-  @Roles(ROLES.ADMIN)
-  @UseGuards(RolesGuard)
-  @Put('/film-update')
-  @ApiBody({
-    type: UpdateFilmDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: CreateFilmDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'JWT токен не указан в заголовках',
-  })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Некоректный JWT токен или нет роли админа',
-  })
-  async updateFilm(@Body() dto: UpdateFilmDto) {
-    return this.filmClient
-      .send('updateFilm', dto)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
@@ -161,6 +166,9 @@ export class AppFilmController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteFilm(@Param('id') id: number) {
+    if(typeof id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.filmClient
       .send('removeFilm', id)
       .pipe(
@@ -171,29 +179,28 @@ export class AppFilmController {
   }
 
   @ApiTags('Фильмы')
-  @ApiOperation({
-    summary: 'Поиск фильмов по строке',
-    description: 'Поиск проходит в полях name и name_en',
-  })
-  @Get('/films/search/:str')
-  @ApiParam({
-    name: 'str',
-    example: 'lorem',
-    required: true,
-    description: 'Строка для поиска фильма',
-    type: String,
+  @ApiOperation({ summary: 'Обновить данные о фильме' })
+  @Roles(ROLES.ADMIN)
+  @UseGuards(RolesGuard)
+  @Put('/film-update')
+  @ApiBody({
+    type: UpdateFilmDto,
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: "Список фильмов",
+    type: CreateFilmDto,
   })
   @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Пустая строка',
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
   })
-  async searchFilmByStr(@Param('str') finder: string) {
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или нет роли админа',
+  })
+  async updateFilm(@Body() dto: UpdateFilmDto) {
     return this.filmClient
-      .send('searchFilmsByStr', finder)
+      .send('updateFilm', dto)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
