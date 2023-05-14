@@ -3,6 +3,7 @@ import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { CreateCountryDto, UpdateCountryDto } from '@app/models';
 import {
+    BadRequestException,
   Body,
   Controller,
   Delete,
@@ -103,39 +104,11 @@ export class AppCountryController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async getOneCountry(@Param('id') id: number) {
+    if(typeof id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.countryClient
       .send('findOneCountry', id)
-      .pipe(
-        catchError((error) =>
-          throwError(() => new RpcException(error.response)),
-        ),
-      );
-  }
-
-  @ApiTags('Страны')
-  @ApiOperation({ summary: 'Обновить данные по стране' })
-  @Roles(ROLES.ADMIN)
-  @UseGuards(RolesGuard)
-  @Put('/country-update')
-  @ApiBody({
-    type: UpdateCountryDto,
-    description: 'Обновить данные о стране',
-  })
-  @ApiResponse({
-    type: CreateCountryDto,
-    status: HttpStatus.OK,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'JWT токен не указан в заголовках',
-  })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Некоректный JWT токен или нет роли админа',
-  })
-  async updateCountry(@Body() dto: UpdateCountryDto) {
-    return this.countryClient
-      .send('updateCountry', dto)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
@@ -168,8 +141,42 @@ export class AppCountryController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteCountry(@Param('id') id: number) {
+    if(typeof id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.countryClient
       .send('removeCountry', id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Страны')
+  @ApiOperation({ summary: 'Обновить данные по стране' })
+  @Roles(ROLES.ADMIN)
+  @UseGuards(RolesGuard)
+  @Put('/country-update')
+  @ApiBody({
+    type: UpdateCountryDto,
+    description: 'Обновить данные о стране',
+  })
+  @ApiResponse({
+    type: CreateCountryDto,
+    status: HttpStatus.OK,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'JWT токен не указан в заголовках',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Некоректный JWT токен или нет роли админа',
+  })
+  async updateCountry(@Body() dto: UpdateCountryDto) {
+    return this.countryClient
+      .send('updateCountry', dto)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

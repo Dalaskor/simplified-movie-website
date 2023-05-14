@@ -4,6 +4,7 @@ import { RolesGuard } from '@app/common/auth/roles.guard';
 import { CreateScoreDto, DeleteScoreDto } from '@app/models';
 import { UpdateScoreDto } from '@app/models/dtos/update-score.dto';
 import {
+    BadRequestException,
   Body,
   Controller,
   Delete,
@@ -46,43 +47,6 @@ export class AppScoresController {
   async createScore(@Body() dto: CreateScoreDto) {
     return this.scoreClient
       .send('createScore', dto)
-      .pipe(
-        catchError((error) =>
-          throwError(() => new RpcException(error.response)),
-        ),
-      );
-  }
-
-  @ApiTags('Оценки')
-  @Get('/scores/count/:film_id')
-  @ApiOperation({ summary: 'Получить количество оценок фильма' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: CreateScoreDto,
-  })
-  async getCountByFilmScores(@Param('film_id') film_id: number) {
-    return this.scoreClient
-      .send('getCountByFilm', film_id)
-      .pipe(
-        catchError((error) =>
-          throwError(() => new RpcException(error.response)),
-        ),
-      );
-  }
-
-  @ApiTags('Оценки')
-  @Get('/scores/:film_id/:user_id')
-  @ApiOperation({ summary: 'Получить оценку пользователя на фильм' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: CreateScoreDto,
-  })
-  async getScoreByUser(
-    @Param('film_id') film_id: number,
-    @Param('user_id') user_id: number,
-  ) {
-    return this.scoreClient
-      .send('getScoreByUser', { film_id, user_id })
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
@@ -145,6 +109,52 @@ export class AppScoresController {
   async deleteScore(@Body() dto: DeleteScoreDto) {
     return this.scoreClient
       .send('deleteScore', dto)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Оценки')
+  @Get('/scores/count/:film_id')
+  @ApiOperation({ summary: 'Получить количество оценок фильма' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: CreateScoreDto,
+  })
+  async getCountByFilmScores(@Param('film_id') film_id: number) {
+    if(typeof film_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
+    return this.scoreClient
+      .send('getCountByFilm', film_id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Оценки')
+  @Get('/scores/:film_id/:user_id')
+  @ApiOperation({ summary: 'Получить оценку пользователя на фильм' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: CreateScoreDto,
+  })
+  async getScoreByUser(
+    @Param('film_id') film_id: number,
+    @Param('user_id') user_id: number,
+  ) {
+    if(typeof film_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
+    if(typeof user_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
+    return this.scoreClient
+      .send('getScoreByUser', { film_id, user_id })
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

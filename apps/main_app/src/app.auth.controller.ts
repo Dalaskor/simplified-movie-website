@@ -12,6 +12,7 @@ import {
   VkLoginDto,
 } from '@app/models';
 import {
+    BadRequestException,
   Body,
   Controller,
   Delete,
@@ -120,6 +121,9 @@ export class AppAuthController {
   })
   @UseGuards(JwtAuthGuard)
   async logout(@Param('user_id') user_id: number) {
+    if(typeof user_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.authClient
       .send('logout', user_id)
       .pipe(
@@ -157,6 +161,9 @@ export class AppAuthController {
     description: 'Некоректный JWT токен',
   })
   async refreshTokens(@Param('user_id') user_id: number, @Req() req: any) {
+    if(typeof user_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.authClient
       .send('refreshTokens', { user_id, refreshToken: req.refreshToken })
       .pipe(
@@ -220,6 +227,9 @@ export class AppAuthController {
     description: 'Некоректный JWT токен',
   })
   async getUser(@Param('id') id: number) {
+    if(typeof id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.authClient
       .send('getUser', id)
       .pipe(

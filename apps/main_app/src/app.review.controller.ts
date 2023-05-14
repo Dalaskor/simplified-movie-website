@@ -3,6 +3,7 @@ import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { CreateReviewDto, OutputReviewDto, UpdateReviewDto } from '@app/models';
 import {
+    BadRequestException,
   Body,
   Controller,
   Delete,
@@ -100,8 +101,31 @@ export class AppReviewController {
     description: 'Некоректный JWT токен или нет роли пользователя',
   })
   async deleteReview(@Param('id') id: number) {
+    if(typeof id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.reviewClient
       .send('deleteReview', id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Отзывы')
+  @Get('/reviews/:id')
+  @ApiOperation({ summary: 'Получить один отзыв' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: CreateReviewDto,
+  })
+  async getOneReview(@Param('id') id: number) {
+    if(typeof id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
+    return this.reviewClient
+      .send('getOneReview', id)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
@@ -117,6 +141,9 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getCountByFilmReview(@Param('film_id') film_id: number) {
+    if(typeof film_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.reviewClient
       .send('getCountByFilm', film_id)
       .pipe(
@@ -134,6 +161,9 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getAllByFilmReview(@Param('film_id') film_id: number) {
+    if(typeof film_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.reviewClient
       .send('getAllByFilmReview', film_id)
       .pipe(
@@ -151,25 +181,11 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getAllByUserReview(@Param('user_id') user_id: number) {
+    if(typeof user_id != 'number') {
+        throw new BadRequestException('Ошибка ввода');
+    }
     return this.reviewClient
       .send('getAllByUserReview', user_id)
-      .pipe(
-        catchError((error) =>
-          throwError(() => new RpcException(error.response)),
-        ),
-      );
-  }
-
-  @ApiTags('Отзывы')
-  @Get('/reviews/:id')
-  @ApiOperation({ summary: 'Получить один отзыв' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: CreateReviewDto,
-  })
-  async getOneReview(@Param('id') id: number) {
-    return this.reviewClient
-      .send('getOneReview', id)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
