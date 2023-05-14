@@ -880,10 +880,19 @@ export class FilmService {
       includes.push({
         model: Genre,
         as: 'genres',
+        required: true,
         where: {
           name: {
             [Op.or]: genreFilter,
           },
+        },
+      });
+    } else if (genreEnFilter.length > 0) {
+      includes.push({
+        model: Genre,
+        as: 'genres',
+        required: true,
+        where: {
           name_en: {
             [Op.or]: genreEnFilter,
           },
@@ -892,11 +901,14 @@ export class FilmService {
     } else {
       includes.push({
         model: Genre,
+        as: 'genres',
+        required: true,
       });
     }
-    if (genreFilter.length > 0) {
+    if (countryFilter.length > 0) {
       includes.push({
         model: Country,
+        required: true,
         where: {
           name: {
             [Op.or]: countryFilter,
@@ -906,12 +918,15 @@ export class FilmService {
     } else {
       includes.push({
         model: Country,
+        as: 'countries',
+        required: true,
       });
     }
     if (actorFilter.length > 0) {
       includes.push({
         model: Staff,
         as: 'actors',
+        required: true,
         where: {
           name: {
             [Op.or]: actorFilter,
@@ -923,6 +938,7 @@ export class FilmService {
       includes.push({
         model: Staff,
         as: 'directors',
+        required: true,
         where: {
           name: {
             [Op.or]: directorFilter,
@@ -934,11 +950,12 @@ export class FilmService {
     const films = await this.filmRepository.findAll({
       order: [
         [orderBy, order],
-        ['name', 'ASC'],
+        ['name', Order.ASC],
       ],
       include: includes,
       offset: skip,
       limit: take,
+      group: ['id', 'name'],
     });
 
     const count = await this.filmRepository.count({
