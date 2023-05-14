@@ -101,7 +101,7 @@ export class AppReviewController {
     description: 'Некоректный JWT токен или нет роли пользователя',
   })
   async deleteReview(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
@@ -121,7 +121,7 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getOneReview(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
@@ -141,7 +141,7 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getCountByFilmReview(@Param('film_id') film_id: number) {
-    if(typeof film_id != 'number') {
+    if(!Number(film_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
@@ -161,7 +161,7 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getAllByFilmReview(@Param('film_id') film_id: number) {
-    if(typeof film_id != 'number') {
+    if(!Number(film_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
@@ -181,7 +181,7 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getAllByUserReview(@Param('user_id') user_id: number) {
-    if(typeof user_id != 'number') {
+    if(!Number(user_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient

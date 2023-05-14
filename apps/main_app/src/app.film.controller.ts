@@ -129,7 +129,7 @@ export class AppFilmController {
     status: HttpStatus.OK,
   })
   async getFilmById(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.filmClient
@@ -166,7 +166,7 @@ export class AppFilmController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteFilm(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.filmClient

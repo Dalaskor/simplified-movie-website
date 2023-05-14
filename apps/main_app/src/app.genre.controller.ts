@@ -95,7 +95,7 @@ export class AppGenreController {
     status: HttpStatus.OK,
   })
   async getOneGenre(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.genreClient
@@ -132,7 +132,7 @@ export class AppGenreController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteGenre(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.genreClient

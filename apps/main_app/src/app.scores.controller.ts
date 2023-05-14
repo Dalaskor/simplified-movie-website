@@ -124,7 +124,7 @@ export class AppScoresController {
     type: CreateScoreDto,
   })
   async getCountByFilmScores(@Param('film_id') film_id: number) {
-    if(typeof film_id != 'number') {
+    if(!Number(film_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.scoreClient
@@ -147,10 +147,10 @@ export class AppScoresController {
     @Param('film_id') film_id: number,
     @Param('user_id') user_id: number,
   ) {
-    if(typeof film_id != 'number') {
+    if(!Number(film_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
-    if(typeof user_id != 'number') {
+    if(!Number(user_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.scoreClient

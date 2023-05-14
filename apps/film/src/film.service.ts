@@ -884,7 +884,6 @@ export class FilmService {
       includes.push({
         model: Genre,
         as: 'genres',
-        required: true,
         where: {
           name: {
             [Op.or]: genreFilter,
@@ -895,7 +894,6 @@ export class FilmService {
       includes.push({
         model: Genre,
         as: 'genres',
-        required: true,
         where: {
           name_en: {
             [Op.or]: genreEnFilter,
@@ -906,13 +904,11 @@ export class FilmService {
       includes.push({
         model: Genre,
         as: 'genres',
-        required: true,
       });
     }
     if (countryFilter.length > 0) {
       includes.push({
         model: Country,
-        required: true,
         where: {
           name: {
             [Op.or]: countryFilter,
@@ -923,14 +919,12 @@ export class FilmService {
       includes.push({
         model: Country,
         as: 'countries',
-        required: true,
       });
     }
     if (actorFilter.length > 0) {
       includes.push({
         model: Staff,
         as: 'actors',
-        required: true,
         where: {
           name: {
             [Op.or]: actorFilter,
@@ -942,7 +936,6 @@ export class FilmService {
       includes.push({
         model: Staff,
         as: 'directors',
-        required: true,
         where: {
           name: {
             [Op.or]: directorFilter,

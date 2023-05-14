@@ -104,7 +104,7 @@ export class AppCountryController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async getOneCountry(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.countryClient
@@ -141,7 +141,7 @@ export class AppCountryController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteCountry(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.countryClient

@@ -121,7 +121,7 @@ export class AppAuthController {
   })
   @UseGuards(JwtAuthGuard)
   async logout(@Param('user_id') user_id: number) {
-    if(typeof user_id != 'number') {
+    if(!Number(user_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.authClient
@@ -161,7 +161,7 @@ export class AppAuthController {
     description: 'Некоректный JWT токен',
   })
   async refreshTokens(@Param('user_id') user_id: number, @Req() req: any) {
-    if(typeof user_id != 'number') {
+    if(!Number(user_id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.authClient
@@ -227,7 +227,7 @@ export class AppAuthController {
     description: 'Некоректный JWT токен',
   })
   async getUser(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.authClient
