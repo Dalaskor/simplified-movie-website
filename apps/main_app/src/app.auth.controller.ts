@@ -9,6 +9,7 @@ import {
   ExceptionDto,
   GoogleResponseDto,
   OutputJwtTokens,
+  TokenResponseDto,
   VkLoginDto,
 } from '@app/models';
 import {
@@ -32,6 +33,7 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -291,6 +293,36 @@ export class AppAuthController {
         ),
       );
   }
+
+  @ApiTags('Авторизация')
+  @Post('/google/login')
+  @ApiQuery({
+      name: 'email',
+      type: String,
+      description: "Email пользователя Google",
+  })
+  @ApiResponse({
+      type: TokenResponseDto,
+      status: HttpStatus.OK,
+  })
+  async googleLoginViaDto(@Query() user: any) {
+      console.log(user)
+    if (!user.email || typeof user.email != 'string') {
+      throw new RpcException(new BadRequestException('No user from Google'));
+    }
+    return this.authClient
+      .send('googleLoginViaDto', {email: user.email})
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Авторизация')
+  @ApiOperation({
+    summary: 'Передача пользователя из google в бд',
+  })
 
   @ApiTags('Авторизация')
   @ApiOperation({ summary: 'OAuth через VK' })

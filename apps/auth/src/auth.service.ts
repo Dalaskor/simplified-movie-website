@@ -265,6 +265,24 @@ export class AuthService {
     return await this.registration({ email: userEmail, password });
   }
 
+  async googleLoginViaDto(user: any) {
+    if (!user.email || typeof user.email != 'string') {
+      throw new RpcException(new BadRequestException('No user from Google'));
+    }
+
+    const userEmail = user.email;
+    const candidate = await this.userService.getUserByEmail(userEmail);
+
+    if (candidate) {
+      return this.generateToken(candidate);
+    }
+
+    const genPass = this.gen_password(15);
+    const password = await bcrypt.hash(genPass, 5);
+
+    return await this.registration({ email: userEmail, password });
+  }
+
   /**
    * Генерация пароля.
    * @param {number} len - Размер пароля.

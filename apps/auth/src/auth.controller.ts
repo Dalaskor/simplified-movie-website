@@ -118,6 +118,11 @@ export class AuthController {
     return await this.authService.googleLogin(user);
   }
 
+  @MessagePattern('googleLoginViaDto')
+  async googleLoginViaDto(@Payload() user: any) {
+      return await this.authService.googleLoginViaDto(user);
+  }
+
   /**
    * OAuth через vk
    */
