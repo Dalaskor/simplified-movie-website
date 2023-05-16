@@ -10,6 +10,7 @@ import {
   GoogleResponseDto,
   OutputJwtTokens,
   TokenResponseDto,
+  UserGmailOAuth,
   VkLoginDto,
 } from '@app/models';
 import {
@@ -296,18 +297,12 @@ export class AppAuthController {
 
   @ApiTags('Авторизация')
   @Post('/google/login')
-  @ApiQuery({
-      name: 'email',
-      type: String,
-      description: "Email пользователя Google",
-  })
   @ApiResponse({
-      type: TokenResponseDto,
-      status: HttpStatus.OK,
+      type: OutputJwtTokens,
+      status: HttpStatus.CREATED,
   })
-  async googleLoginViaDto(@Query() user: any) {
-      console.log(user)
-    if (!user.email || typeof user.email != 'string') {
+  async googleLoginViaDto(@Query() user: UserGmailOAuth) {
+    if (!user || !user.email || typeof user.email != 'string') {
       throw new RpcException(new BadRequestException('No user from Google'));
     }
     return this.authClient
@@ -365,6 +360,10 @@ export class AppAuthController {
   })
   @ApiBody({
     type: VkLoginDto,
+  })
+  @ApiResponse({
+      type: OutputJwtTokens,
+      status: HttpStatus.CREATED,
   })
   async vkAuthResult(@Body() vkLoginDto: VkLoginDto) {
     if(!Number(vkLoginDto.user_id)) {

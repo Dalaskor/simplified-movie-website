@@ -59,3 +59,4 @@ export * from './dtos/token.dto';
 export * from './dtos/vk-login.dto';
 
 export * from './dtos/refresh-tokens.dto';
+export * from './dtos/user-gmail-oauth.dto';

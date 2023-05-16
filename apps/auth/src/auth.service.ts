@@ -102,7 +102,6 @@ export class AuthService {
     await this.userService.updateRefreshToken(user.id, hashRefreshToken);
 
     return tokens;
-    // return await this.generateToken(user);
   }
 
   /**
@@ -274,7 +273,11 @@ export class AuthService {
     const candidate = await this.userService.getUserByEmail(userEmail);
 
     if (candidate) {
-      return this.generateToken(candidate);
+      const tokens = await this.generateTokens(candidate);
+      const hashRefresh = await bcrypt.hash(tokens.refreshToken, 5);
+      candidate.refreshToken = hashRefresh;
+      await candidate.save();
+      return tokens;
     }
 
     const genPass = this.gen_password(15);
@@ -304,11 +307,6 @@ export class AuthService {
    */
   async vkLogin(query: VkLoginDto) {
     if (query.access_token && query.user_id) {
-      // const checkToken = await this.validateVkToken(query.access_token);
-      // if (checkToken === false) {
-        // throw new RpcException(new UnauthorizedException('Токен не валидный'));
-      // }
-
       const password = this.gen_password(15);
       const userDto: CreateUserDto = {
         email: `${query.user_id}@vk.com`,
@@ -319,7 +317,11 @@ export class AuthService {
 
       if (candidate) {
         console.log('GENERATE TOKEN');
-        return await this.generateToken(candidate);
+        const tokens = await this.generateTokens(candidate);
+        const hashRefresh = await bcrypt.hash(tokens.refreshToken, 5);
+        candidate.refreshToken = hashRefresh;
+        await candidate.save();
+        return tokens;
       }
 
       return await this.registration(userDto);
