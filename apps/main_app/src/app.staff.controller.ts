@@ -88,7 +88,7 @@ export class AppStaffController {
     name: 'str',
     example: 'lorem',
     required: true,
-    description: 'Строка для поиска актеров и режисеров',
+    description: 'Строка для поиска актеров и режиссеров',
     type: String,
   })
   @ApiResponse({

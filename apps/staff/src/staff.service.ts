@@ -285,6 +285,16 @@ export class StaffService {
 
     let typeFilter: string[] = pageOptionsDto.type ? [pageOptionsDto.type] : [];
 
+    let search = {};
+    if (pageOptionsDto.search) {
+      const finder: string = `%${pageOptionsDto.search}%`;
+      search = {
+        name: {
+          [Op.iLike]: finder,
+        },
+      };
+    }
+
     const staffs = await this.staffRepository.findAll({
       include: [
         {
@@ -297,6 +307,7 @@ export class StaffService {
         },
         { all: true },
       ],
+      where: search,
       order: [['createdAt', order]],
       offset: skip,
       limit: take,
@@ -326,7 +337,6 @@ export class StaffService {
         name: {
           [Op.iLike]: finder,
         },
-
       },
       limit: 10,
     });

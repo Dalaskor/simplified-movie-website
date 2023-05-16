@@ -11,4 +11,11 @@ export class StaffPagFilter extends PageOptionsDto {
   @IsEnum(STAFF_TYPES)
   @IsOptional()
   readonly type?: STAFF_TYPES;
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Поиск по имени участника',
+  })
+  @IsOptional()
+  readonly search?: String;
 }
