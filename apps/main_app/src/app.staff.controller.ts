@@ -124,7 +124,7 @@ export class AppStaffController {
     status: HttpStatus.OK,
   })
   async getOneStaff(@Param('id') id: number) {
-    if(typeof id != 'number') {
+    if(!Number(id)) {
         throw new BadRequestException('Ошибка ввода');
     }
     return this.staffClient

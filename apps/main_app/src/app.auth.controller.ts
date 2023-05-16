@@ -9,7 +9,6 @@ import {
   ExceptionDto,
   GoogleResponseDto,
   OutputJwtTokens,
-  TokenResponseDto,
   UserGmailOAuth,
   VkLoginDto,
 } from '@app/models';
