@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ScoreService {
@@ -41,12 +42,13 @@ export class ScoreService {
     }
 
     await this.incFilmRating(score.film_id, count, score.value);
+    await this.updateCountScoreByFilm(score.film_id);
 
     return score;
   }
 
   async checkFilm(film_id: number): Promise<any> {
-    return this.filmClient.send('checkFilmExistById', film_id);
+    return await lastValueFrom(this.filmClient.send('checkFilmExistById', film_id));
   }
 
   /**
@@ -86,8 +88,10 @@ export class ScoreService {
     }
 
     await this.decFilmRating(score.film_id, count, score.value);
+    const film_id: number = score.film_id;
 
     await score.destroy();
+    await this.updateCountScoreByFilm(film_id);
 
     return { message: 'Оценка удалена' };
   }
@@ -97,11 +101,13 @@ export class ScoreService {
     count: number,
     value: number,
   ): Promise<any> {
-    return this.filmClient.send('incFilmRating', {
-      film_id,
-      count,
-      value,
-    });
+    return await lastValueFrom(
+      this.filmClient.send('incFilmRating', {
+        film_id,
+        count,
+        value,
+      }),
+    );
   }
 
   private async updateFilmRating(
@@ -110,12 +116,14 @@ export class ScoreService {
     old_value: number,
     new_value: number,
   ): Promise<any> {
-    return this.filmClient.send('updateFilmRating', {
-      film_id,
-      count,
-      old_value,
-      new_value,
-    });
+    return await lastValueFrom(
+      this.filmClient.send('updateFilmRating', {
+        film_id,
+        count,
+        old_value,
+        new_value,
+      }),
+    );
   }
 
   private async decFilmRating(
@@ -123,11 +131,13 @@ export class ScoreService {
     count: number,
     value: number,
   ): Promise<any> {
-    return this.filmClient.send('decFilmRating', {
-      film_id,
-      count,
-      value,
-    });
+    return await lastValueFrom(
+      this.filmClient.send('decFilmRating', {
+        film_id,
+        count,
+        value,
+      }),
+    );
   }
 
   /**
@@ -139,6 +149,7 @@ export class ScoreService {
     const count = await this.scoreRepository.destroy({
       where: { film_id },
     });
+    await this.updateCountScoreByFilm(film_id);
 
     return {
       statusCode: HttpStatus.OK,
@@ -175,7 +186,18 @@ export class ScoreService {
    * @returns number - Количество оценок на фильм.
    */
   async getCountByFilm(film_id: number): Promise<number> {
-    return await this.scoreRepository.count({ where: { film_id } });
+    let count = await this.scoreRepository.count({ where: { film_id } });
+    if (count) {
+        return count;
+    }
+    return 0;
+  }
+
+  private async updateCountScoreByFilm(film_id: number): Promise<any> {
+    const count = await this.getCountByFilm(film_id);
+    return await lastValueFrom(
+      this.filmClient.send('changeCountScoresForFilm', { film_id, count }),
+    );
   }
 
   /**

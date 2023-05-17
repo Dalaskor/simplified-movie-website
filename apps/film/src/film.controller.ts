@@ -27,6 +27,11 @@ interface FilmRatingUpdateData {
   new_value: number;
 }
 
+interface ChangeScoreCount {
+    film_id: number;
+    count: number;
+}
+
 @Controller()
 export class FilmController {
   constructor(
@@ -177,5 +182,13 @@ export class FilmController {
   @MessagePattern('searchFilmsByStr')
   async SearchFilmsByStr(@Payload() finder: string): Promise<Film[]> {
     return await this.filmService.searchFilmsByStr(finder);
+  }
+
+  /**
+   * Изменить количество оценок на фильме.
+   */
+  @MessagePattern('changeCountScoresForFilm')
+  async ChangeCountScoresForFilm(@Payload() data: ChangeScoreCount) {
+      return await this.filmService.chagneCountScores(data.film_id, data.count);
   }
 }

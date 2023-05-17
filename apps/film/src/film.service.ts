@@ -186,16 +186,6 @@ export class FilmService {
       curFilm.operators = operators;
 
       await curFilm.save();
-
-      /* const spectatorIds = [];
-            for (const spectator of dto.spectators) {
-                const createdSpectator = await this.createSpectator(spectator);
-                if(!createdSpectator) {
-                    continue;
-                }
-                spectatorIds.push(createdSpectator.id);
-            }
-            await curFilm.$set('spectators', spectatorIds); */
     }
 
     return { status: 'Created' };
@@ -437,8 +427,8 @@ export class FilmService {
    * @returns Результат выполнения функции.
    */
   async remove(id: number): Promise<any> {
-    if(!id) {
-        throw new RpcException(new BadRequestException('Ошибка ввода'));
+    if (!id) {
+      throw new RpcException(new BadRequestException('Ошибка ввода'));
     }
 
     const film = await this.findOne(id);
@@ -984,7 +974,7 @@ export class FilmService {
       throw new RpcException(new NotFoundException('Фильм не найден'));
     }
 
-    const newAvgScore = this.incRating(count, film.scoreAVG, value);
+    const newAvgScore: number = this.incRating(count, film.scoreAVG, value);
 
     film.scoreAVG = newAvgScore;
     await film.save();
@@ -1012,7 +1002,7 @@ export class FilmService {
       throw new RpcException(new NotFoundException('Фильм не найден'));
     }
 
-    const newAvgScore = this.decRating(count, film.scoreAVG, value);
+    const newAvgScore: number = this.decRating(count, film.scoreAVG, value);
 
     film.scoreAVG = newAvgScore;
     await film.save();
@@ -1132,8 +1122,8 @@ export class FilmService {
    * @throws BadRequestException
    */
   async checkFilmExistById(id: number): Promise<any> {
-    if(!id) {
-        throw new RpcException(new BadRequestException('Ошибка ввода'));
+    if (!id) {
+      throw new RpcException(new BadRequestException('Ошибка ввода'));
     }
 
     const film = await this.filmRepository.findByPk(id);
@@ -1178,5 +1168,18 @@ export class FilmService {
       limit: 10,
     });
     return films;
+  }
+
+  /**
+   * Изменить количество оценок фильма.
+   */
+  async chagneCountScores(film_id: number, count: number): Promise<any> {
+    const film = await this.filmRepository.findByPk(film_id);
+    if (!film) {
+      throw new RpcException(new NotFoundException('Фильм не найден'));
+    }
+    film.countScore = count;
+    await film.save();
+    return {statusCode: HttpStatus.OK};
   }
 }

@@ -143,6 +143,9 @@ export class Film extends Model<Film, FilmCreationAttrs> {
   @Column({ type: DataType.FLOAT, allowNull: true })
   scoreAVG: number;
 
+  @Column({type: DataType.INTEGER, defaultValue: 0})
+  countScore: number;
+
   @BelongsToMany(() => Country, () => FilmCountries)
   countries: Country[];
 
