@@ -213,6 +213,8 @@ export class CreateFilmDto {
   @ValidateNested({ each: true })
   @Type(() => Spectator)
   spectators: Spectator[];
+
+  countScore?: number;
 }
 
 class Spectator {

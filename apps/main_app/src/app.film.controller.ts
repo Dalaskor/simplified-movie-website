@@ -80,6 +80,8 @@ export class AppFilmController {
       this.filmClient.send<FilmPagResult>('getFilmsWithPag', pageOptionsDto),
     );
     await res.header('x-total-count', filmPagResult.count);
+    await res.header('x-min-count-score', filmPagResult.minScore);
+    await res.header('x-max-count-score', filmPagResult.maxScore);
     await res.send(filmPagResult.films);
   }
 

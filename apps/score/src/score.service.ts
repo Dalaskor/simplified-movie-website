@@ -28,7 +28,9 @@ export class ScoreService {
   async create(dto: CreateScoreDto): Promise<Score> {
     await this.checkFilm(dto.user_id);
 
-    const count = await this.getCountByFilm(dto.film_id);
+    const count: number = await lastValueFrom(
+      this.filmClient.send('getCountScoresForFilm', dto.film_id),
+    );
     const candidate = await this.findOne(dto.film_id, dto.user_id);
 
     if (candidate) {
@@ -42,13 +44,15 @@ export class ScoreService {
     }
 
     await this.incFilmRating(score.film_id, count, score.value);
-    await this.updateCountScoreByFilm(score.film_id);
+    await this.updateCountScoreByFilm(score.film_id, true);
 
     return score;
   }
 
   async checkFilm(film_id: number): Promise<any> {
-    return await lastValueFrom(this.filmClient.send('checkFilmExistById', film_id));
+    return await lastValueFrom(
+      this.filmClient.send('checkFilmExistById', film_id),
+    );
   }
 
   /**
@@ -80,7 +84,9 @@ export class ScoreService {
    * @throws NotFoundException
    */
   async delete(dto: DeleteScoreDto) {
-    const count = await this.getCountByFilm(dto.film_id);
+    const count: number = await lastValueFrom(
+      this.filmClient.send('getCountScoresForFilm', dto.film_id),
+    );
     const score = await this.findOne(dto.film_id, dto.user_id);
 
     if (!score) {
@@ -91,7 +97,7 @@ export class ScoreService {
     const film_id: number = score.film_id;
 
     await score.destroy();
-    await this.updateCountScoreByFilm(film_id);
+    await this.updateCountScoreByFilm(film_id, false);
 
     return { message: 'Оценка удалена' };
   }
@@ -149,7 +155,7 @@ export class ScoreService {
     const count = await this.scoreRepository.destroy({
       where: { film_id },
     });
-    await this.updateCountScoreByFilm(film_id);
+    await this.updateCountScoreByFilm(film_id, false);
 
     return {
       statusCode: HttpStatus.OK,
@@ -188,15 +194,15 @@ export class ScoreService {
   async getCountByFilm(film_id: number): Promise<number> {
     let count = await this.scoreRepository.count({ where: { film_id } });
     if (count) {
-        return count;
+      return count;
     }
     return 0;
   }
 
-  private async updateCountScoreByFilm(film_id: number): Promise<any> {
+  private async updateCountScoreByFilm(film_id: number, isUp: boolean): Promise<any> {
     const count = await this.getCountByFilm(film_id);
     return await lastValueFrom(
-      this.filmClient.send('changeCountScoresForFilm', { film_id, count }),
+      this.filmClient.send('changeCountScoresForFilm', { film_id, count, isUp }),
     );
   }
 

@@ -30,6 +30,7 @@ interface FilmRatingUpdateData {
 interface ChangeScoreCount {
     film_id: number;
     count: number;
+    isUp: boolean;
 }
 
 @Controller()
@@ -189,6 +190,14 @@ export class FilmController {
    */
   @MessagePattern('changeCountScoresForFilm')
   async ChangeCountScoresForFilm(@Payload() data: ChangeScoreCount) {
-      return await this.filmService.chagneCountScores(data.film_id, data.count);
+      return await this.filmService.chagneCountScores(data.film_id, data.count, data.isUp);
+  }
+
+  /**
+   * Изменить количество оценок на фильме.
+   */
+  @MessagePattern('getCountScoresForFilm')
+  async getCountScoresForFilm(@Payload() film_id: number) {
+      return await this.filmService.getScoreCountByFilm(film_id);
   }
 }

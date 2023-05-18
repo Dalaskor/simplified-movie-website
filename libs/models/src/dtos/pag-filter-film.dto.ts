@@ -1,7 +1,7 @@
 import { Order, SORT_PARAMS } from '@app/common';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, Min } from 'class-validator';
 import { PageOptionsDto } from './page-options.dto';
 
 export class FilmPagFilterDto extends PageOptionsDto {
@@ -66,4 +66,25 @@ export class FilmPagFilterDto extends PageOptionsDto {
   @Type(() => Array<string>)
   @IsOptional()
   readonly directors?: string[] = [];
+
+  @ApiPropertyOptional({
+    minimum: 0,
+    default: 0,
+    description: 'Минимальная оценка фильма',
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  readonly minCountScore?: number = 0;
+
+  @ApiPropertyOptional({
+    minimum: 1,
+    description: 'Максимальная оценка фильма',
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  readonly maxCountScore?: number;
 }

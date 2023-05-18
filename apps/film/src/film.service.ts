@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
@@ -185,10 +186,32 @@ export class FilmService {
       await curFilm.$set('operators', operarotsId);
       curFilm.operators = operators;
 
+      if (!curFilm.countScore || curFilm.countScore == 0) {
+        curFilm.countScore = Math.floor(Math.random() * 5000000);
+      }
+      if (!curFilm.scoreAVG) {
+        curFilm.scoreAVG = this.randomInRange(0, 10);
+      }
       await curFilm.save();
     }
 
     return { status: 'Created' };
+  }
+
+  private randomInRange(min: number, max: number): number {
+    if (min > max) {
+      throw new RpcException(
+        new InternalServerErrorException(
+          'Minimum value should be smaller than maximum value.',
+        ),
+      );
+    }
+    return Math.random() * max + min;
+  }
+
+  async getScoreCountByFilm(film_id: number) {
+    const film = await this.filmRepository.findByPk(film_id);
+    return film.countScore;
   }
 
   /**
@@ -828,9 +851,17 @@ export class FilmService {
     const orderBy: string = pageOptionsDto.orderBy
       ? pageOptionsDto.orderBy
       : SORT_PARAMS.rating;
+    const minScore: number = await this.filmRepository.min('countScore');
+    const maxScore: number = await this.filmRepository.max('countScore');
     const page: number = pageOptionsDto.page ? pageOptionsDto.page : 1;
     const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
     const skip = (page - 1) * take;
+    const minScoreFilter: number = pageOptionsDto.minCountScore
+      ? pageOptionsDto.minCountScore
+      : 0;
+    const maxScoreFilter: number = pageOptionsDto.maxCountScore
+      ? pageOptionsDto.maxCountScore
+      : maxScore;
 
     let genreFilter: string[] = pageOptionsDto.genres
       ? pageOptionsDto.genres
@@ -940,6 +971,11 @@ export class FilmService {
         ['name', Order.ASC],
       ],
       include: includes,
+      where: {
+        countScore: {
+          [Op.between]: [minScoreFilter, maxScoreFilter],
+        },
+      },
       offset: skip,
       limit: take,
       group: ['id', 'name'],
@@ -947,11 +983,16 @@ export class FilmService {
 
     const count = await this.filmRepository.count({
       include: includes,
+      where: {
+        countScore: {
+          [Op.between]: [minScoreFilter, maxScoreFilter],
+        },
+      },
       distinct: true,
       col: 'id',
     });
 
-    return { films, count };
+    return { films, count, minScore, maxScore };
   }
 
   /**
@@ -1173,13 +1214,25 @@ export class FilmService {
   /**
    * Изменить количество оценок фильма.
    */
-  async chagneCountScores(film_id: number, count: number): Promise<any> {
+  async chagneCountScores(
+    film_id: number,
+    count: number,
+    isUp: boolean,
+  ): Promise<any> {
     const film = await this.filmRepository.findByPk(film_id);
     if (!film) {
       throw new RpcException(new NotFoundException('Фильм не найден'));
     }
-    film.countScore = count;
+    if (isUp) {
+      film.countScore += count;
+    } else {
+      if (count == 0) {
+        film.countScore -= 1;
+      } else {
+        film.countScore -= count;
+      }
+    }
     await film.save();
-    return {statusCode: HttpStatus.OK};
+    return { statusCode: HttpStatus.OK };
   }
 }
