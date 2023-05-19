@@ -87,4 +87,25 @@ export class FilmPagFilterDto extends PageOptionsDto {
   @Min(1)
   @IsOptional()
   readonly maxCountScore?: number;
+
+  @ApiPropertyOptional({
+    minimum: 0,
+    default: 0,
+    description: 'Фильтр по году выпуска (начиная с)',
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  readonly yearStart?: number = 0;
+
+  @ApiPropertyOptional({
+    minimum: 1,
+    description: 'Фильтр по году выпуска (до)',
+  })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  readonly yearEnd?: number;
 }

@@ -454,7 +454,9 @@ export class FilmService {
     if (!film) {
       throw new RpcException(new NotFoundException('Фильм не найден'));
     }
-    await lastValueFrom(this.scoreClient.send('deleteAllByFilmWithoutUpdate', film.id));
+    await lastValueFrom(
+      this.scoreClient.send('deleteAllByFilmWithoutUpdate', film.id),
+    );
     await lastValueFrom(
       this.reviewClient.send('deleteAllByFilmReview', film.id),
     );
@@ -849,6 +851,8 @@ export class FilmService {
       : SORT_PARAMS.rating;
     const minScore: number = await this.filmRepository.min('countScore');
     const maxScore: number = await this.filmRepository.max('countScore');
+    const yearStart: number = await this.filmRepository.min('year');
+    const yearEnd: number = await this.filmRepository.max('year');
     const page: number = pageOptionsDto.page ? pageOptionsDto.page : 1;
     const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
     const skip = (page - 1) * take;
@@ -858,6 +862,12 @@ export class FilmService {
     const maxScoreFilter: number = pageOptionsDto.maxCountScore
       ? pageOptionsDto.maxCountScore
       : maxScore;
+    const yearStartFilter: number = pageOptionsDto.yearStart
+      ? pageOptionsDto.yearStart
+      : yearStart;
+    const yearEndFilter: number = pageOptionsDto.yearEnd
+      ? pageOptionsDto.yearEnd
+      : yearEnd;
 
     let genreFilter: string[] = pageOptionsDto.genres
       ? pageOptionsDto.genres
@@ -971,6 +981,9 @@ export class FilmService {
         countScore: {
           [Op.between]: [minScoreFilter, maxScoreFilter],
         },
+        year: {
+          [Op.between]: [yearStartFilter, yearEndFilter],
+        },
       },
       offset: skip,
       limit: take,
@@ -982,6 +995,9 @@ export class FilmService {
       where: {
         countScore: {
           [Op.between]: [minScoreFilter, maxScoreFilter],
+        },
+        year: {
+          [Op.between]: [yearStartFilter, yearEndFilter],
         },
       },
       distinct: true,
