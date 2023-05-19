@@ -1,5 +1,6 @@
 import {
   CreateReviewDto,
+  GetReviewsByParent,
   OutputReviewDto,
   Review,
   UpdateReviewDto,
@@ -91,5 +92,10 @@ export class ReviewController {
   @MessagePattern('getCountByFilm')
   async getCountByFilm(@Payload() film_id: number): Promise<number> {
     return await this.reviewService.getCountByFilm(film_id);
+  }
+
+  @MessagePattern('getFilmReviewsByParent')
+  async getAllReviewsByParent(@Payload() data: GetReviewsByParent): Promise<Review[]> {
+    return await this.reviewService.getAllReviewsByParent(data.film_id, data.parent_id);
   }
 }

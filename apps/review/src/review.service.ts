@@ -203,4 +203,19 @@ export class ReviewService {
   async getCountByFilm(film_id: number): Promise<number> {
     return await this.reviewRepository.count({ where: { film_id } });
   }
+
+  /**
+   * Получить все дочерние коментарии.
+   * @param {number} film_id - Идентификатор фильма.
+   * @param {number} parent_id - Идентификатор родителя
+   */
+  async getAllReviewsByParent(
+    film_id: number,
+    parent_id: number,
+  ): Promise<Review[]> {
+    const reviews = await this.reviewRepository.findAll({
+      where: { film_id, parent: parent_id },
+    });
+    return reviews;
+  }
 }

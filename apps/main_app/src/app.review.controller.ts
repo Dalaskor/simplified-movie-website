@@ -1,9 +1,9 @@
 import { REVIEW_SERVICE, ROLES } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
-import { CreateReviewDto, OutputReviewDto, UpdateReviewDto } from '@app/models';
+import { CreateReviewDto, GetReviewsByParent, OutputReviewDto, UpdateReviewDto } from '@app/models';
 import {
-    BadRequestException,
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -101,8 +101,8 @@ export class AppReviewController {
     description: 'Некоректный JWT токен или нет роли пользователя',
   })
   async deleteReview(@Param('id') id: number) {
-    if(!Number(id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
       .send('deleteReview', id)
@@ -121,8 +121,8 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getOneReview(@Param('id') id: number) {
-    if(!Number(id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
       .send('getOneReview', id)
@@ -141,8 +141,8 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getCountByFilmReview(@Param('film_id') film_id: number) {
-    if(!Number(film_id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(film_id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
       .send('getCountByFilm', film_id)
@@ -161,11 +161,36 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getAllByFilmReview(@Param('film_id') film_id: number) {
-    if(!Number(film_id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(film_id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
       .send('getAllByFilmReview', film_id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @ApiTags('Отзывы')
+  @Get('/reviews/film/:film_id/:parent_id')
+  @ApiOperation({ summary: 'Получить все дочерние коментарии по фильму' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: CreateReviewDto,
+    isArray: true,
+  })
+  async getAllByFilmReviewByParent(
+    @Param('film_id') film_id: number,
+    @Param('parent_id') parent_id: number,
+  ) {
+    if (!Number(film_id) || !Number(parent_id)) {
+      throw new BadRequestException('Ошибка ввода');
+    }
+    const data: GetReviewsByParent = {film_id, parent_id};
+    return this.reviewClient
+      .send('getFilmReviewsByParent', data)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
@@ -181,8 +206,8 @@ export class AppReviewController {
     type: CreateReviewDto,
   })
   async getAllByUserReview(@Param('user_id') user_id: number) {
-    if(!Number(user_id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(user_id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.reviewClient
       .send('getAllByUserReview', user_id)

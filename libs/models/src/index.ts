@@ -60,3 +60,5 @@ export * from './dtos/vk-login.dto';
 
 export * from './dtos/refresh-tokens.dto';
 export * from './dtos/user-gmail-oauth.dto';
+
+export * from './dtos/get-reviews-by-parent.dto';
