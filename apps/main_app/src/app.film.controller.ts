@@ -82,6 +82,8 @@ export class AppFilmController {
     await res.header('x-total-count', filmPagResult.count);
     await res.header('x-min-count-score', filmPagResult.minScore);
     await res.header('x-max-count-score', filmPagResult.maxScore);
+    await res.header('x-min-year', filmPagResult.minYear);
+    await res.header('x-max-year', filmPagResult.maxYear);
     await res.send(filmPagResult.films);
   }
 

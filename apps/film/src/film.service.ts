@@ -1004,7 +1004,14 @@ export class FilmService {
       col: 'id',
     });
 
-    return { films, count, minScore, maxScore };
+    return {
+      films,
+      count,
+      minScore,
+      maxScore,
+      minYear: yearStart,
+      maxYear: yearEnd,
+    };
   }
 
   /**
