@@ -1,7 +1,7 @@
 import { CreateScoreDto, DeleteScoreDto, Score } from '@app/models';
 import { UpdateScoreDto } from '@app/models/dtos/update-score.dto';
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { BadRequestException, Controller } from '@nestjs/common';
+import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { ScoreService } from './score.service';
 
 interface ScoreData {
@@ -61,7 +61,23 @@ export class ScoreController {
    */
   @MessagePattern('deleteAllByFilm')
   async deleteAllByFilm(@Payload() film_id: number): Promise<any> {
+    if (!Number(film_id)) {
+        throw new RpcException(new BadRequestException('Ошибка ввода'));
+    }
     return await this.scoreService.deleteAllByFilm(film_id);
+  }
+
+  /**
+   * Удалить все оценки связанные с определенным фильмом.
+   * @param {number} film_id - Идентификтор фильма.
+   * @returns Результат удаления оценок.
+   */
+  @MessagePattern('deleteAllByFilmWithoutUpdate')
+  async deleteAllByFilmWithoutUpdate(@Payload() film_id: number): Promise<any> {
+    if (!Number(film_id)) {
+        throw new RpcException(new BadRequestException('Ошибка ввода'));
+    }
+    return await this.scoreService.deleteAllByFilmWithoutUpdate(film_id);
   }
 
   /**

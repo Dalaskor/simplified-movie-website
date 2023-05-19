@@ -191,7 +191,8 @@ export class ReviewService {
    * @returns number - Количество удаленных отзывов.
    */
   async deleteAllByFilm(film_id: number): Promise<number> {
-    return await this.reviewRepository.destroy({ where: { film_id } });
+    const count = await this.reviewRepository.destroy({ where: { film_id } });
+    return count;
   }
 
   /**

@@ -450,19 +450,15 @@ export class FilmService {
    * @returns Результат выполнения функции.
    */
   async remove(id: number): Promise<any> {
-    if (!id) {
-      throw new RpcException(new BadRequestException('Ошибка ввода'));
+    const film = await this.filmRepository.findByPk(id);
+    if (!film) {
+      throw new RpcException(new NotFoundException('Фильм не найден'));
     }
-
-    const film = await this.findOne(id);
-
-    await lastValueFrom(this.scoreClient.send('deleteAllByFilm', film.id));
+    await lastValueFrom(this.scoreClient.send('deleteAllByFilmWithoutUpdate', film.id));
     await lastValueFrom(
       this.reviewClient.send('deleteAllByFilmReview', film.id),
     );
-
     await film.destroy();
-
     return { statusCode: HttpStatus.OK, value: 'Фильм удален' };
   }
 

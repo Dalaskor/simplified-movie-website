@@ -165,6 +165,22 @@ export class ScoreService {
   }
 
   /**
+   * Удалить все оценки связанные с определенным фильмом.
+   * @param {number} film_id - Идентификтор фильма.
+   * @returns Результат удаления оценок.
+   */
+  async deleteAllByFilmWithoutUpdate(film_id: number) {
+    const count = await this.scoreRepository.destroy({
+      where: { film_id },
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Оценки успешно удалены',
+      count,
+    };
+  }
+
+  /**
    * Получить оценку пользователя на фильм.
    * @param {number} film_id - Идентификатор фильма.
    * @param {number} user_id - Идентификатор пользователя.
