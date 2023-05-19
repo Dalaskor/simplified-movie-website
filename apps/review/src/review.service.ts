@@ -218,4 +218,9 @@ export class ReviewService {
     });
     return reviews;
   }
+
+  async getAllFilmReviewsOnlyParent(film_id: number): Promise<Review[]> {
+      const reviews = await this.reviewRepository.findAll({where: {film_id, parent: null}})
+      return reviews;
+  }
 }

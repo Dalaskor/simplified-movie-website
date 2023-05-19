@@ -217,4 +217,25 @@ export class AppReviewController {
         ),
       );
   }
+
+  @ApiTags('Отзывы')
+  @Get('/reviews/parents/:film_id')
+  @ApiOperation({ summary: 'Получить все родительские коментарии к фильму' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: CreateReviewDto,
+    isArray: true,
+  })
+  async getFilmReviewsOnlyParents(@Param('film_id') film_id: number) {
+    if (!Number(film_id)) {
+      throw new BadRequestException('Ошибка ввода');
+    }
+    return this.reviewClient
+      .send('getFilmReviewsOnlyParent', film_id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 }
