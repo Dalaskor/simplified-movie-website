@@ -1,11 +1,5 @@
 import { GENRE_ORDERBY, Order } from '@app/common';
-import {
-  CreateGenreDto,
-  Genre,
-  GenrePag,
-  PageOptionsDto,
-  UpdateGenreDto,
-} from '@app/models';
+import { CreateGenreDto, Genre, GenrePag, UpdateGenreDto } from '@app/models';
 import {
   BadRequestException,
   HttpStatus,
@@ -27,9 +21,20 @@ export class GenreService {
    * @throws BadRequestException
    */
   async createMany(createGenreDtoArray: CreateGenreDto[]): Promise<Genre[]> {
-    const genres = await this.genreRepository.bulkCreate(createGenreDtoArray, {
+    /* const genres = await this.genreRepository.bulkCreate(createGenreDtoArray, {
       ignoreDuplicates: true,
-    });
+    }); */
+
+    const genres = [];
+    for (const dto of createGenreDtoArray) {
+      let genre = await this.genreRepository.findOne({
+        where: { name: dto.name },
+      });
+      if (!genre) {
+        genre = await this.genreRepository.create(dto);
+      }
+      genres.push(genre);
+    }
 
     if (!genres) {
       throw new RpcException(

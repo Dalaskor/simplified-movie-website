@@ -23,10 +23,26 @@ export class CountryService {
   async createMany(
     createCountryDtoArray: CreateCountryDto[],
   ): Promise<Country[]> {
-    const countries = await this.countryRepository.bulkCreate(
+    /* const countries = await this.countryRepository.bulkCreate(
       createCountryDtoArray,
       { ignoreDuplicates: true },
-    );
+    ); */
+
+    const countries = [];
+    for (const dto of createCountryDtoArray) {
+      let country = await this.countryRepository.findOne({
+        where: { name: dto.name },
+      });
+      if (!country) {
+        country = await this.countryRepository.create(dto);
+      }
+      countries.push(country);
+    }
+    if (!countries) {
+      throw new RpcException(
+        new BadRequestException('Ошибка заполнения стран.'),
+      );
+    }
 
     return countries;
   }

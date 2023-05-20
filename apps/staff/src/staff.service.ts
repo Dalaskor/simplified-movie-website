@@ -41,17 +41,11 @@ export class StaffService {
       });
 
       if (candidate) {
+        staffs.push(candidate);
         continue;
       }
 
       const staff = await this.staffRepository.create({ name: dto.name });
-
-      /* if (!staff) {
-                throw new RpcException(
-                    new BadRequestException('Ошибка создания участника.'),
-                );
-            } */
-
       const typesIds = [];
       const typesArray = [];
 
