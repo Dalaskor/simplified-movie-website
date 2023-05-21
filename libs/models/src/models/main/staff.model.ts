@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   BelongsToMany,
   Column,
@@ -17,6 +18,10 @@ interface StaffCreationsAttrs {
 
 @Table({ tableName: 'staffs' })
 export class Staff extends Model<Staff, StaffCreationsAttrs> {
+  @ApiProperty({
+    example: 1,
+    description: 'ID участника фильма',
+  })
   @Column({
     type: DataType.INTEGER,
     unique: true,
@@ -25,6 +30,10 @@ export class Staff extends Model<Staff, StaffCreationsAttrs> {
   })
   id: number;
 
+  @ApiProperty({
+    example: "Райан Гослинг",
+    description: 'Имя участника фильма',
+  })
   @Column({
     type: DataType.STRING,
     unique: true,
@@ -32,6 +41,10 @@ export class Staff extends Model<Staff, StaffCreationsAttrs> {
   })
   name: string;
 
+  @ApiProperty({
+    example: "Что-то делал",
+    description: 'Биография участника фильма',
+  })
   @Column({
     type: DataType.TEXT,
     defaultValue: BiographyFill,

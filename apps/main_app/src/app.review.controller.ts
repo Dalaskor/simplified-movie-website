@@ -5,6 +5,7 @@ import {
   CreateReviewDto,
   GetReviewsByParent,
   OutputReviewDto,
+  Review,
   UpdateReviewDto,
 } from '@app/models';
 import {
@@ -34,7 +35,7 @@ export class AppReviewController {
   @Post('/reviews')
   @ApiOperation({ summary: 'Создать отзыв к фильму' })
   @ApiBody({
-    type: CreateReviewDto,
+    type: OutputReviewDto,
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -68,7 +69,7 @@ export class AppReviewController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: OutputReviewDto,
+    type: Review,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -95,7 +96,6 @@ export class AppReviewController {
   @ApiOperation({ summary: 'Удалить отзыв к фильму' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateReviewDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -123,7 +123,7 @@ export class AppReviewController {
   @ApiOperation({ summary: 'Получить один отзыв' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateReviewDto,
+    type: OutputReviewDto,
   })
   async getOneReview(@Param('id') id: number) {
     if (!Number(id)) {
@@ -143,7 +143,6 @@ export class AppReviewController {
   @ApiOperation({ summary: 'Получить количество отзывов к фильму' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateReviewDto,
   })
   async getCountByFilmReview(@Param('film_id') film_id: number) {
     if (!Number(film_id)) {

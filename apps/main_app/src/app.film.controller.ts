@@ -1,7 +1,12 @@
 import { FilmPagResult, FILM_SERVICE, ROLES } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
-import { CreateFilmDto, FilmPagFilterDto, UpdateFilmDto } from '@app/models';
+import {
+  CreateFilmDto,
+  Film,
+  FilmPagFilterDto,
+  UpdateFilmDto,
+} from '@app/models';
 import {
   BadRequestException,
   Body,
@@ -42,7 +47,7 @@ export class AppFilmController {
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    type: CreateFilmDto,
+    type: Film,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -68,9 +73,9 @@ export class AppFilmController {
   })
   @Get('/films')
   @ApiResponse({
-    type: CreateFilmDto,
-    status: HttpStatus.OK,
+    type: Film,
     isArray: true,
+    status: HttpStatus.OK,
   })
   async getFilmWithPag(
     @Query() pageOptionsDto: FilmPagFilterDto,
@@ -91,7 +96,7 @@ export class AppFilmController {
 
   @ApiTags('Фильмы')
   @ApiOperation({
-    summary: 'Поиск фильмов по строке',
+    summary: 'Поиск фильмов по строке (Первые 10 подходящих фильмов)',
     description: 'Поиск проходит в полях name и name_en',
   })
   @Get('/films/search/:str')
@@ -104,6 +109,8 @@ export class AppFilmController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
+    type: Film,
+    isArray: true,
     description: 'Список фильмов',
   })
   @ApiResponse({
@@ -131,7 +138,7 @@ export class AppFilmController {
     type: Number,
   })
   @ApiResponse({
-    type: CreateFilmDto,
+    type: Film,
     status: HttpStatus.OK,
   })
   async getFilmById(@Param('id') id: number) {
@@ -194,7 +201,7 @@ export class AppFilmController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateFilmDto,
+    type: Film,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,

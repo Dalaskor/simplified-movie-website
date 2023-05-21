@@ -1,9 +1,14 @@
 import { ROLES, STAFF_SERVICE } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
-import { CreateStaffDto, StaffPagFilter, UpdateStaffDto } from '@app/models';
 import {
-    BadRequestException,
+  CreateStaffDto,
+  Staff,
+  StaffPagFilter,
+  UpdateStaffDto,
+} from '@app/models';
+import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -36,7 +41,7 @@ export class AppStaffController {
   @UseGuards(RolesGuard)
   @Post('/staffs')
   @ApiBody({
-    type: CreateStaffDto,
+    type: Staff,
     description: 'Создание участника',
   })
   @ApiResponse({
@@ -65,9 +70,9 @@ export class AppStaffController {
   @ApiOperation({ summary: 'Получить список участников с пагинацией' })
   @Get('/staffs')
   @ApiResponse({
-    type: CreateStaffDto,
-    status: HttpStatus.OK,
+    type: Staff,
     isArray: true,
+    status: HttpStatus.OK,
   })
   async getStaffsWithPag(@Query() pageOptionsDto: StaffPagFilter) {
     return this.staffClient
@@ -93,7 +98,9 @@ export class AppStaffController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: "Список участников",
+    type: Staff,
+    isArray: true,
+    description: 'Список участников',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -120,12 +127,12 @@ export class AppStaffController {
     type: Number,
   })
   @ApiResponse({
-    type: CreateStaffDto,
+    type: Staff,
     status: HttpStatus.OK,
   })
   async getOneStaff(@Param('id') id: number) {
-    if(!Number(id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.staffClient
       .send('findOneStaff', id)
@@ -161,8 +168,8 @@ export class AppStaffController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteStaff(@Param('id') id: number) {
-    if(typeof id != 'number') {
-        throw new BadRequestException('Ошибка ввода');
+    if (typeof id != 'number') {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.staffClient
       .send('removeStaff', id)

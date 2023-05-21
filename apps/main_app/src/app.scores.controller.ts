@@ -1,10 +1,10 @@
 import { ROLES, SCORE_SERVICE } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
-import { CreateScoreDto, DeleteScoreDto } from '@app/models';
+import { CreateScoreDto, DeleteScoreDto, Score } from '@app/models';
 import { UpdateScoreDto } from '@app/models/dtos/update-score.dto';
 import {
-    BadRequestException,
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -34,7 +34,7 @@ export class AppScoresController {
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    type: CreateScoreDto,
+    type: Score,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -66,7 +66,7 @@ export class AppScoresController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateScoreDto,
+    type: Score,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -96,7 +96,6 @@ export class AppScoresController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateScoreDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -121,11 +120,10 @@ export class AppScoresController {
   @ApiOperation({ summary: 'Получить количество оценок фильма' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateScoreDto,
   })
   async getCountByFilmScores(@Param('film_id') film_id: number) {
-    if(!Number(film_id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(film_id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.scoreClient
       .send('getCountByFilm', film_id)
@@ -141,17 +139,17 @@ export class AppScoresController {
   @ApiOperation({ summary: 'Получить оценку пользователя на фильм' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateScoreDto,
+    type: Score,
   })
   async getScoreByUser(
     @Param('film_id') film_id: number,
     @Param('user_id') user_id: number,
   ) {
-    if(!Number(film_id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(film_id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
-    if(!Number(user_id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(user_id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.scoreClient
       .send('getScoreByUser', { film_id, user_id })

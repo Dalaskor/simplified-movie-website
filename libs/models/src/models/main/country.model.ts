@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 interface CountryCreationAttrs {
@@ -6,6 +7,10 @@ interface CountryCreationAttrs {
 
 @Table({ tableName: 'countries' })
 export class Country extends Model<Country, CountryCreationAttrs> {
+  @ApiProperty({
+    example: 1,
+    description: 'ID страны',
+  })
   @Column({
     type: DataType.INTEGER,
     unique: true,
@@ -14,6 +19,10 @@ export class Country extends Model<Country, CountryCreationAttrs> {
   })
   id: number;
 
+  @ApiProperty({
+    example: 'Россия',
+    description: 'Название страны',
+  })
   @Column({
     type: DataType.STRING,
     unique: true,

@@ -3,7 +3,6 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';

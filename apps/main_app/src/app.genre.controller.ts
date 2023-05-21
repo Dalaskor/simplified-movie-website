@@ -1,9 +1,9 @@
 import { GENRE_SERVICE, ROLES } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
-import { CreateGenreDto, GenrePag, UpdateGenreDto } from '@app/models';
+import { CreateGenreDto, Genre, GenrePag, UpdateGenreDto } from '@app/models';
 import {
-    BadRequestException,
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -41,7 +41,7 @@ export class AppGenreController {
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    type: CreateGenreDto,
+    type: Genre,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -65,7 +65,7 @@ export class AppGenreController {
   @ApiOperation({ summary: 'Получить список всех жанров' })
   @Get('/genres')
   @ApiResponse({
-    type: CreateGenreDto,
+    type: Genre,
     isArray: true,
     description: 'Получить список жанров',
     status: HttpStatus.OK,
@@ -91,12 +91,12 @@ export class AppGenreController {
     type: Number,
   })
   @ApiResponse({
-    type: CreateGenreDto,
+    type: Genre,
     status: HttpStatus.OK,
   })
   async getOneGenre(@Param('id') id: number) {
-    if(!Number(id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.genreClient
       .send('findOneGenre', id)
@@ -132,8 +132,8 @@ export class AppGenreController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteGenre(@Param('id') id: number) {
-    if(!Number(id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.genreClient
       .send('removeGenre', id)
@@ -150,7 +150,7 @@ export class AppGenreController {
   @UseGuards(RolesGuard)
   @Put('/genre-update')
   @ApiBody({
-    type: UpdateGenreDto,
+    type: Genre,
     description: 'Обновить данные о жанре',
   })
   @ApiResponse({

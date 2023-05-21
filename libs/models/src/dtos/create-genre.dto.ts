@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, ValidateIf } from 'class-validator';
+import { IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class CreateGenreDto {
   @ApiProperty({
@@ -15,5 +15,6 @@ export class CreateGenreDto {
   })
   @IsString({ message: 'Должно быть строкой' })
   @ValidateIf((object, value) => value !== null)
+  @IsOptional()
   name_en?: string | null;
 }
