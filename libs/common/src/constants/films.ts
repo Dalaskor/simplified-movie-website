@@ -7,4 +7,6 @@ export interface FilmPagResult {
   maxScore: number;
   minYear: number;
   maxYear: number;
+  minRating: number;
+  maxRating: number;
 }

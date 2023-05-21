@@ -190,7 +190,7 @@ export class FilmService {
         curFilm.countScore = Math.floor(Math.random() * 5000000);
       }
       if (!curFilm.scoreAVG) {
-        curFilm.scoreAVG = this.randomInRange(0, 10);
+        curFilm.scoreAVG = this.randomRating();
       }
       await curFilm.save();
     }
@@ -198,15 +198,12 @@ export class FilmService {
     return { status: 'Created' };
   }
 
-  private randomInRange(min: number, max: number): number {
-    if (min > max) {
-      throw new RpcException(
-        new InternalServerErrorException(
-          'Minimum value should be smaller than maximum value.',
-        ),
-      );
+  private randomRating(): number {
+    const result: number = Math.random() * 10;
+    if (result > 10) {
+        return 10;
     }
-    return Math.random() * max + min;
+    return result;
   }
 
   async getScoreCountByFilm(film_id: number) {
@@ -853,6 +850,8 @@ export class FilmService {
     const maxScore: number = await this.filmRepository.max('countScore');
     const yearStart: number = await this.filmRepository.min('year');
     const yearEnd: number = await this.filmRepository.max('year');
+    const ratingStart: number = await this.filmRepository.min('scoreAVG');
+    const ratingEnd: number = await this.filmRepository.max('scoreAVG');
     const page: number = pageOptionsDto.page ? pageOptionsDto.page : 1;
     const take: number = pageOptionsDto.take ? pageOptionsDto.take : 10;
     const skip = (page - 1) * take;
@@ -868,6 +867,12 @@ export class FilmService {
     const yearEndFilter: number = pageOptionsDto.yearEnd
       ? pageOptionsDto.yearEnd
       : yearEnd;
+    const ratingStartFilter: number = pageOptionsDto.ratingStart
+      ? pageOptionsDto.ratingStart
+      : ratingStart;
+    const ratingEndFilter: number = pageOptionsDto.ratingEnd
+      ? pageOptionsDto.ratingEnd
+      : ratingEnd;
 
     let genreFilter: string[] = pageOptionsDto.genres
       ? pageOptionsDto.genres
@@ -984,6 +989,9 @@ export class FilmService {
         year: {
           [Op.between]: [yearStartFilter, yearEndFilter],
         },
+        scoreAVG: {
+          [Op.between]: [ratingStartFilter, ratingEndFilter],
+        },
       },
       offset: skip,
       limit: take,
@@ -999,6 +1007,9 @@ export class FilmService {
         year: {
           [Op.between]: [yearStartFilter, yearEndFilter],
         },
+        scoreAVG: {
+          [Op.between]: [ratingStartFilter, ratingEndFilter],
+        },
       },
       distinct: true,
       col: 'id',
@@ -1011,6 +1022,8 @@ export class FilmService {
       maxScore,
       minYear: yearStart,
       maxYear: yearEnd,
+      minRating: ratingStart,
+      maxRating: ratingEnd,
     };
   }
 

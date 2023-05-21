@@ -3,7 +3,7 @@ import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
 import { CreateFilmDto, FilmPagFilterDto, UpdateFilmDto } from '@app/models';
 import {
-    BadRequestException,
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -84,6 +84,8 @@ export class AppFilmController {
     await res.header('x-max-count-score', filmPagResult.maxScore);
     await res.header('x-min-year', filmPagResult.minYear);
     await res.header('x-max-year', filmPagResult.maxYear);
+    await res.header('x-min-rating', filmPagResult.minRating);
+    await res.header('x-max-rating', filmPagResult.maxRating);
     await res.send(filmPagResult.films);
   }
 
@@ -102,7 +104,7 @@ export class AppFilmController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: "Список фильмов",
+    description: 'Список фильмов',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -133,8 +135,8 @@ export class AppFilmController {
     status: HttpStatus.OK,
   })
   async getFilmById(@Param('id') id: number) {
-    if(!Number(id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.filmClient
       .send('findOneFilm', id)
@@ -170,8 +172,8 @@ export class AppFilmController {
     description: 'Некоректный JWT токен или нет роли админа',
   })
   async deleteFilm(@Param('id') id: number) {
-    if(!Number(id)) {
-        throw new BadRequestException('Ошибка ввода');
+    if (!Number(id)) {
+      throw new BadRequestException('Ошибка ввода');
     }
     return this.filmClient
       .send('removeFilm', id)
