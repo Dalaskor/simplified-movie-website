@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsArray, IsInt, IsString, ValidateNested } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateFilmDto {
   @ApiProperty({
@@ -207,17 +206,13 @@ export class CreateFilmDto {
     description: 'URL обложки фильма',
   })
   @IsString({ message: 'Должно быть строкой' })
-  mainImg: string;
+  @IsOptional()
+  mainImg?: string;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Spectator)
-  spectators: Spectator[];
-
+  @ApiProperty({
+    example: 100,
+  })
+  @IsNumber({}, { message: 'Должно быть числом (Необязательное поле)' })
+  @IsOptional()
   countScore?: number;
-}
-
-class Spectator {
-  country: string;
-  count: string;
 }
