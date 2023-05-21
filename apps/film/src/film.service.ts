@@ -612,10 +612,10 @@ export class FilmService {
         if (!countryArray.find((value) => value.name == name))
           countryArray.push({ name });
       });
-      value.spectators.forEach((obj) => {
+      /* value.spectators.forEach((obj) => {
         if (!countryArray.find((value) => value.name == obj.country))
           countryArray.push({ name: obj.country });
-      });
+      }); */
     });
 
     return countryArray;
