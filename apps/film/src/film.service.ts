@@ -201,7 +201,7 @@ export class FilmService {
   private randomRating(): number {
     const result: number = Math.random() * 10;
     if (result > 10) {
-        return 10;
+      return 10;
     }
     return result;
   }
@@ -278,6 +278,36 @@ export class FilmService {
    * @returns Film - Созданный фильм.
    */
   async create(dto: CreateFilmDto): Promise<Film> {
+    if (!Array.isArray(dto.country)) {
+      dto.country = [dto.country];
+    }
+    if (!Array.isArray(dto.genre)) {
+      dto.genre = [dto.genre];
+    }
+    if (!Array.isArray(dto.director)) {
+      dto.director = [dto.director];
+    }
+    if (!Array.isArray(dto.scenario)) {
+      dto.scenario = [dto.scenario];
+    }
+    if (!Array.isArray(dto.producer)) {
+      dto.producer = [dto.producer];
+    }
+    if (!Array.isArray(dto.operator)) {
+      dto.operator = [dto.operator];
+    }
+    if (!Array.isArray(dto.compositor)) {
+      dto.compositor = [dto.compositor];
+    }
+    if (!Array.isArray(dto.artist)) {
+      dto.artist = [dto.artist];
+    }
+    if (!Array.isArray(dto.montage)) {
+      dto.montage = [dto.montage];
+    }
+    if (!Array.isArray(dto.actors)) {
+      dto.actors = [dto.actors];
+    }
     const film = await this.filmRepository.create({
       name: dto.name,
       name_en: dto.name_en,
