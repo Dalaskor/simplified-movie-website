@@ -73,7 +73,10 @@ export class UsersService {
    * @returns User - Найденный пользователь.
    */
   async getUser(id: number): Promise<User> {
-    return await this.usersRepository.findByPk(id, { include: { all: true } });
+    return await this.usersRepository.findOne({
+      where: { id },
+      include: { all: true },
+    });
   }
 
   /**
