@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, Length } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -18,4 +18,12 @@ export class CreateUserDto {
     message: 'Длина пароля должна быть не меньше 6 и не больше 24',
   })
   password: string;
+
+  @ApiPropertyOptional({
+    example: 'Ivan',
+    description: 'Имя пользователя (необязательное поле)',
+  })
+  @IsString({ message: '"name" должно быть строкой' })
+  @IsOptional()
+  name?: string;
 }

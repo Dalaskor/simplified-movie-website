@@ -96,6 +96,7 @@ export class AuthService {
     const user = await this.userService.createUser({
       email: dto.email,
       password: hashPassword,
+      name: dto.name,
     });
     const tokens = await this.generateTokens(user);
     const hashRefreshToken = await bcrypt.hash(tokens.refreshToken, 5);
@@ -236,11 +237,9 @@ export class AuthService {
    */
   async getUser(id: number) {
     const user = await this.userService.getUser(id);
-
     if (!user) {
       throw new RpcException(new NotFoundException('Пользователь не найден'));
     }
-
     return user;
   }
 

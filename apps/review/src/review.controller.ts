@@ -70,7 +70,7 @@ export class ReviewController {
    * @returns Review[] - Список найденных отзывов.
    */
   @MessagePattern('getAllByUserReview')
-  async getAllByUser(@Payload() user_id: number): Promise<Review[]> {
+  async getAllByUser(@Payload() user_id: number): Promise<OutputReviewDto[]> {
     return await this.reviewService.getAllByUser(user_id);
   }
 
@@ -95,7 +95,7 @@ export class ReviewController {
   }
 
   @MessagePattern('getFilmReviewsByParent')
-  async getAllReviewsByParent(@Payload() data: GetReviewsByParent): Promise<Review[]> {
+  async getAllReviewsByParent(@Payload() data: GetReviewsByParent): Promise<OutputReviewDto[]> {
     return await this.reviewService.getAllReviewsByParent(data.film_id, data.parent_id);
   }
 

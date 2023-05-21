@@ -46,5 +46,13 @@ export class OutputReviewDto {
   @IsString({ message: 'user_email Должно быть строкой' })
   user_email?: string;
 
+  @ApiProperty({
+    example: 'Ivan',
+    description: 'Имя пользователя',
+  })
+  @IsOptional()
+  @IsString({ message: 'user_name Должно быть строкой' })
+  user_name?: string;
+
   createdAt?: string;
 }

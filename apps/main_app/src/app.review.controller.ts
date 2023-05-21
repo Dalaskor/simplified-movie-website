@@ -1,7 +1,12 @@
 import { REVIEW_SERVICE, ROLES } from '@app/common';
 import { Roles } from '@app/common/auth/roles-auth.decorator';
 import { RolesGuard } from '@app/common/auth/roles.guard';
-import { CreateReviewDto, GetReviewsByParent, OutputReviewDto, UpdateReviewDto } from '@app/models';
+import {
+  CreateReviewDto,
+  GetReviewsByParent,
+  OutputReviewDto,
+  UpdateReviewDto,
+} from '@app/models';
 import {
   BadRequestException,
   Body,
@@ -158,7 +163,8 @@ export class AppReviewController {
   @ApiOperation({ summary: 'Получить все отзывы по фильму' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateReviewDto,
+    type: OutputReviewDto,
+    isArray: true,
   })
   async getAllByFilmReview(@Param('film_id') film_id: number) {
     if (!Number(film_id)) {
@@ -178,7 +184,7 @@ export class AppReviewController {
   @ApiOperation({ summary: 'Получить все дочерние коментарии по фильму' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateReviewDto,
+    type: OutputReviewDto,
     isArray: true,
   })
   async getAllByFilmReviewByParent(
@@ -188,7 +194,7 @@ export class AppReviewController {
     if (!Number(film_id) || !Number(parent_id)) {
       throw new BadRequestException('Ошибка ввода');
     }
-    const data: GetReviewsByParent = {film_id, parent_id};
+    const data: GetReviewsByParent = { film_id, parent_id };
     return this.reviewClient
       .send('getFilmReviewsByParent', data)
       .pipe(
@@ -203,7 +209,8 @@ export class AppReviewController {
   @ApiOperation({ summary: 'Получить все отзывы пользователя' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: CreateReviewDto,
+    type: OutputReviewDto,
+    isArray: true,
   })
   async getAllByUserReview(@Param('user_id') user_id: number) {
     if (!Number(user_id)) {
