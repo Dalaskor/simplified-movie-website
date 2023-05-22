@@ -355,7 +355,12 @@ export class FilmService {
     const operators = await this.getStaffsByNames(dto.operator);
     await this.filmApplyOperators(film, operators);
 
-    return film;
+    const filmId = film.id;
+    const newFilm: Film = await this.filmRepository.findOne({
+      where: { id: filmId },
+      include: { all: true },
+    });
+    return newFilm;
   }
 
   /**
