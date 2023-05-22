@@ -269,6 +269,7 @@ export class AuthService {
     }
 
     const userEmail = user.email;
+    const userName = user.name;
     const candidate = await this.userService.getUserByEmail(userEmail);
 
     if (candidate) {
@@ -282,7 +283,7 @@ export class AuthService {
     const genPass = this.gen_password(15);
     const password = await bcrypt.hash(genPass, 5);
 
-    return await this.registration({ email: userEmail, password });
+    return await this.registration({ email: userEmail, password, name: userName });
   }
 
   /**
@@ -309,6 +310,7 @@ export class AuthService {
       const password = this.gen_password(15);
       const userDto: CreateUserDto = {
         email: `${query.user_id}@vk.com`,
+        name: query.name ? query.name : null,
         password,
       };
 

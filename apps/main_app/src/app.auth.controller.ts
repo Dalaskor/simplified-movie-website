@@ -33,7 +33,6 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -305,7 +304,7 @@ export class AppAuthController {
       throw new RpcException(new BadRequestException('No user from Google'));
     }
     return this.authClient
-      .send('googleLoginViaDto', {email: user.email})
+      .send('googleLoginViaDto', {email: user.email, name: user.name})
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
