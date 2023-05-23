@@ -100,7 +100,7 @@ export class ReviewController {
   }
 
   @MessagePattern('getFilmReviewsOnlyParent')
-  async getAllFilmReviewsOnlyParent(@Payload() film_id: number): Promise<Review[]> {
+  async getAllFilmReviewsOnlyParent(@Payload() film_id: number): Promise<OutputReviewDto[]> {
       return await this.reviewService.getAllFilmReviewsOnlyParent(film_id);
   }
 }
