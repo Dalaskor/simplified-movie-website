@@ -253,10 +253,29 @@ export class ReviewService {
     return outputs;
   }
 
-  async getAllFilmReviewsOnlyParent(film_id: number): Promise<Review[]> {
+  async getAllFilmReviewsOnlyParent(film_id: number): Promise<OutputReviewDto[]> {
     const reviews = await this.reviewRepository.findAll({
       where: { film_id, parent: null },
     });
-    return reviews;
+    const outputs: OutputReviewDto[] = [];
+    for (const review of reviews) {
+      const commentUser: User = await lastValueFrom(
+        this.authClient.send('getUser', review.user_id),
+      );
+      if (!commentUser) {
+        throw new RpcException(new NotFoundException('Пользователь не найден'));
+      }
+      outputs.push({
+        id: review.id,
+        text: review.text,
+        user_id: review.user_id,
+        film_id: review.film_id,
+        parent: review.parent,
+        user_email: commentUser.email,
+        user_name: commentUser.name,
+        createdAt: review.createdAt,
+      });
+    }
+    return outputs;
   }
 }
