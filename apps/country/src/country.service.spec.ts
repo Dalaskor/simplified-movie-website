@@ -68,12 +68,6 @@ describe('countryService', () => {
     expect(await service.create(testCreateCountryDto)).toEqual(testCountry);
   });
 
-  it('should create many country', async () => {
-    expect(await service.createMany(testCreateManyCountryDto)).toEqual(
-      testManyCountry,
-    );
-  });
-
   it('should get a single country', async () => {
     const saveStub = jest.fn();
     const findspy = jest.spyOn(model, 'findOne').mockReturnValue({

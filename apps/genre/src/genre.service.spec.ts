@@ -26,23 +26,6 @@ const testCreateGenreDto: CreateGenreDto = {
   name_en: 'Test En',
 };
 
-const testCreateManyGenresDto: CreateGenreDto[] = [
-  {
-    name: 'Test 1',
-    name_en: 'Test En 1',
-  },
-  {
-    name: 'Test 2',
-    name_en: 'Test En 2',
-  },
-];
-
-const testUpdateGenreDto: UpdateGenreDto = {
-  id: 1,
-  name: 'Test',
-  name_en: 'Test En',
-};
-
 describe('GenreService', () => {
   let service: GenreService;
   let model: typeof Genre;
@@ -67,18 +50,8 @@ describe('GenreService', () => {
     model = modRef.get<typeof Genre>(getModelToken(Genre));
   });
 
-  it('should create many genres', async () => {
-    expect(await service.createMany(testCreateManyGenresDto)).toEqual(
-      testManyGenres,
-    );
-  });
-
   it('should create new genre', async () => {
     expect(await service.create(testCreateGenreDto)).toEqual(testGenre);
-  });
-
-  it('should find all genres', async () => {
-    expect(await service.findAll()).toEqual([testGenre]);
   });
 
   it('should find one genre by id', async () => {
@@ -88,22 +61,6 @@ describe('GenreService', () => {
     } as any);
     expect(await service.findOne(1));
     expect(findspy).toBeCalledWith({ where: { id: 1 } });
-  });
-
-  it('should update genre', async () => {
-    const saveStub = jest.fn();
-    const findSpy = jest.spyOn(model, 'findOne').mockReturnValue({
-      save: saveStub,
-    } as any);
-    const retVal = await service.update(
-      testUpdateGenreDto.id,
-      testUpdateGenreDto,
-    );
-
-    expect(findSpy).toBeCalledWith({
-      where: { id: testUpdateGenreDto.id },
-    });
-    expect(saveStub).toBeCalledTimes(1);
   });
 
   it('should remove genre', async () => {

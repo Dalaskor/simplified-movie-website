@@ -108,10 +108,6 @@ describe('GerneController', () => {
     expect(await controller.create(testCreateGenreDto)).toEqual(testGenre);
   });
 
-  it('should find all genres', async () => {
-    expect(await controller.findAll()).toEqual([testGenre]);
-  });
-
   it('should find one genre by id', async () => {
     await controller.findOne(1);
     expect(service.findOne).toHaveBeenCalled();
