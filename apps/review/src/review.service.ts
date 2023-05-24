@@ -37,7 +37,7 @@ export class ReviewService {
       this.authClient.send('getUser', dto.user_id),
     );
     if (!commentUser) {
-      console.log('testing')
+      console.log('testing');
       throw new RpcException(new NotFoundException('Пользователь не найден'));
     }
     const review = await this.reviewRepository.create(dto);
@@ -138,16 +138,18 @@ export class ReviewService {
   async getAllByFilm(film_id: number): Promise<OutputReviewDto[]> {
     const reviews = await this.reviewRepository.findAll({
       where: { film_id },
+      order: [['createdAt', 'DESC']],
     });
 
     const outputs: OutputReviewDto[] = [];
-    for (const review of reviews) {
+    for await (const review of reviews) {
       const commentUser: User = await lastValueFrom(
         this.authClient.send('getUser', review.user_id),
       );
 
       if (!commentUser) {
-        throw new RpcException(new NotFoundException('Пользователь не найден'));
+        continue;
+        // throw new RpcException(new NotFoundException('Пользователь не найден'));
       }
 
       outputs.push({
@@ -179,6 +181,7 @@ export class ReviewService {
     }
     const reviews = await this.reviewRepository.findAll({
       where: { user_id },
+      order: [['createdAt', 'DESC']],
     });
 
     const outputs: OutputReviewDto[] = [];
@@ -228,15 +231,17 @@ export class ReviewService {
   ): Promise<OutputReviewDto[]> {
     const reviews = await this.reviewRepository.findAll({
       where: { film_id, parent: parent_id },
+      order: [['createdAt', 'DESC']],
     });
     const outputs: OutputReviewDto[] = [];
-    for (const review of reviews) {
+    for await (const review of reviews) {
       const commentUser: User = await lastValueFrom(
         this.authClient.send('getUser', review.user_id),
       );
 
       if (!commentUser) {
-        throw new RpcException(new NotFoundException('Пользователь не найден'));
+        continue;
+        // throw new RpcException(new NotFoundException('Пользователь не найден'));
       }
 
       outputs.push({
@@ -253,17 +258,21 @@ export class ReviewService {
     return outputs;
   }
 
-  async getAllFilmReviewsOnlyParent(film_id: number): Promise<OutputReviewDto[]> {
+  async getAllFilmReviewsOnlyParent(
+    film_id: number,
+  ): Promise<OutputReviewDto[]> {
     const reviews = await this.reviewRepository.findAll({
       where: { film_id, parent: null },
+      order: [['createdAt', 'DESC']],
     });
     const outputs: OutputReviewDto[] = [];
-    for (const review of reviews) {
+    for await (const review of reviews) {
       const commentUser: User = await lastValueFrom(
         this.authClient.send('getUser', review.user_id),
       );
       if (!commentUser) {
-        throw new RpcException(new NotFoundException('Пользователь не найден'));
+        continue;
+        // throw new RpcException(new NotFoundException('Пользователь не найден'));
       }
       outputs.push({
         id: review.id,
