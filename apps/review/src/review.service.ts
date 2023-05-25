@@ -126,6 +126,7 @@ export class ReviewService {
       film_id: review.film_id,
       parent: review.parent,
       user_email: commentUser.email,
+      user_name: commentUser.name,
       createdAt: review.createdAt,
     };
   }
