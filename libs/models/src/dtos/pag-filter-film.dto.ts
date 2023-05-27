@@ -1,7 +1,7 @@
 import { Order, SORT_PARAMS } from '@app/common';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, Max, Min } from 'class-validator';
 import { PageOptionsDto } from './page-options.dto';
 
 export class FilmPagFilterDto extends PageOptionsDto {
@@ -116,7 +116,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
     description: 'Фильтр по рейтингу (начиная с)',
   })
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   @Min(0)
   @Max(9)
   @IsOptional()
@@ -132,6 +132,6 @@ export class FilmPagFilterDto extends PageOptionsDto {
   @IsInt()
   @Min(1)
   @Max(10)
-  @IsOptional()
+  @IsNumber()
   readonly ratingEnd?: number;
 }
