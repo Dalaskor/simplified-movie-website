@@ -132,6 +132,6 @@ export class FilmPagFilterDto extends PageOptionsDto {
   @IsNumber()
   @Min(1)
   @Max(10)
-  @IsNumber()
+  @IsOptional()
   readonly ratingEnd?: number;
 }
