@@ -129,7 +129,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
     description: 'Фильтр по рейтингу (до)',
   })
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   @Min(1)
   @Max(10)
   @IsNumber()
