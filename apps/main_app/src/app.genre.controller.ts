@@ -51,6 +51,10 @@ export class AppGenreController {
     status: HttpStatus.FORBIDDEN,
     description: 'Некоректный JWT токен или нет роли админа',
   })
+  @ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Ошибка создания жанра'
+  })
   async createGenre(@Body() dto: CreateGenreDto) {
     return this.genreClient
       .send('createGenre', dto)

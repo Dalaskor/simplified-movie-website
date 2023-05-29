@@ -21,10 +21,6 @@ export class GenreService {
    * @throws BadRequestException
    */
   async createMany(createGenreDtoArray: CreateGenreDto[]): Promise<Genre[]> {
-    /* const genres = await this.genreRepository.bulkCreate(createGenreDtoArray, {
-      ignoreDuplicates: true,
-    }); */
-
     const genres = [];
     for (const dto of createGenreDtoArray) {
       let genre = await this.genreRepository.findOne({
@@ -52,12 +48,23 @@ export class GenreService {
    * @throws BadRequestException
    */
   async create(createGenreDto: CreateGenreDto): Promise<Genre> {
-    const genre = this.genreRepository.create(createGenreDto);
-
+    const candidate: Genre = await this.genreRepository.findOne({
+      where: {
+        [Op.or]: {
+          name: createGenreDto.name,
+          name_en: createGenreDto.name_en,
+        },
+      },
+    });
+    if (candidate) {
+      throw new RpcException(
+        new BadRequestException('Жанр с таким именем уже существует'),
+      );
+    }
+    const genre: Genre = await this.genreRepository.create(createGenreDto);
     if (!genre) {
       throw new RpcException(new BadRequestException('Ошибка создания жанра.'));
     }
-
     return genre;
   }
 
