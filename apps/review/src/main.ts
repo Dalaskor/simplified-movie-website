@@ -8,7 +8,11 @@ async function bootstrap() {
   const app = await NestFactory.create(ReviewModule);
   const rmqService = app.get<RmqService>(RmqService);
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    allowedHeaders: '*',
+    exposedHeaders: '*',
+  });
   app.connectMicroservice<RmqOptions>(rmqService.getOptions('REVIEW', false));
   app.useGlobalPipes(new ValidationPipe());
 

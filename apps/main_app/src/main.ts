@@ -15,7 +15,11 @@ async function bootstrap() {
     .setVersion('1.0.0')
     .build();
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    allowedHeaders: '*',
+    exposedHeaders: '*',
+  });
   app.useGlobalFilters(new RpcExceptionFilter());
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));

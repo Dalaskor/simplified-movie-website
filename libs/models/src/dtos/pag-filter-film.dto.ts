@@ -118,7 +118,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  @Max(9)
+  @Max(9.9)
   @IsOptional()
   readonly ratingStart?: number = 0;
 
@@ -130,7 +130,7 @@ export class FilmPagFilterDto extends PageOptionsDto {
   })
   @Type(() => Number)
   @IsNumber()
-  @Min(1)
+  @Min(0.1)
   @Max(10)
   @IsOptional()
   readonly ratingEnd?: number;

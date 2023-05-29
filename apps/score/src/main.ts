@@ -9,7 +9,11 @@ async function bootstrap() {
 
   const rmqService = app.get<RmqService>(RmqService);
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    allowedHeaders: '*',
+    exposedHeaders: '*',
+  });
   app.connectMicroservice<RmqOptions>(rmqService.getOptions('SCORE', false));
   app.useGlobalPipes(new ValidationPipe());
 
